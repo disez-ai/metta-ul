@@ -53,46 +53,49 @@ assignments = np.eye(k)[y].T # (k, n)
 metta_preamble = '''
 ! (import! &self numme)
 
-(: Distance (-> Points Points Matrix))
+! (bind! pyNone (py-atom "None"))
+! (bind! pyTrue (py-atom "True"))
+! (bind! pyFalse (py-atom "False"))
 
-(: euclidean Distance)
 (=
-    (euclidean $X $Y)
-
+    (np.shape $x $i)
+    ((py-dot (py-dot $x shape) __getitem__) $i)
 )
+
+(: Distance (-> Points Points Matrix))
 '''
 
 metta_kmeans_definition = '''
 (=
     (update-centroids $X $assignments)
-    (np-divide
-        (np-matmul ($assignments) ($X))
-        (np-sum 
-            ($assignments)
-            (py-atom "1") 
-            py-none
-            py-none
-            py-true
+    (np.div
+        (np.matmul $assignments $X)
+        (np.sum 
+            $assignments
+            1
+            pyNone
+            pyNone
+            pyTrue
         )
     )
 )
 
 (=
     (assign $X $centroids)
-    (np-transpose
-        (np-one-hot-encode
-            (np-argmin
-                (np-linalg-norm
-                    (np-subtract
+    (np.transpose
+        (np.one_hot
+            (np.argmin
+                (np.linalg.norm
+                    (np.sub
                         (np-expand-dims $X (py-atom "0"))
                         (np-expand-dims $centroids (py-atom "1"))
                     )
-                    py-none
-                    (py-atom "-1")
+                    pyNone
+                    2
                 )
                 (py-atom "0")
             )
-            (np-eye (np-shape $centroids (py-atom "0")))
+            (np.shape $centroids 0)
         )
     )
 )
@@ -133,25 +136,37 @@ metta = MeTTa()
 metta.run(metta_preamble)
 metta.run(metta_kmeans_definition)
 
-metta_nparray_to_pylist(metta, 'X', X)
-metta_nparray_to_pylist(metta, 'centroids', centroids)
+# metta_nparray_to_pylist(metta, 'X', X)
+# metta_nparray_to_pylist(metta, 'centroids', centroids)
 
-# X_metta = pylist_to_metta(X.tolist())
-# metta.space().add_atom(E(S('='), S('(X)'), X_metta))
+X_metta = pylist_to_metta(X.tolist())
+metta.space().add_atom(E(S('='), E(S('X')), X_metta))
+metta.run('! (bind! &npX (np.array (X)))')
+
+centroids_metta = pylist_to_metta(centroids.tolist())
+metta.space().add_atom(E(S('='), E(S('Centroids')), centroids_metta))
+metta.run('! (bind! &npCentroids (np.array (Centroids)))')
+
+assignments_metta = pylist_to_metta(assignments.tolist())
+metta.space().add_atom(E(S('='), E(S('Assignments')), assignments_metta))
+metta.run('! (bind! &npAssignments (np.array (Assignments)))')
 # y_metta = metta_array(metta, 'y', y.tolist())
 # centroids_metta = metta_array(metta, 'centroids', centroids.tolist())
 # assignments_metta = metta_array(metta, 'assignments', assignments.tolist())
 
 result = metta.run(
 '''
-! (update-centroids
-    X
-    (assign
-        X
-        centroids
-    )               
-)
+! (np.shape &npX 0)
 '''
+# '''
+# ! (update-centroids
+#     &npX
+#     (assign
+#         &npX
+#         &npCentroids
+#     )
+# )
+# '''
 )
 
 print(result)

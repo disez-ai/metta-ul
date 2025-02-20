@@ -95,6 +95,10 @@ def numme_atoms():
     nmDivAtom = G(PatternOperation('np.div', wrapnpop(np.divide), unwrap=False))
     nmMMulAtom = G(PatternOperation('np.matmul', wrapnpop(np.matmul), unwrap=False))
     nmArgmin = G(PatternOperation('np.argmin', wrapnpop(np.argmin), unwrap=False))
+    nmTranspose = G(PatternOperation('np.transpose', wrapnpop(np.transpose), unwrap=False))
+    nmNorm = G(PatternOperation('np.linalg.norm', wrapnpop(np.linalg.norm), unwrap=False))
+    nmSum = G(PatternOperation('np.sum', wrapnpop(np.sum), unwrap=False))
+    nmOneHot = G(PatternOperation('np.one_hot', wrapnpop(lambda labels, k: np.eye(k)[labels]), unwrap=False))
 
     return {
         r"np\.vector": nmVectorAtom,
@@ -104,5 +108,9 @@ def numme_atoms():
         r"np\.mul": nmMulAtom,
         r"np\.matmul": nmMMulAtom,
         r"np\.div": nmDivAtom,
-        r"np\.argmin": nmArgmin
+        r"np\.argmin": nmArgmin,
+        r"np\.transpose": nmTranspose,
+        r"np\.linalg\.norm": nmNorm,
+        r"np\.sum": nmSum,
+        'np.one_hot': nmOneHot
     }
