@@ -1,27 +1,43 @@
 from typing import List
-from hyperon import MeTTa, ExpressionAtom, E, S, V, G, OperationAtom
+from hyperon import MeTTa, ExpressionAtom, E, S, V, G, OperationAtom, ValueAtom
 import numpy as np
 import numpy.random as random
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 
 
-# def metta_array(_metta: MeTTa, _var: str, _arr: List, add_to_space=True) -> ExpressionAtom:
-#     res = _metta.parse_single(
-#         f'''(= 
-#                 ({_var})
-#                 (np-array
-#                     (py-atom "{_arr}")
-#                 )
-#             )''')
+def metta_nparray_to_pylist(_metta: MeTTa, _var: str, _x: np.ndarray) -> None:
+    def list_to_py_list(lst):
+        """
+        Recursively converts a nested Python list into a string in the py-list format.
+        """
+        if isinstance(lst, list):
 
-#     if add_to_space:
-#         _metta.space().add_atom(res)
+            # Recursively convert each element and join with a space
 
-#     return res
+            return "(" + " ".join(list_to_py_list(item) for item in lst) + ")"
 
-def metta_array(_metta: MeTTa, _var: str, _arr: List) -> None:
-    _metta.run(f'! (bind! {_var} (np-array (py-atom "{_arr}")))')
+        else:
+
+            # Convert non-list element (e.g., int, float) to string
+
+            return str(lst)
+
+    py_list = list_to_py_list(_x.tolist())
+    _metta.run(f'(= ({_var}) (np.array {py_list}))')
+
+def pylist_to_metta(_arr: List) -> ExpressionAtom:
+    res = []
+    for element in _arr:
+        if isinstance(element, list):
+            res.append(pylist_to_metta(element))
+        else:
+            res.append(ValueAtom(element))
+
+    return E(*res)
+
+# def metta_array(_metta: MeTTa, _var: str, _arr: List) -> None:
+#     _metta.run(E('=', S(_var), E('np.array')))
 
 
 random.seed(0)
@@ -35,23 +51,15 @@ centroids = X[random.choice(X.shape[0], k, replace=False)] # (k, d)
 assignments = np.eye(k)[y].T # (k, n)
 
 metta_preamble = '''
-! (bind! py-none (py-atom "None"))
-! (bind! py-false (py-atom "False"))
-! (bind! py-true (py-atom "True"))
-! (bind! py-slice (py-atom slice))
-! (bind! np (py-atom numpy))
-! (bind! np-eye (py-dot np eye))
-! (bind! np-array (py-dot np asarray))
-! (bind! np-matmul (py-dot np matmul))
-! (bind! np-sum (py-dot np sum))
-! (bind! np-divide (py-dot np divide))
-! (bind! np-subtract (py-dot np subtract))
-! (bind! np-expand-dims (py-dot np expand_dims))
-! (bind! np-argmin (py-dot np argmin))
-! (bind! np-one-hot-encode (py-atom "lambda labels, eye: eye[labels]"))
-! (bind! np-linalg-norm (py-dot np linalg.norm))
-! (bind! np-transpose (py-dot np transpose))
-! (bind! np-shape (py-atom "lambda x, i: x.shape[i]"))
+! (import! &self numme)
+
+(: Distance (-> Points Points Matrix))
+
+(: euclidean Distance)
+(=
+    (euclidean $X $Y)
+
+)
 '''
 
 metta_kmeans_definition = '''
@@ -76,15 +84,15 @@ metta_kmeans_definition = '''
             (np-argmin
                 (np-linalg-norm
                     (np-subtract
-                        (np-expand-dims ($X) (py-atom "0"))
-                        (np-expand-dims ($centroids) (py-atom "1"))
+                        (np-expand-dims $X (py-atom "0"))
+                        (np-expand-dims $centroids (py-atom "1"))
                     )
                     py-none
                     (py-atom "-1")
                 )
                 (py-atom "0")
             )
-            (np-eye (np-shape ($centroids) (py-atom "0")))
+            (np-eye (np-shape $centroids (py-atom "0")))
         )
     )
 )
@@ -98,7 +106,7 @@ metta_kmeans_definition = '''
                 $X
                 (np-transpose
                     (np-one-hot-encode
-                        (np-argmin
+                        (np.argmin
                             (np-linalg-norm
                                 (np-subtract
                                     (np-expand-dims $X (py-atom "0"))
@@ -125,23 +133,26 @@ metta = MeTTa()
 metta.run(metta_preamble)
 metta.run(metta_kmeans_definition)
 
-X_metta = metta_array(metta, 'X', X.tolist())
-y_metta = metta_array(metta, 'y', y.tolist())
-centroids_metta = metta_array(metta, 'centroids', centroids.tolist())
-assignments_metta = metta_array(metta, 'assignments', assignments.tolist())
+metta_nparray_to_pylist(metta, 'X', X)
+metta_nparray_to_pylist(metta, 'centroids', centroids)
 
-result = metta.run('''
-(=
-    (list)
-    ((py-dot (np-array (py-list (1.0 2.0 3.0))) tolist))
+# X_metta = pylist_to_metta(X.tolist())
+# metta.space().add_atom(E(S('='), S('(X)'), X_metta))
+# y_metta = metta_array(metta, 'y', y.tolist())
+# centroids_metta = metta_array(metta, 'centroids', centroids.tolist())
+# assignments_metta = metta_array(metta, 'assignments', assignments.tolist())
+
+result = metta.run(
+'''
+! (update-centroids
+    X
+    (assign
+        X
+        centroids
+    )               
 )
-                   
-(=
-    (pop [$x $xs])
-    ($x)
+'''
 )
-! (pop (list))
-''')
 
 print(result)
 print(centroids)
