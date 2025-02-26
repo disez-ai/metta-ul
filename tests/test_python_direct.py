@@ -5,18 +5,18 @@ import numpy as np
 from sklearn.datasets import make_blobs
 
 
-def pylist_to_metta(_arr: List) -> ExpressionAtom:
-    res = []
-    for element in _arr:
-        if isinstance(element, list):
-            res.append(pylist_to_metta(element))
-        else:
-            res.append(ValueAtom(element))
+def test_python_kmeans():
 
-    return E(*res)
+    def pylist_to_metta(_arr: List) -> ExpressionAtom:
+        res = []
+        for element in _arr:
+            if isinstance(element, list):
+                res.append(pylist_to_metta(element))
+            else:
+                res.append(ValueAtom(element))
 
+        return E(*res)
 
-def a_test_python_kmeans():
     random.seed(1)
 
     n = 100
@@ -34,15 +34,12 @@ def a_test_python_kmeans():
 
     metta = MeTTa()
 
+    metta.run("!(import! &self metta_ul:cluster:kmeans)")
+
     X_metta = pylist_to_metta(X.tolist())
     metta.space().add_atom(E(S("="), E(S("X")), X_metta))
 
-    result = metta.run(
-        """
-        !(import! &self metta_ul:cluster:kmeans)
-        !(kmeans (np.array (X)) 3)
-        """
-    )
+    result = metta.run("!(kmeans (np.array (X)) 3)")
 
     print(result)
     print(centroids_true)
@@ -81,7 +78,7 @@ def metta_nparray_to_pylist(_metta: MeTTa, _var: str, _x: np.ndarray) -> None:
 
 def test_py_dot_kmeans():
     # setting the random seed
-    np.random.seed(0)
+    random.seed(1)
 
     # defining the problem hyperparameters
     n = 5
@@ -103,9 +100,8 @@ def test_py_dot_kmeans():
     metta.run("!(import! &self metta_ul:cluster:py_dot_kmeans)")
     # running the kmeans on X and k
     metta_program = f"""
-    ! (bind! np (py-atom numpy))
-    ! (kmeans X {k} {max_iter})
-    ! y
+! (kmeans X {k} {max_iter})
+! y
     """
-    print("before exec")
+    print(metta_program)
     print(metta.run(metta_program))

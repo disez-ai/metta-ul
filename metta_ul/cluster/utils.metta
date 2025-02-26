@@ -1,3 +1,5 @@
+! (bind! np (py-atom numpy))
+
 (=
     (to-np $x)
     ((py-dot np array) $x)

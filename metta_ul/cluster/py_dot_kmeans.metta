@@ -1,3 +1,5 @@
+! (import! &self utils)
+
 ; -> np.linalg.norm(np.expand_dims(X, axis=0) - np.expand_dims(centroids, axis=1), axis=-1)
 (=
     (euclidean-distance $X $centroids)
