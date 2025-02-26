@@ -16,7 +16,7 @@ test:
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
 	@echo "Running pytest in the container..."
-	docker run -it --mount type=bind,src=$(CWD),dst=/app --user "$(id -u):$(id -g)" --name $(CONTAINER_NAME)  $(IMAGE_NAME)  pytest -s
+	docker run -it --mount type=bind,src=$(CWD),dst=/app --name $(CONTAINER_NAME)  $(IMAGE_NAME)  pytest -s
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
 
