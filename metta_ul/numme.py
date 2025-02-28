@@ -131,7 +131,7 @@ def numme_atoms():
     nmChoose = G(
         PatternOperation(
             "np.choose",
-            wrapnpop(lambda x, k: x[np.random.randint(0, x.shape[0], k)]),
+            wrapnpop(lambda x, k: x[np.random.choice(x.shape[0], k, replace=False)]),
             unwrap=False,
         )
     )
