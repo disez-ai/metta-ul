@@ -1,8 +1,5 @@
-from typing import List
-from hyperon import MeTTa, ExpressionAtom, E, S, ValueAtom, Atom
-import numpy.random as random
+from hyperon import MeTTa, Atom
 import numpy as np
-from sklearn.datasets import make_blobs
 
 
 def test_kmeans(metta: MeTTa):
@@ -20,7 +17,7 @@ def test_kmeans(metta: MeTTa):
     result: Atom = metta.run('! (kmeans (np.array (X)) 3)')[0][0]
 
     centroids_true = [[1,0,0], [0,1,0], [0,0,1]]
-    centroids: np.ndarray = result.get_object().value.astype(int)
+    centroids: np.ndarray = result.get_object().value
 
     assert np.allclose(centroids.sum(axis=0), [1, 1, 1])
     assert np.allclose(centroids.sum(axis=1), [1, 1, 1])
@@ -45,7 +42,7 @@ def test_py_dot_kmeans(metta: MeTTa):
     result: Atom = metta.run('! (kmeans (py-list (X)) 3 5)')[0][0]
 
     centroids_true = [[1,0,0], [0,1,0], [0,0,1]]
-    centroids: np.ndarray = np.asarray(result.get_object().value, dtype=int)
+    centroids: np.ndarray = np.asarray(result.get_object().value)
 
     assert np.allclose(centroids.sum(axis=0), [1, 1, 1])
     assert np.allclose(centroids.sum(axis=1), [1, 1, 1])
