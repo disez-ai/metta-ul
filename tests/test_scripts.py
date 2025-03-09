@@ -15,5 +15,5 @@ def run_script(fname):
 
 
 def test_scripts():
-    # process_exceptions(run_script(f"{pwd}/file_name.metta"))
+    # process_exceptions(run_script(f"{pwd}/pdm_test.metta"))
     return
