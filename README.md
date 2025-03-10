@@ -17,10 +17,6 @@ This project is packaged as a Python module and includes a Dockerized environmen
 - **Amirhossein Nourani Zadeh** - <amirhossein.nouranizadeh@gmail.com>
 - **Farhoud** - <amirhossein.nouranizadeh@gmail.com>
 
-## Repository
-
-[GitHub Repository](https://github.com/SNetGrant/metta_kmeans)
-
 ## Requirements
 
 - Python 3.7 or later
