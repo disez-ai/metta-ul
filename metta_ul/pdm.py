@@ -132,25 +132,3 @@ def pdme_atoms():
         r"pdm\.read_csv": pdLoadFromJson,
         r"pdm\.values": pdmValues,
     }
-
-    # nmArrayAtom = G(PatternOperation('np.array', wrapnpop(
-    #     lambda *args: np.array(args)), unwrap=False, rec=True))
-    # nmAddAtom = G(PatternOperation('np.add', wrapnpop(np.add), unwrap=False))
-    # nmSubAtom = G(PatternOperation(
-    #     'np.sub', wrapnpop(np.subtract), unwrap=False))
-    # nmMulAtom = G(PatternOperation(
-    #     'np.mul', wrapnpop(np.multiply), unwrap=False))
-    # nmDivAtom = G(PatternOperation(
-    #     'np.div', wrapnpop(np.divide), unwrap=False))
-    # nmMMulAtom = G(PatternOperation(
-    #     'np.matmul', wrapnpop(np.matmul), unwrap=False))
-    #
-    # return {
-    #     r"np\.vector": nmVectorAtom,
-    #     r"np\.array": nmArrayAtom,
-    #     r"np\.add": nmAddAtom,
-    #     r"np\.sub": nmSubAtom,
-    #     r"np\.mul": nmMulAtom,
-    #     r"np\.matmul": nmMMulAtom,
-    #     r"np\.div": nmDivAtom
-    # }
