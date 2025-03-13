@@ -140,6 +140,10 @@ def numme_atoms():
     nmEinsum = G(PatternOperation("np.einsum", wrapnpop(np.einsum), unwrap=False))
     nmExp = G(PatternOperation("np.exp", wrapnpop(np.exp), unwrap=False))
     nmLog = G(PatternOperation("np.log", wrapnpop(np.log), unwrap=False))
+    nmCov = G(PatternOperation("np.cov", wrapnpop(np.cov), unwrap=False))
+    nmRepeat = G(PatternOperation("np.repeat", wrapnpop(np.repeat), unwrap=False))
+    nmEye = G(PatternOperation("np.eye", wrapnpop(np.eye), unwrap=False))
+    nmOnes = G(PatternOperation("np.ones", wrapnpop(np.ones), unwrap=False))
 
     return {
         "np.vector": nmVectorAtom,
@@ -160,5 +164,9 @@ def numme_atoms():
         "np.linalg.inv": nmInv,
         "np.einsum": nmEinsum,
         "np.exp": nmExp,
-        "np.log": nmLog
+        "np.log": nmLog,
+        "np.cov": nmCov,
+        "np.repeat": nmRepeat,
+        "np.eye": nmEye,
+        "np.ones": nmOnes
     }
