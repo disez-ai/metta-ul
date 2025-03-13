@@ -1,4 +1,4 @@
-from hyperon.atoms import *
+from hyperon.atoms import MatchableObject, GroundedAtom, ExpressionAtom, VariableAtom, S, G, get_string_value, AtomType, OperationObject, NoReduceError
 from hyperon.ext import register_atoms
 
 from numme import _np_atom_type, NumpyValue
@@ -42,7 +42,6 @@ class DataFrameValue(MatchableObject):
 class PatternValue(MatchableObject):
 
     def match_(self, other):
-        print("self", self, "other", other)
         if isinstance(other, GroundedAtom):
             other = other.get_object().content
         if not isinstance(other, PatternValue):
@@ -58,7 +57,6 @@ class PatternOperation(OperationObject):
         self.rec = rec
 
     def execute(self, *args, res_typ=AtomType.UNDEFINED):
-        print("exec", args)
         if self.rec:
             args = args[0].get_children()
             args = [self.execute(arg)[0]
@@ -79,42 +77,57 @@ def _dataframe_atom_type(df):
 
 def wrapnpop(func):
     def wrapper(*args):
-        print("args are: ", args)
-        a = [arg.get_object().value for arg in args]
-        print("a is ", *a)
-        res = func(*a)
+        a, k = unwrap_args(args)
+        res = func(*a, **k)
         typ = _dataframe_atom_type(res)
         return [G(DataFrameValue(res), typ)]
     return wrapper
 
 
-def _load_from_json(a, b):
-    f_name = a.get_name()
-    print(f_name)
-    use_columns = []
-    for arg in b.get_children():
-        if isinstance(arg, ExpressionAtom):
-            print("arg", type(arg.get_children()[0]))
-            use_columns = [s.get_name() for s in arg.get_children()]
+def unwrap_args(atoms):
+    args = []
+    kwargs = {}
+    for a in atoms:
+        if isinstance(a, ExpressionAtom):
+            ch = a.get_children()
+            if len(ch) > 0:
+                try:
+                    kwarg = ch
+                    assert len(kwarg) == 2
+                except:
+                    raise RuntimeError(f"Incorrect kwarg format {kwarg}")
+                try:
+                    kwargs[get_string_value(
+                        kwarg[0])] = kwarg[1].get_object().content
+                except:
+                    raise NoReduceError()
+                continue
+        if hasattr(a, 'get_object'):
+            args.append(a.get_object().content)
+        else:
+            # NOTE:
+            # Currently, applying grounded operations to pure atoms is not reduced.
+            # If we want, we can raise an exception, or form an error expression instead,
+            # so a MeTTa program can catch and analyze it.
+            # raise RuntimeError("Grounded operation " + self.name + " with unwrap=True expects only grounded arguments")
+            raise NoReduceError()
+    return args, kwargs
 
-    res = pd.read_csv(f_name, usecols=use_columns)
-    typ = _dataframe_atom_type(res)
-    return [G(DataFrameValue(res), typ)]
 
-
-def _pdm_values(args):
-    print("pdm_values", type(args.get_object().content))
-    res = args.get_object().content.values
+def _to_numme(*args):
+    print(type(args[0]))
+    res = args[0].get_object().content.values
     typ = _np_atom_type(res)
     return [G(NumpyValue(res), typ)]
 
 
-@ register_atoms
+@register_atoms
 def pdme_atoms():
 
     pdLoadFromJson = G(PatternOperation(
-        "pdm.read_csv", _load_from_json, unwrap=False))
-    pdmValues = G(PatternOperation("pdm.values", _pdm_values, unwrap=True))
+        "pdm.read_csv", wrapnpop(pd.read_csv), unwrap=False))
+    pdmValues = G(PatternOperation("pdm.values", _to_numme, unwrap=False))
+
     return {
         r"pdm\.read_csv": pdLoadFromJson,
         r"pdm\.values": pdmValues,

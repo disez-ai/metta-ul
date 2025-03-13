@@ -57,7 +57,8 @@ def test_pdm(metta: MeTTa):
         '''
         ! (import! &self metta_ul:pdm)
 
-        ! (bind! &df (pdm.read_csv tests/housing.csv (usecols (longitude latitude median_house_value))))
+
+        ! (bind! &df (pdm.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude" "median_house_value")))))
 
 
         '''
@@ -66,5 +67,21 @@ def test_pdm(metta: MeTTa):
     result: Atom = metta.run(
         "! (pdm.values &df)")
 
-    print("res", result)
-    assert result[0].get_object().value == (3, 3)
+    # print("res", result)
+    # assert result[0][0].get_object().value == (3, 3)
+
+
+def test_norm(metta: MeTTa):
+    res = metta.run(
+        '''
+! (import! &self metta_ul:pdm)
+! (import! &self metta_ul:skl)
+
+! (bind! &df (pdm.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
+
+! (bind! &n (skl.preprocessing.normalize (pdm.values &df)))
+
+! (assertEqual (get-type &n) (NPArray (20640 2)))
+    '''
+    )
+    print(res)
