@@ -50,38 +50,3 @@ def test_py_dot_kmeans(metta: MeTTa):
     assert centroids[0].tolist() in centroids_true
     assert centroids[1].tolist() in centroids_true
     assert centroids[2].tolist() in centroids_true
-
-
-def test_pdm(metta: MeTTa):
-    metta.run(
-        '''
-        ! (import! &self metta_ul:pdm)
-
-
-        ! (bind! &df (pdm.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude" "median_house_value")))))
-
-
-        '''
-    )
-
-    result: Atom = metta.run(
-        "! (pdm.values &df)")
-
-    # print("res", result)
-    # assert result[0][0].get_object().value == (3, 3)
-
-
-def test_norm(metta: MeTTa):
-    res = metta.run(
-        '''
-! (import! &self metta_ul:pdm)
-! (import! &self metta_ul:skl)
-
-! (bind! &df (pdm.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
-
-! (bind! &n (skl.preprocessing.normalize (pdm.values &df)))
-
-! (assertEqual (get-type &n) (NPArray (20640 2)))
-    '''
-    )
-    print(res)

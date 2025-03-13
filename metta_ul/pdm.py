@@ -115,7 +115,6 @@ def unwrap_args(atoms):
 
 
 def _to_numme(*args):
-    print(type(args[0]))
     res = args[0].get_object().content.values
     typ = _np_atom_type(res)
     return [G(NumpyValue(res), typ)]

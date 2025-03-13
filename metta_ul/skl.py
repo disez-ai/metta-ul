@@ -6,16 +6,6 @@ from numme import PatternOperation
 from numme import wrapnpop
 
 
-def no(*args):
-    print("data", type(args[0]))
-    try:
-        res = normalize(*args)
-        return res
-    except Exception as e:
-        print(e)
-        raise e
-
-
 @register_atoms
 def slk_atoms():
 
