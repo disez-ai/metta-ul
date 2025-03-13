@@ -17,7 +17,8 @@ requires-python = ">=3.7"
 dependencies = [
     "hyperon>=0.2.2",
     "scikit-learn",
-    "pandas"
+    "pandas",
+    "seaborn",
 ]
 
 [project.optional-dependencies]

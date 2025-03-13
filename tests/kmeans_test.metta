@@ -8,5 +8,6 @@
 
 ! (bind! &n (skl.preprocessing.normalize &norm))
 
-! (kmeans &norm 3)
+! (bind! &cn (kmeans &norm 3))
 
+! (assertEqual (get-type $cn) (get-type (py-list )))
