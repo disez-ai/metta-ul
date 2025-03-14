@@ -86,7 +86,7 @@ def test_gmm_mahalanobis_term(metta: MeTTa):
     assert np.allclose(mahalanobis_term, mahalanobis_term_true)
 
 
-def test_gmm_exponent(metta: MeTTa):
+def test_gmm_gaussian_pdf(metta: MeTTa):
     metta.run(
         '''
         ! (import! &self metta_ul:cluster:gmm)
@@ -112,44 +112,14 @@ def test_gmm_exponent(metta: MeTTa):
         '''
         )
     
-    result: Atom = metta.run('! (gmm.exponent (np.array (X)) (np.array (means)) (np.array (covariances)))')[0][0]
-    exponent: np.ndarray = result.get_object().value
+    result: Atom = metta.run('! (gmm.gaussian-pdf (np.array (X)) (np.array (means)) (np.array (covariances)))')[0][0]
+    gaussian_pdf: np.ndarray = result.get_object().value
     exponent_true = np.asarray([
         [-1.8378770664093453, -2.8378770664093453, -2.3378770664093453],
         [-2.8378770664093453, -1.8378770664093453, -2.3378770664093453]
     ])
 
-    assert np.allclose(exponent, exponent_true)
-
-
-def test_gmm_weighted_pdfs(metta: MeTTa):
-    metta.run(
-        '''
-        ! (import! &self metta_ul:cluster:gmm)
-
-        (=
-            (exponents)
-            (
-                (-1.8378770664093453 -2.8378770664093453 -2.3378770664093453)
-                (-2.8378770664093453 -1.8378770664093453 -2.3378770664093453)
-            )
-        )
-
-        (=
-            (weights)
-            ((/ 1.0 3) (/ 1.0 3) (/ 1.0 3))
-        )
-        '''
-        )
-    
-    result: Atom = metta.run('! (gmm.weighted-pdfs (np.array (exponents)) (np.array (weights)))')[0][0]
-    weighted_pdfs: np.ndarray = result.get_object().value
-    weighted_pdfs_true = np.asarray([
-        [0.05305165, 0.01951661, 0.03217745],
-        [0.01951661, 0.05305165, 0.03217745]
-    ])
-
-    assert np.allclose(weighted_pdfs, weighted_pdfs_true)
+    assert np.allclose(gaussian_pdf, np.exp(exponent_true))
 
 
 def test_gmm_log_likelihood(metta: MeTTa):
@@ -191,7 +161,7 @@ def test_gmm_log_likelihood(metta: MeTTa):
     assert np.allclose(log_likelihood, log_likelihood_true)
 
 
-def test_gmm(metta: MeTTa):
+def test_gmm_init(metta: MeTTa):
     metta.run(
         '''
         ! (import! &self metta_ul:cluster:gmm)
@@ -203,14 +173,215 @@ def test_gmm(metta: MeTTa):
         '''
         )
     
-    result: Atom = metta.run('! (gmm (np.array (X)) 3)')[0][0]
+    result: Atom = metta.run('! (gmm.init (np.array (X)) 3)')[0][0]
 
-    centroids_true = [[1,0,0], [0,1,0], [0,0,1]]
-    centroids: np.ndarray = np.asarray(result.get_object().value)
+    weights, means, covariances = (atom.get_object().value for atom in result.get_children())
+    weights_true = np.ones(3) / 3
+    covariances_true = np.repeat(np.cov(np.eye(3))[np.newaxis, :, :], 3, axis=0)
 
-    assert np.allclose(centroids.sum(axis=0), [1, 1, 1])
-    assert np.allclose(centroids.sum(axis=1), [1, 1, 1])
+    assert np.allclose(means.sum(axis=0), [1, 1, 1])
+    assert np.allclose(means.sum(axis=1), [1, 1, 1])
 
-    assert centroids[0].tolist() in centroids_true
-    assert centroids[1].tolist() in centroids_true
-    assert centroids[2].tolist() in centroids_true
+    assert np.allclose(weights, weights_true)
+
+    assert np.allclose(covariances, covariances_true)
+
+
+def test_gmm_e_step(metta: MeTTa):
+    metta.run(
+        '''
+        ! (import! &self metta_ul:cluster:gmm)
+
+        (=
+            (X)
+            ((1 0) (0 1))
+        )
+
+        (=
+            (means)
+            ((1 0) (0 1))
+        )
+
+        (=
+            (covariances)
+            (
+                ((1 0) (0 1))
+                ((1 0) (0 1))
+            )
+        )
+
+        (=
+            (weights)
+            (0.5 0.5)
+        )
+        '''
+    )
+
+    result: Atom = metta.run('! (gmm.e-step (np.array (X)) (np.array (weights)) (np.array (means)) (np.array (covariances)))')[0][0]
+
+    responsibiliies = result.get_object().value
+    responsibiliies_true = np.array([
+        [0.73105858, 0.26894142],
+        [0.26894142, 0.73105858]
+        ])
+
+    assert np.allclose(responsibiliies, responsibiliies_true)
+
+
+def test_gmm_m_step(metta: MeTTa):
+    metta.run(
+        '''
+        ! (import! &self metta_ul:cluster:gmm)
+
+        (=
+            (X)
+            ((1 0) (0 1))
+        )
+
+        (=
+            (responsibiliies)
+            (
+                (0.73105858 0.26894142)
+                (0.26894142 0.73105858)
+            )
+        )
+        '''
+    )
+
+    result: Atom = metta.run('! (gmm.m-step (np.array (X)) (np.array (responsibiliies)))')[0][0]
+
+    weights, means, covariances = (atom.get_object().value for atom in result.get_children())
+
+    weights_true = np.ones(2) / 2
+    means_true = np.array([
+        [0.73105858, 0.26894142],
+        [0.26894142, 0.73105858]
+        ])
+    covariances_true = np.repeat([[
+        [ 0.19661193, -0.19661193],
+        [-0.19661193,  0.19661193]
+        ]], 2, axis=0)
+
+    assert np.allclose(weights, weights_true)
+    assert np.allclose(means, means_true)
+    assert np.allclose(covariances, covariances_true)
+
+
+def test_gmm_recursion_max_iter_0(metta: MeTTa):
+    metta.run(
+        '''
+        ! (import! &self metta_ul:cluster:gmm)
+
+        (=
+            (X)
+            ((1 0) (0 1))
+        )
+
+        (=
+            (means)
+            ((1 0) (0 1))
+        )
+
+        (=
+            (covariances)
+            (
+                ((1 0) (0 1))
+                ((1 0) (0 1))
+            )
+        )
+
+        (=
+            (weights)
+            (0.5 0.5)
+        )
+        '''
+    )
+
+    result: Atom = metta.run('! (gmm.recursion (np.array (X)) ((np.array (weights)) (np.array (means)) (np.array (covariances))) 0)')[0][0]
+
+    weights, means, covariances = (atom.get_object().value for atom in result.get_children())
+    weights_true = np.ones(2) / 2
+    means_true = np.eye(2)
+    covariances_true = np.repeat(np.eye(2)[np.newaxis, :, :], 2, axis=0)
+
+    assert np.allclose(weights, weights_true)
+    assert np.allclose(means, means_true)
+    assert np.allclose(covariances, covariances_true)
+
+
+def test_gmm_recursion_max_iter_1(metta: MeTTa):
+    metta.run(
+        '''
+        ! (import! &self metta_ul:cluster:gmm)
+
+        (=
+            (X)
+            ((1 0) (0 1))
+        )
+
+        (=
+            (means)
+            ((1 0) (0 1))
+        )
+
+        (=
+            (covariances)
+            (
+                ((1 0) (0 1))
+                ((1 0) (0 1))
+            )
+        )
+
+        (=
+            (weights)
+            (0.5 0.5)
+        )
+        '''
+    )
+
+    result: Atom = metta.run('! (gmm.recursion (np.array (X)) ((np.array (weights)) (np.array (means)) (np.array (covariances))) 1)')[0][0]
+
+    weights, means, covariances = (atom.get_object().value for atom in result.get_children())
+    weights_true = np.ones(2) / 2
+    means_true = np.array([
+        [0.73105858, 0.26894142],
+        [0.26894142, 0.73105858]
+        ])
+    covariances_true = np.repeat([[
+        [ 0.19661193, -0.19661193],
+        [-0.19661193,  0.19661193]
+        ]], 2, axis=0)
+
+    assert np.allclose(weights, weights_true)
+    assert np.allclose(means, means_true)
+    assert np.allclose(covariances, covariances_true)
+
+
+def test_gmm(metta: MeTTa):
+    metta.run(
+        '''
+        ! (import! &self metta_ul:cluster:gmm)
+
+        (=
+            (X)
+            ((1 0) (0 1))
+        )
+        '''
+        )
+    
+    result: Atom = metta.run('! (gmm (np.array (X)) 2 1)')[0][0]
+
+    weights, means, covariances = (atom.get_object().value for atom in result.get_children())
+    weights_true = np.ones(2) / 2
+    means_true = np.array([
+        [0.73105858, 0.26894142],
+        [0.26894142, 0.73105858]
+        ])
+    covariances_true = np.repeat([[
+        [ 0.19661193, -0.19661193],
+        [-0.19661193,  0.19661193]
+        ]], 2, axis=0)
+
+    assert np.allclose(weights, weights_true)
+    assert np.allclose(means, means_true)
+    assert np.allclose(covariances, covariances_true)

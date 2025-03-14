@@ -36,28 +36,24 @@
     )
 )
 
-; exponent = -0.5 * (mahalanobis_term + D * np.log(2 * np.pi) + log_det_cov)
+; gaussian_pdf = np.exp(-0.5 * (mahalanobis_term + D * np.log(2 * np.pi) + log_det_cov))
 (=
-    (gmm.exponent $X $means $covariances)
-    (np.mul
-        -0.5
-        (np.add
+    (gmm.gaussian-pdf $X $means $covariances)
+    (np.exp
+        (np.mul
+            -0.5
             (np.add
-                (gmm.mahalanobis-term $X $means $covariances)
-                (np.mul
-                    (py-getitem (py-dot $X shape) 1)
-                    (np.log (np.mul (np.array (2)) (py-dot np pi)))
+                (np.add
+                    (gmm.mahalanobis-term $X $means $covariances)
+                    (np.mul
+                        (py-getitem (py-dot $X shape) 1)
+                        (np.log (np.mul (np.array (2)) (py-dot np pi)))
+                    )
                 )
+                (np.linalg.slogabsdet $covariances)
             )
-            (np.linalg.slogabsdet $covariances)
         )
     )
-)
-
-; weighted_pdfs = np.exp(exponent) * weights
-(=
-    (gmm.weighted-pdfs $exponent $weights)
-    (np.mul (np.exp $exponent) $weights)
 )
 
 ; log_likelihood = np.sum(np.log(np.sum(weighted_pdfs, axis=1)))
@@ -66,8 +62,8 @@
     (np.sum
         (np.log
             (np.sum
-                (gmm.weighted-pdfs
-                    (gmm.exponent $X $means $covariances)
+                (np.mul
+                    (gmm.gaussian-pdf $X $means $covariances)
                     $weights
                 )
                 1
@@ -78,4 +74,105 @@
         pyNone
         pyTrue
     )
+)
+
+(=
+    (gmm.init $X $k)
+    (
+        (np.div
+            (np.ones $k)
+            $k
+        )
+
+        (np.choose $X $k)
+
+        (np.add
+            (np.repeat
+                (np.expand_dims (np.cov $X pyNone pyFalse) 0)
+                $k
+                0
+            )
+            (np.mul
+                0.000001
+                (np.eye (py-getitem (py-dot $X shape) 1))
+            )
+        )
+    )
+)
+
+(=
+    (gmm.e-step $X $weights $means $covariances)
+    (let $weighted-pdfs
+        (np.mul
+            (gmm.gaussian-pdf $X $means $covariances)
+            $weights
+        )
+
+        (np.div
+            $weighted-pdfs
+            (np.sum
+                $weighted-pdfs
+                1
+                pyNone
+                pyNone
+                pyTrue
+            )
+        )
+    )
+)
+
+(=
+    (gmm.m-step $X $responsibilities)
+    (let $Nk (np.sum $responsibilities 0)
+        (let $means
+            (np.div
+                (np.matmul (np.transpose $responsibilities) $X)
+                (np.expand_dims $Nk 1)
+            )
+            (let $X-centered (gmm.center $X $means)
+                (
+                    (np.div $Nk (py-getitem (py-dot $X shape) 0))
+                    $means
+                    (np.div
+                        (np.einsum
+                            "nk,nkd,nke->kde"
+                            $responsibilities
+                            $X-centered
+                            $X-centered
+                        )
+                        (np.expand_dims (np.expand_dims $Nk -1) -1)
+                    )
+                )
+            )
+        )
+    )
+)
+
+(=
+    (gmm.recursion $X ($weights $means $covariances) $max-iter)
+    (if (> $max-iter 0)
+        (gmm.recursion
+            $X
+            (gmm.m-step
+                $X
+                (gmm.e-step $X $weights $means $covariances)
+            )
+            (- $max-iter 1)
+        )
+        ($weights $means $covariances)
+    )
+)
+
+(=
+    (gmm $X $k $max-iter)
+    (gmm.recursion
+        $X
+        (gmm.init $X $k)
+        $max-iter
+    )
+)
+
+(=
+    (gmm $X $k)
+    (gmm $X $k 100)
 )
