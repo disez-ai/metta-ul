@@ -4,6 +4,15 @@
 IMAGE_NAME = metta_ul
 CONTAINER_NAME = metta_ul_run
 CWD = $(shell pwd)
+OS := $(shell uname -s)
+
+ifeq ($(OS),Linux)
+    USER_ID := $(shell id -u)
+    GROUP_ID := $(shell id -g)
+else
+    USER_ID := 1000  # Default fallback for non-Linux systems
+    GROUP_ID := 1000
+endif
 
 # Build the Docker image
 build:
@@ -16,7 +25,7 @@ test:
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
 	@echo "Running pytest in the container..."
-	docker run -it --mount type=bind,src=$(CWD),dst=/app --name $(CONTAINER_NAME)  $(IMAGE_NAME)  pytest -sx
+	docker run --rm -it --mount type=bind,src=$(CWD),dst=/app --name $(CONTAINER_NAME)  $(IMAGE_NAME)  pytest -sx
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
 
