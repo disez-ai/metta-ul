@@ -151,6 +151,7 @@ def numme_atoms():
     nmArgsort = G(PatternOperation("np.argsort", wrapnpop(np.argsort), unwrap=False))
     nmArange = G(PatternOperation("np.arange", wrapnpop(np.arange), unwrap=False))
     nmTake = G(PatternOperation("np.take", wrapnpop(np.take), unwrap=False))
+    nmArgmax = G(PatternOperation("np.argmax", wrapnpop(np.argmax), unwrap=False))
 
     return {
         "np.vector": nmVectorAtom,
@@ -182,5 +183,6 @@ def numme_atoms():
         "np.sqrt": nmSqrt,
         "np.argsort": nmArgsort,
         "np.arange": nmArange,
-        "np.take": nmTake
+        "np.take": nmTake,
+        "np.argmax": nmArgmax
     }
