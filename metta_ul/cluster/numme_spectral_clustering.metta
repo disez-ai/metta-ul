@@ -5,6 +5,69 @@
 ! (bind! pyTrue (py-atom "True"))
 ! (bind! pyFalse (py-atom "False"))
 
+; TODO: Fix the import problem to include kmeans from kmeans.metta
+; ============== KMEANS ==============
+(=
+    (kmeans.update $X $assignments)
+    (np.div
+        (np.matmul $assignments $X)
+        (np.sum
+            $assignments
+            1
+            pyNone
+            pyNone
+            pyTrue
+        )
+    )
+)
+
+(=
+    (kmeans.assign $X $centroids $k)
+    (np.transpose
+        (np.one_hot
+            (np.argmin
+                (np.linalg.norm
+                    (np.sub
+                        (np.expand_dims $X 0)
+                        (np.expand_dims $centroids 1)
+                    )
+                    pyNone
+                    2
+                )
+                0
+            )
+            $k
+        )
+    )
+)
+
+(=
+    (kmeans.recursion $X $centroids $k $max-iter)
+    (if (> $max-iter 0)
+        (kmeans.recursion
+            $X
+            (kmeans.update
+                $X
+                (kmeans.assign $X $centroids $k)
+            )
+            $k
+            (- $max-iter 1)
+        )
+        $centroids
+    )
+)
+
+(=
+    (kmeans $X $k)
+    (kmeans $X $k 100)
+)
+
+(=
+    (kmeans $X $k $max-iter)
+    (kmeans.recursion $X (np.choose $X $k) $k $max-iter)
+)
+
+; ===============================================
 (=
     (to-np $x)
     ((py-dot np array) $x)
@@ -128,5 +191,53 @@
         (eigenvectors $eigh-I)
         ((py-dot (np.argsort (eigenvalues $eigh-I)) __getitem__) (np.arange $k))
         1
+    )
+)
+
+(=
+    (row-normalize $X)
+    (np.div
+        $X
+        (np.linalg.norm
+            $X
+            pyNone
+            1
+            pyTrue
+        )
+    )
+)
+
+(=
+    (spectral-clustering $X $k $sigma $max-iter)
+    (kmeans
+        (row-normalize
+            (spectral-embeddings
+                (eigh
+                    (normalized-laplacian
+                        (rbf-affinity-matrix
+                            (square-distance-matrix
+                                (square-norm $X)
+                                $X
+                            )
+                            $sigma
+                        )
+                        (inverse-degree-matrix
+                            (degree
+                                (rbf-affinity-matrix
+                                    (square-distance-matrix
+                                        (square-norm $X)
+                                        $X
+                                    )
+                                    $sigma
+                                )
+                            )
+                        )
+                    )
+                )
+                $k
+            )
+        )
+        $k
+        $max-iter
     )
 )
