@@ -2,20 +2,7 @@ import math
 
 from hyperon import MeTTa, Atom
 import numpy as np
-
-
-def test_numme(metta: MeTTa):
-    metta.run(
-        '''
-        !(import! &self metta_ul:cluster:numme_spectral_clustering)        
-        
-        '''
-    )
-
-    result: Atom = metta.run('! (np.array (X))')[0][0]
-    element: int = result.get_object().value
-
-    assert element == 1
+from sklearn.metrics import adjusted_rand_score
 
 
 def test_compute_affinity(metta: MeTTa):
@@ -338,3 +325,191 @@ def test_spectral_embedding(metta: MeTTa):
     U = result.get_object().value
 
     assert U.shape == (2, 0), "Expected an output with shape (n_samples, 0) when k=0."
+
+
+def test_row_normalize(metta: MeTTa):
+    metta.run(
+        """        
+        !(import! &self metta_ul:cluster:numme_spectral_clustering)
+
+        (=
+            (A)
+            (np.array ((3 4) (5 12)))
+        )
+        (=
+            (B)
+            (np.array ((3) (-4) (5)))
+        )
+        (=
+            (C)
+            (np.array ((0 0) (1 2)))
+        )
+        (=
+            (D)
+            (np.array ((1 1 1) (1 1 1) (1 1 1)))
+        )
+        """
+    )
+    result: Atom = metta.run(
+        """
+        ! (row-normalize (A))
+        """
+    )[0][0]
+    A_norm = result.get_object().value
+    expected = np.array([[3 / 5, 4 / 5], [5 / 13, 12 / 13]])
+    assert A_norm.shape == expected.shape, "Output shape must match input shape."
+    assert np.allclose(A_norm, expected), "Row normalization failed on standard input."
+
+    result: Atom = metta.run(
+        """
+        ! (row-normalize (B))
+        """
+    )[0][0]
+    B_norm = result.get_object().value
+    expected = np.array([[1.0], [-1.0], [1.0]])
+    assert B_norm.shape == expected.shape, "Output shape must match input shape."
+    assert np.allclose(B_norm, expected), "Row normalization failed on standard input."
+
+    with np.errstate(divide='ignore', invalid='ignore'):
+        result: Atom = metta.run(
+            """
+            ! (row-normalize (C))
+            """
+        )[0][0]
+    C_norm = result.get_object().value
+    # For the zero row, dividing by zero should result in nan values.
+    assert np.isnan(C_norm[0]).all(), "Row normalization should yield nan for zero vector."
+    # For the nonzero row:
+    expected_nonzero = np.array([1, 2]) / np.linalg.norm([1, 2])
+    assert np.allclose(C_norm[1], expected_nonzero), "Row normalization failed on nonzero row with a zero row present."
+
+    result: Atom = metta.run(
+        """
+        ! (row-normalize (D))
+        """
+    )[0][0]
+    D_norm = result.get_object().value
+    norm_value = np.sqrt(3)
+    expected = np.ones((3, 3)) / norm_value
+    assert D_norm.shape == expected.shape, "Output shape must match input shape for ones matrix."
+    assert np.allclose(D_norm, expected), "Row normalization failed for ones matrix."
+
+
+def test_spectral_clustering(metta: MeTTa):
+    metta.run(
+        """        
+        !(import! &self metta_ul:cluster:numme_spectral_clustering)                
+        """
+    )
+    result: Atom = metta.run(
+        """  
+        (= 
+            (X1)
+            (np.array ((1 0 0) (0 1 0) (0 0 1)))
+        )
+        (=
+            (K1)
+            3
+        )      
+        (=
+            (embeddings)
+            (spectral-embeddings
+                (eigh
+                    (normalized-laplacian
+                        (rbf-affinity-matrix
+                            (square-distance-matrix
+                                (square-norm (X1))
+                                (X1)
+                            )
+                            0.1
+                        )
+                        (inverse-degree-matrix
+                            (degree
+                                (rbf-affinity-matrix
+                                    (square-distance-matrix
+                                        (square-norm (X1))
+                                        (X1)
+                                    )
+                                    0.1
+                                )
+                            )
+                        )
+                    )
+                )
+                (K1)
+            )
+        )        
+        
+        ! (np.argmax
+                (np.transpose
+                    (kmeans.assign 
+                        (embeddings) 
+                        (spectral-clustering (X1) (K1) 0.1 100) 
+                        (K1)
+                    )
+                )
+                1            
+        )                
+        """
+    )[0][0]
+    labels = result.get_object().value
+    ground_truth = np.array([0, 1, 2])
+    ari = adjusted_rand_score(ground_truth, labels)
+    assert ari == 1.0, f"Expected ARI of 1.0, but got {ari}"
+
+    result: Atom = metta.run(
+        """        
+        (= 
+            (X2)
+            (np.array ((0 0) (0.1 0) (1.0 1.0) (1.1 1.0)))
+        )
+        (=
+            (K2)
+            2
+        )    
+                
+        (=
+            (embeddings)
+            (spectral-embeddings
+                (eigh
+                    (normalized-laplacian
+                        (rbf-affinity-matrix
+                            (square-distance-matrix
+                                (square-norm (X2))
+                                (X2)
+                            )
+                            0.1
+                        )
+                        (inverse-degree-matrix
+                            (degree
+                                (rbf-affinity-matrix
+                                    (square-distance-matrix
+                                        (square-norm (X2))
+                                        (X2)
+                                    )
+                                    0.1
+                                )
+                            )
+                        )
+                    )
+                )
+                (K2)
+            )
+        )        
+
+        ! (np.argmax
+                (np.transpose
+                    (kmeans.assign 
+                        (embeddings) 
+                        (spectral-clustering (X2) (K2) 0.1 100) 
+                        (K2)
+                    )
+                )
+                1            
+        )              
+        """
+    )[0][0]
+    labels = result.get_object().value
+    ground_truth = np.array([0, 0, 1, 1])
+    ari = adjusted_rand_score(ground_truth, labels)
+    assert ari == 1.0, f"Expected ARI of 1.0, but got {ari}"
