@@ -19,6 +19,7 @@ def metta_nparray_to_pylist(_metta: MeTTa, _var: str, _x: np.ndarray) -> None:
     _x : np.ndarray
         The NumPy array to be converted.
     """
+
     def list_to_py_list(lst):
         """
         Recursively converts a nested Python list into a string in the py-list format.
@@ -31,7 +32,7 @@ def metta_nparray_to_pylist(_metta: MeTTa, _var: str, _x: np.ndarray) -> None:
             return str(lst)
 
     py_list = list_to_py_list(_x.tolist())
-    _metta.run(f'! (bind! {_var} (py-list {py_list}))')
+    _metta.run(f"! (bind! {_var} (py-list {py_list}))")
 
 
 # setting the random seed
@@ -47,13 +48,15 @@ X, y = make_moons(n_samples=10, noise=0.05, random_state=42)
 metta = MeTTa()
 
 # binding the numpy as py-atom with alias 'np'
-metta.run("""
+metta.run(
+    """
     ! (bind! np (py-atom numpy))
-""")
+"""
+)
 
 # registering the input data to the Space
-metta_nparray_to_pylist(metta, 'X', X)
-metta_nparray_to_pylist(metta, 'y', y)
+metta_nparray_to_pylist(metta, "X", X)
+metta_nparray_to_pylist(metta, "y", y)
 
 
 # general utility numpy functions acting on py-list atoms

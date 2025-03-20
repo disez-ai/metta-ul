@@ -45,7 +45,9 @@ def test_compute_affinity(metta: MeTTa):
     )[0][0]
     W: int = result.get_object().value
     assert W.shape == (1, 1), "Expected a 1x1 matrix for a single sample."
-    assert np.allclose(W, np.array([[1.0]])), "Affinity for a single sample should be 1."
+    assert np.allclose(
+        W, np.array([[1.0]])
+    ), "Affinity for a single sample should be 1."
 
     result: Atom = metta.run(
         """
@@ -61,10 +63,7 @@ def test_compute_affinity(metta: MeTTa):
         """
     )[0][0]
     W: int = result.get_object().value
-    expected_W = np.array([
-        [1.0, math.exp(-0.5)],
-        [math.exp(-0.5), 1.0]
-    ])
+    expected_W = np.array([[1.0, math.exp(-0.5)], [math.exp(-0.5), 1.0]])
     assert np.allclose(W, expected_W), "Affinity matrix for two samples is incorrect."
 
     result: Atom = metta.run(
@@ -81,12 +80,16 @@ def test_compute_affinity(metta: MeTTa):
         """
     )[0][0]
     W: int = result.get_object().value
-    expected_W = np.array([
-        [1.0, math.exp(-0.5), math.exp(-0.5)],
-        [math.exp(-0.5), 1.0, math.exp(-1.0)],
-        [math.exp(-0.5), math.exp(-1.0), 1.0]
-    ])
-    assert np.allclose(W, expected_W), "Affinity matrix for three 2D samples is incorrect."
+    expected_W = np.array(
+        [
+            [1.0, math.exp(-0.5), math.exp(-0.5)],
+            [math.exp(-0.5), 1.0, math.exp(-1.0)],
+            [math.exp(-0.5), math.exp(-1.0), 1.0],
+        ]
+    )
+    assert np.allclose(
+        W, expected_W
+    ), "Affinity matrix for three 2D samples is incorrect."
 
     result: Atom = metta.run(
         """
@@ -133,7 +136,9 @@ def test_compute_affinity(metta: MeTTa):
         """
     )[0][0]
     W_with_neg_sigma: int = result.get_object().value
-    assert np.allclose(W_with_pos_sigma, W_with_neg_sigma), "Affinity matrix should be identical for sigma and -sigma."
+    assert np.allclose(
+        W_with_pos_sigma, W_with_neg_sigma
+    ), "Affinity matrix should be identical for sigma and -sigma."
 
 
 def test_compute_normalized_laplacian(metta: MeTTa):
@@ -168,7 +173,9 @@ def test_compute_normalized_laplacian(metta: MeTTa):
     )[0][0]
     L_norm: int = result.get_object().value
     expected = np.zeros((3, 3))
-    assert np.allclose(L_norm, expected), "L_norm must be a zero matrix when W is the identity matrix."
+    assert np.allclose(
+        L_norm, expected
+    ), "L_norm must be a zero matrix when W is the identity matrix."
 
     result: Atom = metta.run(
         """        
@@ -176,9 +183,10 @@ def test_compute_normalized_laplacian(metta: MeTTa):
         """
     )[0][0]
     L_norm: int = result.get_object().value
-    expected = np.array([[0.5, -0.5],
-                         [-0.5, 0.5]])
-    assert np.allclose(L_norm, expected), "L_norm for a 2x2 complete graph is incorrect."
+    expected = np.array([[0.5, -0.5], [-0.5, 0.5]])
+    assert np.allclose(
+        L_norm, expected
+    ), "L_norm for a 2x2 complete graph is incorrect."
 
     result: Atom = metta.run(
         """        
@@ -186,12 +194,16 @@ def test_compute_normalized_laplacian(metta: MeTTa):
         """
     )[0][0]
     L_norm: int = result.get_object().value
-    expected = np.array([
-        [1 - 1 / 3, -1 / 3, -1 / 3],
-        [-1 / 3, 1 - 1 / 3, -1 / 3],
-        [-1 / 3, -1 / 3, 1 - 1 / 3]
-    ])
-    assert np.allclose(L_norm, expected), "L_norm for a 3x3 complete graph is incorrect."
+    expected = np.array(
+        [
+            [1 - 1 / 3, -1 / 3, -1 / 3],
+            [-1 / 3, 1 - 1 / 3, -1 / 3],
+            [-1 / 3, -1 / 3, 1 - 1 / 3],
+        ]
+    )
+    assert np.allclose(
+        L_norm, expected
+    ), "L_norm for a 3x3 complete graph is incorrect."
 
     result: Atom = metta.run(
         """ 
@@ -246,8 +258,9 @@ def test_spectral_embedding(metta: MeTTa):
     eigenvalues, eigenvectors = np.linalg.eigh(L)
     idx = np.argsort(eigenvalues)
     expected_U = eigenvectors[:, idx[:k]]
-    assert np.allclose(np.abs(U), np.abs(
-        expected_U)), "Eigenvectors from spectral_embedding do not match expected values for a identity matrix."
+    assert np.allclose(
+        np.abs(U), np.abs(expected_U)
+    ), "Eigenvectors from spectral_embedding do not match expected values for a identity matrix."
 
     # Test 1: Diagonal matrix test
     result: Atom = metta.run(
@@ -266,7 +279,10 @@ def test_spectral_embedding(metta: MeTTa):
     )[0][0]
     U = result.get_object().value
     # Check the shape of the output
-    assert U.shape == (3, 2), "Expected output shape (3,2) for a 3x3 diagonal matrix with k=2."
+    assert U.shape == (
+        3,
+        2,
+    ), "Expected output shape (3,2) for a 3x3 diagonal matrix with k=2."
 
     # Compute the expected eigen-decomposition
     L = np.diag([0, 1, 2])
@@ -274,8 +290,9 @@ def test_spectral_embedding(metta: MeTTa):
     eigenvalues, eigenvectors = np.linalg.eigh(L)
     idx = np.argsort(eigenvalues)
     expected_U = eigenvectors[:, idx[:k]]
-    assert np.allclose(np.abs(U), np.abs(
-        expected_U)), "Eigenvectors from spectral_embedding do not match expected values for a diagonal matrix."
+    assert np.allclose(
+        np.abs(U), np.abs(expected_U)
+    ), "Eigenvectors from spectral_embedding do not match expected values for a diagonal matrix."
 
     # Test 2: Small symmetric matrix test
     result: Atom = metta.run(
@@ -296,8 +313,7 @@ def test_spectral_embedding(metta: MeTTa):
     assert U.shape == (2, 2), "Expected output shape (2,2) for a 2x2 matrix with k=2."
 
     # Verify that each column satisfies the eigenvalue equation: L_sym * u = lambda * u
-    L = np.array([[0.5, -0.5],
-                  [-0.5, 0.5]])
+    L = np.array([[0.5, -0.5], [-0.5, 0.5]])
     k = 2
     eigenvalues, eigenvectors = np.linalg.eigh(L)
     idx = np.argsort(eigenvalues)
@@ -305,7 +321,9 @@ def test_spectral_embedding(metta: MeTTa):
     for i in range(k):
         lam = sorted_eigenvalues[i]
         # Check that L_sym @ U[:, i] ≈ lam * U[:, i]
-        assert np.allclose(L @ U[:, i], lam * U[:, i]), f"Eigenvector {i} does not satisfy the eigenvalue equation."
+        assert np.allclose(
+            L @ U[:, i], lam * U[:, i]
+        ), f"Eigenvector {i} does not satisfy the eigenvalue equation."
 
     # Test 3: Edge case with k = 0
     result: Atom = metta.run(
@@ -370,7 +388,7 @@ def test_row_normalize(metta: MeTTa):
     assert B_norm.shape == expected.shape, "Output shape must match input shape."
     assert np.allclose(B_norm, expected), "Row normalization failed on standard input."
 
-    with np.errstate(divide='ignore', invalid='ignore'):
+    with np.errstate(divide="ignore", invalid="ignore"):
         result: Atom = metta.run(
             """
             ! (row-normalize (C))
@@ -378,10 +396,14 @@ def test_row_normalize(metta: MeTTa):
         )[0][0]
     C_norm = result.get_object().value
     # For the zero row, dividing by zero should result in nan values.
-    assert np.isnan(C_norm[0]).all(), "Row normalization should yield nan for zero vector."
+    assert np.isnan(
+        C_norm[0]
+    ).all(), "Row normalization should yield nan for zero vector."
     # For the nonzero row:
     expected_nonzero = np.array([1, 2]) / np.linalg.norm([1, 2])
-    assert np.allclose(C_norm[1], expected_nonzero), "Row normalization failed on nonzero row with a zero row present."
+    assert np.allclose(
+        C_norm[1], expected_nonzero
+    ), "Row normalization failed on nonzero row with a zero row present."
 
     result: Atom = metta.run(
         """
@@ -391,7 +413,9 @@ def test_row_normalize(metta: MeTTa):
     D_norm = result.get_object().value
     norm_value = np.sqrt(3)
     expected = np.ones((3, 3)) / norm_value
-    assert D_norm.shape == expected.shape, "Output shape must match input shape for ones matrix."
+    assert (
+        D_norm.shape == expected.shape
+    ), "Output shape must match input shape for ones matrix."
     assert np.allclose(D_norm, expected), "Row normalization failed for ones matrix."
 
 

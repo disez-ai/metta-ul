@@ -24,9 +24,9 @@ def compute_affinity(X: np.ndarray, sigma: float) -> np.ndarray:
     W : np.ndarray of shape (n_samples, n_samples)
         The computed affinity matrix.
     """
-    sq_norms = np.sum(X ** 2, axis=1, keepdims=True)
+    sq_norms = np.sum(X**2, axis=1, keepdims=True)
     sq_dists = sq_norms + sq_norms.T - 2 * np.dot(X, X.T)
-    W = np.exp(-sq_dists / (2 * sigma ** 2))
+    W = np.exp(-sq_dists / (2 * sigma**2))
     return W
 
 
@@ -121,7 +121,9 @@ def apply_kmeans(U_norm: np.ndarray, k: int, max_iter: int) -> np.ndarray:
     return labels
 
 
-def spectral_clustering(X: np.ndarray, k: int, sigma: float = 0.1, max_iter: int = 1000) -> np.ndarray:
+def spectral_clustering(
+    X: np.ndarray, k: int, sigma: float = 0.1, max_iter: int = 1000
+) -> np.ndarray:
     """
     Perform spectral clustering using the normalized Laplacian.
 
@@ -165,12 +167,14 @@ def main():
     print(labels)
 
     plt.figure(figsize=(8, 6))
-    plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis', edgecolors='k', s=80, alpha=0.6)
+    plt.scatter(
+        X[:, 0], X[:, 1], c=labels, cmap="viridis", edgecolors="k", s=80, alpha=0.6
+    )
     plt.title("Spectral Clustering on 2D Moons Dataset")
     plt.xlabel("Feature 1")
     plt.ylabel("Feature 2")
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

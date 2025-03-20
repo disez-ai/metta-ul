@@ -135,7 +135,13 @@ def numme_atoms():
             unwrap=False,
         )
     )
-    nmLogDet = G(PatternOperation("np.linalg.slogabsdet", wrapnpop(lambda x: np.linalg.slogdet(x).logabsdet), unwrap=False))
+    nmLogDet = G(
+        PatternOperation(
+            "np.linalg.slogabsdet",
+            wrapnpop(lambda x: np.linalg.slogdet(x).logabsdet),
+            unwrap=False,
+        )
+    )
     nmInv = G(PatternOperation("np.linalg.inv", wrapnpop(np.linalg.inv), unwrap=False))
     nmEinsum = G(PatternOperation("np.einsum", wrapnpop(np.einsum), unwrap=False))
     nmExp = G(PatternOperation("np.exp", wrapnpop(np.exp), unwrap=False))
@@ -145,7 +151,9 @@ def numme_atoms():
     nmEye = G(PatternOperation("np.eye", wrapnpop(np.eye), unwrap=False))
     nmOnes = G(PatternOperation("np.ones", wrapnpop(np.ones), unwrap=False))
     nmPower = G(PatternOperation("np.power", wrapnpop(np.power), unwrap=False))
-    nmRandomRand = G(PatternOperation("np.random.rand", wrapnpop(np.random.rand), unwrap=False))
+    nmRandomRand = G(
+        PatternOperation("np.random.rand", wrapnpop(np.random.rand), unwrap=False)
+    )
     nmDiag = G(PatternOperation("np.diag", wrapnpop(np.diag), unwrap=False))
     nmSqrt = G(PatternOperation("np.sqrt", wrapnpop(np.sqrt), unwrap=False))
     nmArgsort = G(PatternOperation("np.argsort", wrapnpop(np.argsort), unwrap=False))
@@ -184,5 +192,5 @@ def numme_atoms():
         "np.argsort": nmArgsort,
         "np.arange": nmArange,
         "np.take": nmTake,
-        "np.argmax": nmArgmax
+        "np.argmax": nmArgmax,
     }

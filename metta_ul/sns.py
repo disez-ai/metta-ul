@@ -1,4 +1,16 @@
-from hyperon.atoms import G, Atoms, MatchableObject, GroundedAtom, ExpressionAtom, VariableAtom, OperationObject, S, AtomType, NoReduceError, get_string_value
+from hyperon.atoms import (
+    G,
+    Atoms,
+    MatchableObject,
+    GroundedAtom,
+    ExpressionAtom,
+    VariableAtom,
+    OperationObject,
+    S,
+    AtomType,
+    NoReduceError,
+    get_string_value,
+)
 from hyperon.ext import register_atoms
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -8,8 +20,7 @@ from pdm import unwrap_args
 class PlotValue(MatchableObject):
 
     def __eq__(self, other):
-        return isinstance(other, PlotValue) and\
-            self.content == other.content
+        return isinstance(other, PlotValue) and self.content == other.content
 
     def match_(self, other):
         bindings = {}
@@ -56,20 +67,24 @@ class PatternOperation(OperationObject):
     def execute(self, *PlotValue, res_typ=AtomType.UNDEFINED):
         if self.rec:
             PlotValue = PlotValue[0].get_children()
-            PlotValue = [self.execute(arg)[0]
-                         if isinstance(arg, ExpressionAtom) else arg for arg in PlotValue]
+            PlotValue = [
+                self.execute(arg)[0] if isinstance(arg, ExpressionAtom) else arg
+                for arg in PlotValue
+            ]
         # If there is a variable or PatternValue in arguments, create PatternValue
         # instead of executing the operation
         for arg in PlotValue:
-            if isinstance(arg, GroundedAtom) and\
-               isinstance(arg.get_object(), PatternValue) or\
-               isinstance(arg, VariableAtom):
+            if (
+                isinstance(arg, GroundedAtom)
+                and isinstance(arg.get_object(), PatternValue)
+                or isinstance(arg, VariableAtom)
+            ):
                 return [G(PatternValue([self, PlotValue]))]
         return super().execute(*PlotValue, res_typ=res_typ)
 
 
 def _plot_atom_type(df):
-    return S('PlotValue')
+    return S("PlotValue")
 
 
 def wrapnpop(func):
@@ -81,14 +96,16 @@ def wrapnpop(func):
         fig.savefig("out.png")
         typ = _plot_atom_type(res)
         return [G(PlotValue(res), typ)]
+
     return wrapper
 
 
 @register_atoms
 def slk_atoms():
 
-    snsScatterplot = G(PatternOperation(
-        "sns.scatterplot", wrapnpop(sns.scatterplot), unwrap=False))
+    snsScatterplot = G(
+        PatternOperation("sns.scatterplot", wrapnpop(sns.scatterplot), unwrap=False)
+    )
 
     return {
         r"sns\.scatterplot": snsScatterplot,

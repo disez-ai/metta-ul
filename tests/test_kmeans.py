@@ -4,17 +4,17 @@ import numpy as np
 
 def test_kmeans(metta: MeTTa):
     metta.run(
-        '''
+        """
         ! (import! &self metta_ul:cluster:kmeans)
 
         (=
             (X)
             ((1 0 0) (0 1 0) (0 0 1))
         )
-        '''
+        """
     )
 
-    result: Atom = metta.run('! (kmeans (np.array (X)) 3)')[0][0]
+    result: Atom = metta.run("! (kmeans (np.array (X)) 3)")[0][0]
 
     centroids_true = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     centroids: np.ndarray = result.get_object().value
@@ -29,17 +29,17 @@ def test_kmeans(metta: MeTTa):
 
 def test_py_dot_kmeans(metta: MeTTa):
     metta.run(
-        '''
+        """
         ! (import! &self metta_ul:cluster:py_dot_kmeans)
 
         (=
             (X)
             ((1 0 0) (0 1 0) (0 0 1))
         )
-        '''
+        """
     )
 
-    result: Atom = metta.run('! (kmeans (py-list (X)) 3 5)')[0][0]
+    result: Atom = metta.run("! (kmeans (py-list (X)) 3 5)")[0][0]
 
     centroids_true = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     centroids: np.ndarray = np.asarray(result.get_object().value)

@@ -9,8 +9,11 @@ from numme import wrapnpop
 @register_atoms
 def slk_atoms():
 
-    skl_normalize = G(PatternOperation(
-        "skl.preprocessing.normalize", wrapnpop(normalize), unwrap=False))
+    skl_normalize = G(
+        PatternOperation(
+            "skl.preprocessing.normalize", wrapnpop(normalize), unwrap=False
+        )
+    )
 
     return {
         r"skl\.preprocessing\.normalize": skl_normalize,

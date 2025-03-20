@@ -1,4 +1,15 @@
-from hyperon.atoms import MatchableObject, GroundedAtom, ExpressionAtom, VariableAtom, S, G, get_string_value, AtomType, OperationObject, NoReduceError
+from hyperon.atoms import (
+    MatchableObject,
+    GroundedAtom,
+    ExpressionAtom,
+    VariableAtom,
+    S,
+    G,
+    get_string_value,
+    AtomType,
+    OperationObject,
+    NoReduceError,
+)
 from hyperon.ext import register_atoms
 
 from numme import _np_atom_type, NumpyValue
@@ -8,8 +19,7 @@ import pandas as pd
 class DataFrameValue(MatchableObject):
 
     def __eq__(self, other):
-        return isinstance(other, DataFrameValue) and\
-            self.content.equals(other.content)
+        return isinstance(other, DataFrameValue) and self.content.equals(other.content)
 
     def match_(self, other):
         sh = self.content.shape
@@ -59,20 +69,24 @@ class PatternOperation(OperationObject):
     def execute(self, *args, res_typ=AtomType.UNDEFINED):
         if self.rec:
             args = args[0].get_children()
-            args = [self.execute(arg)[0]
-                    if isinstance(arg, ExpressionAtom) else arg for arg in args]
+            args = [
+                self.execute(arg)[0] if isinstance(arg, ExpressionAtom) else arg
+                for arg in args
+            ]
         # If there is a variable or PatternValue in arguments, create PatternValue
         # instead of executing the operation
         for arg in args:
-            if isinstance(arg, GroundedAtom) and\
-               isinstance(arg.get_object(), PatternValue) or\
-               isinstance(arg, VariableAtom):
+            if (
+                isinstance(arg, GroundedAtom)
+                and isinstance(arg.get_object(), PatternValue)
+                or isinstance(arg, VariableAtom)
+            ):
                 return [G(PatternValue([self, args]))]
         return super().execute(*args, res_typ=res_typ)
 
 
 def _dataframe_atom_type(df):
-    return S('PDDataFrame')
+    return S("PDDataFrame")
 
 
 def wrapnpop(func):
@@ -81,6 +95,7 @@ def wrapnpop(func):
         res = func(*a, **k)
         typ = _dataframe_atom_type(res)
         return [G(DataFrameValue(res), typ)]
+
     return wrapper
 
 
@@ -97,12 +112,11 @@ def unwrap_args(atoms):
                 except:
                     raise RuntimeError(f"Incorrect kwarg format {kwarg}")
                 try:
-                    kwargs[get_string_value(
-                        kwarg[0])] = kwarg[1].get_object().content
+                    kwargs[get_string_value(kwarg[0])] = kwarg[1].get_object().content
                 except:
                     raise NoReduceError()
                 continue
-        if hasattr(a, 'get_object'):
+        if hasattr(a, "get_object"):
             args.append(a.get_object().content)
         else:
             # NOTE:
@@ -123,8 +137,9 @@ def _to_numme(*args):
 @register_atoms
 def pdme_atoms():
 
-    pdLoadFromJson = G(PatternOperation(
-        "pdm.read_csv", wrapnpop(pd.read_csv), unwrap=False))
+    pdLoadFromJson = G(
+        PatternOperation("pdm.read_csv", wrapnpop(pd.read_csv), unwrap=False)
+    )
     pdmValues = G(PatternOperation("pdm.values", _to_numme, unwrap=False))
 
     return {
