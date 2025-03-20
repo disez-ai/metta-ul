@@ -144,6 +144,14 @@ def numme_atoms():
     nmRepeat = G(PatternOperation("np.repeat", wrapnpop(np.repeat), unwrap=False))
     nmEye = G(PatternOperation("np.eye", wrapnpop(np.eye), unwrap=False))
     nmOnes = G(PatternOperation("np.ones", wrapnpop(np.ones), unwrap=False))
+    nmPower = G(PatternOperation("np.power", wrapnpop(np.power), unwrap=False))
+    nmRandomRand = G(PatternOperation("np.random.rand", wrapnpop(np.random.rand), unwrap=False))
+    nmDiag = G(PatternOperation("np.diag", wrapnpop(np.diag), unwrap=False))
+    nmSqrt = G(PatternOperation("np.sqrt", wrapnpop(np.sqrt), unwrap=False))
+    nmArgsort = G(PatternOperation("np.argsort", wrapnpop(np.argsort), unwrap=False))
+    nmArange = G(PatternOperation("np.arange", wrapnpop(np.arange), unwrap=False))
+    nmTake = G(PatternOperation("np.take", wrapnpop(np.take), unwrap=False))
+    nmArgmax = G(PatternOperation("np.argmax", wrapnpop(np.argmax), unwrap=False))
 
     return {
         "np.vector": nmVectorAtom,
@@ -168,5 +176,13 @@ def numme_atoms():
         "np.cov": nmCov,
         "np.repeat": nmRepeat,
         "np.eye": nmEye,
-        "np.ones": nmOnes
+        "np.ones": nmOnes,
+        "np.power": nmPower,
+        "np.random.rand": nmRandomRand,
+        "np.diag": nmDiag,
+        "np.sqrt": nmSqrt,
+        "np.argsort": nmArgsort,
+        "np.arange": nmArange,
+        "np.take": nmTake,
+        "np.argmax": nmArgmax
     }

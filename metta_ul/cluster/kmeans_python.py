@@ -36,4 +36,6 @@ def kmeans(X, k, max_iter=100):
             return recursive_kmeans(X, new_centroids, max_iter - 1)
 
     centroids = init_centroids(X, k)
-    return recursive_kmeans(X, centroids, max_iter)
+    new_centroids = recursive_kmeans(X, centroids, max_iter)
+    assignments = assign(X, new_centroids)
+    return new_centroids, assignments
