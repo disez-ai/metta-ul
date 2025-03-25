@@ -4,10 +4,10 @@
 
 metta-ul is a basic implementation of clustering algorithms in the MeTTa language. It includes implementations of:
 
-- k-means
+- K-Means
 - Gaussian Mixture Models (GMM)
-- Spectral clustering
-- Hierarchical clustering
+- Spectral Clustering
+- Hierarchical Clustering
 
 This project is packaged as a Python module and includes a Dockerized environment for running tests using `pytest`.
 
@@ -15,7 +15,7 @@ This project is packaged as a Python module and includes a Dockerized environmen
 
 - **Ramin Barati** - <rekino@gmail.com>
 - **Amirhossein Nourani Zadeh** - <amirhossein.nouranizadeh@gmail.com>
-- **Farhoud** - <amirhossein.nouranizadeh@gmail.com>
+- **Farhoud** - <farhoud.m7@gmail.com>
 
 ## Requirements
 
@@ -59,23 +59,7 @@ make test
 Alternatively, if you want to run pytest directly inside Docker:
 
 ```sh
-docker run -it --mount type=bind,src=$(pwd),dst=/app --user "$(id -u):$(id -g)" --name metta_ul_run metta_ul pytest -s
-```
-
-## Project Structure
-
-```
-metta-ul/
-│── Dockerfile
-│── Makefile
-│── pyproject.toml
-│── README.md
-│── src/
-│   ├── metta_ul/
-│   │   ├── __init__.py
-│   │   ├── clustering.py  # Clustering algorithm implementations
-│── tests/
-│   ├── test_clustering.py # Unit tests
+docker run -it --rm --mount type=bind,src=$(pwd),dst=/app --name metta_ul_run metta_ul pytest -s
 ```
 
 ## Contributing
@@ -88,4 +72,3 @@ metta-ul/
 ## License
 
 This project is licensed under the MIT License.
-
