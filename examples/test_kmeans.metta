@@ -7,10 +7,7 @@
 
 ! (bind! &n (skl.preprocessing.normalize &norm))
 
-;! (assertEqual (get-type &n) (NPArray (20640 2)))
+! (bind! &model (kmeans.fit &norm 3))
 
-! (bind! &cn (kmeans &norm 3))
+! (bind! &plot (sns.scatterplot (data &df) (x "longitude")  (y "latitude") (hue (labels &model))))
 
-! (kmeans.assign &norm &cn 3)
-
-! (assertEqual (get-type $cn) (get-type (py-list )))
