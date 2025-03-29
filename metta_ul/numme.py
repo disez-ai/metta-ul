@@ -169,6 +169,7 @@ def numme_atoms():
     nmMean = G(PatternOperation("np.mean", wrapnpop(np.mean), unwrap=False))
     nmSqueeze = G(PatternOperation("np.squeeze", wrapnpop(np.squeeze), unwrap=False))
     nmRandomSeed = G(PatternOperation("np.random.seed", wrapnpop(np.random.seed), unwrap=False))
+    nmShape = G(PatternOperation("np.shape", wrapnpop(lambda _x, _i: _x.shape[_i]), unwrap=False))
 
     return {
         "np.vector": nmVectorAtom,
@@ -208,4 +209,5 @@ def numme_atoms():
         "np.max": nmMax,
         "np.squeeze": nmSqueeze,
         "np.random.seed": nmRandomSeed,
+        "np.shape": nmShape,
     }
