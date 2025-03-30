@@ -83,7 +83,6 @@ def _np_atom_type(npobj):
     if not isinstance(npobj, np.ndarray):
         return AtomType.UNDEFINED
     return E(S("NPArray"), E(*[ValueAtom(s, "Number") for s in npobj.shape]))
-    
 
 
 def wrapnpop(func):
@@ -213,18 +212,21 @@ def numme_atoms():
     nmArange = G(PatternOperation(
         "np.arange", wrapnpop(np.arange), unwrap=False))
     nmTake = G(PatternOperation("np.take", wrapnpop(np.take), unwrap=False))
-    nmArgmax = G(PatternOperation(
-        "np.argmax", wrapnpop(np.argmax), unwrap=False))
 
     nmSlice = G(PatternOperation("np.slice", wrapnpop(_slice), unwrap=False))
-    nmArgmax = G(PatternOperation("np.argmax", wrapnpop(np.argmax), unwrap=False))
-    nmIx_ = G(PatternOperation("np.ix_", wrapnpop(np.ix_), unwrap=False, rec=False))
+    nmArgmax = G(PatternOperation(
+        "np.argmax", wrapnpop(np.argmax), unwrap=False))
+    nmIx_ = G(PatternOperation("np.ix_", wrapnpop(
+        np.ix_), unwrap=False, rec=False))
     nmMin = G(PatternOperation("np.min", wrapnpop(np.min), unwrap=False))
     nmMax = G(PatternOperation("np.max", wrapnpop(np.max), unwrap=False))
     nmMean = G(PatternOperation("np.mean", wrapnpop(np.mean), unwrap=False))
-    nmSqueeze = G(PatternOperation("np.squeeze", wrapnpop(np.squeeze), unwrap=False))
-    nmRandomSeed = G(PatternOperation("np.random.seed", wrapnpop(np.random.seed), unwrap=False))
-    nmShape = G(PatternOperation("np.shape", wrapnpop(lambda _x, _i: _x.shape[_i]), unwrap=False))
+    nmSqueeze = G(PatternOperation(
+        "np.squeeze", wrapnpop(np.squeeze), unwrap=False))
+    nmRandomSeed = G(PatternOperation("np.random.seed",
+                     wrapnpop(np.random.seed), unwrap=False))
+    nmShape = G(PatternOperation("np.shape", wrapnpop(
+        lambda _x, _i: _x.shape[_i]), unwrap=False))
 
     return {
         "np.vector": nmVectorAtom,
@@ -258,7 +260,7 @@ def numme_atoms():
         "np.arange": nmArange,
         "np.take": nmTake,
         "np.argmax": nmArgmax,
-        "np.slice": nmSlice
+        "np.slice": nmSlice,
         "np.ix_": nmIx_,
         "np.mean": nmMean,
         "np.min": nmMin,
