@@ -9,7 +9,7 @@ from .numme import wrapnpop
 
 
 def _load_wine_data():
-    return load_wine().data[:, :2]
+    return load_wine().data
 
 
 @register_atoms
