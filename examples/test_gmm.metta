@@ -8,7 +8,11 @@
 
 ;! (gmm &data 2)
 
-;! (bind! &model (gmm &data 2))
+! (bind! &parms (gmm &data 2))
+
+
+!(gmm.predict &data &parms) 
+
 
 ;! (bind! &plot (sns.scatterplot (data &df) (x "longitude")  (y "latitude") (hue (labels &model))))
 

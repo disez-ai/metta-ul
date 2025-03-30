@@ -87,7 +87,6 @@ def wrapnpop(func):
     def wrapper(*args):
         a = [arg.get_object().value if isinstance(arg, GroundedAtom)
              else arg.get_name() for arg in args]
-        print("data", a)
         res = func(*a)
         typ = _np_atom_type(res)
         return [G(NumpyValue(res), typ)]
@@ -98,10 +97,8 @@ def wrapnpop(func):
 def _slice(*args):
     if args[0] is None:
         return None
-    print("slice args", args[1])
     arr = args[0]
     slice_str = parse_to_slice(args[1])
-    print("segee", slice_str)
     return arr[slice_str]
 
 
