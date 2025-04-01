@@ -58,7 +58,7 @@ Merges the two clusters that are closest based on the specified linkage criterio
 
 #### Returns:
 - The updated clusters.
-(agglomerative.recursion $linkage $clusters $distance-matrix $length)
+
 ### `agglomerative.recursion`
 The basic recursion step of the algorithm.
 
