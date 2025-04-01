@@ -69,7 +69,7 @@ The basic recursion step of the algorithm.
 - `$length`: The count of clusters in `$clusters`.
 
 #### Returns:
-- - A hierarchical clustering structure as a MeTTa list.
+- A hierarchical clustering structure as a MeTTa list.
 
 ### `agglomerative`
 Performs agglomerative clustering on a dataset.
