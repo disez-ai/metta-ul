@@ -7,10 +7,6 @@ This module implements the K-Means clustering algorithm in MeTTa. K-Means is a p
 
 ### `kmeans.update`
 
-#### Definition:
-```metta
-(kmeans.update $X $assignments)
-```
 #### Description:
 This function updates the centroids based on the current cluster assignments. It computes the new centroids as the mean of all data points assigned to each cluster.
 
@@ -25,10 +21,6 @@ This function updates the centroids based on the current cluster assignments. It
 
 ### `kmeans.assign`
 
-#### Definition:
-```metta
-(kmeans.assign $X $centroids $k)
-```
 #### Description:
 Assigns each data point to the nearest centroid.
 
@@ -44,10 +36,6 @@ Assigns each data point to the nearest centroid.
 
 ### `kmeans.recursion`
 
-#### Definition:
-```metta
-(kmeans.recursion $X $centroids $k $max-iter)
-```
 #### Description:
 Recursively updates the centroids until the maximum number of iterations is reached.
 
@@ -64,11 +52,6 @@ Recursively updates the centroids until the maximum number of iterations is reac
 
 ### `kmeans`
 
-#### Definition:
-```metta
-(kmeans $X $k)
-(kmeans $X $k $max-iter)
-```
 #### Description:
 Main function to perform K-Means clustering. It initializes centroids randomly and iteratively updates them.
 
