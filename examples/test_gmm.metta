@@ -6,13 +6,12 @@
 
 ! (assertEqual (get-type &data) (NPArray (178 2)))
 
-;! (gmm &data 2)
 
-! (bind! &parms (gmm &data 2))
-
-
-!(gmm.predict &data &parms) 
+! (bind! &model (gmm &data 2))
 
 
-;! (bind! &plot (sns.scatterplot (data &df) (x "longitude")  (y "latitude") (hue (labels &model))))
+! (bind! &labels (gmm.predict &data &model))
+
+
+! (sns.scatterplot (x (np.slice &data [:,0]))  (y (np.slice &data [:,1])) (hue &labels) (alpha 0.6))
 
