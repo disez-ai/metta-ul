@@ -179,7 +179,7 @@ def test_compute_sse(metta: MeTTa):
             )            
         )
                        
-        ! (compute-sse (X1) (indices1) (center1))
+        ! (bisecting-kmeans.compute-sse (X1) (indices1) (center1))
         """
     )[0][0]
     sse: int = result.get_object().value
@@ -207,7 +207,7 @@ def test_compute_sse(metta: MeTTa):
             )            
         )
 
-        ! (compute-sse (X2) (indices2) (center2))
+        ! (bisecting-kmeans.compute-sse (X2) (indices2) (center2))
         """
     )[0][0]
     sse: int = result.get_object().value
@@ -243,7 +243,7 @@ def test_compute_sse(metta: MeTTa):
             )
         )
         
-        ! (compute-sse (X3) (indices3) (center3))
+        ! (bisecting-kmeans.compute-sse (X3) (indices3) (center3))
         """
     )[0][0]
     sse: int = result.get_object().value
@@ -267,7 +267,7 @@ def test_compute_initial_cluster(metta: MeTTa):
             )
         )
 
-        ! (compute-initial-cluster (X1))    
+        ! (bisecting-kmeans.compute-initial-cluster (X1))    
         """
     )[0][0]
     init_cluster = metta_clusters_to_py_clusters(result)
@@ -306,7 +306,7 @@ def test_find_max_cluster(metta: MeTTa):
                 ()
             )
         )
-        ! (find-max-cluster (clusters1))
+        ! (bisecting-kmeans.find-max-cluster (clusters1))
         """
     )[0][0]
     indices, center, sse, hierarchy = result.get_children()
@@ -334,7 +334,7 @@ def test_find_max_cluster(metta: MeTTa):
                 )
             )
         )
-        ! (find-max-cluster (clusters2))
+        ! (bisecting-kmeans.find-max-cluster (clusters2))
         """
     )[0][0]
     indices, center, sse, hierarchy = result.get_children()
@@ -371,7 +371,7 @@ def test_remove_cluster(metta: MeTTa):
             )
         )
         
-        ! (remove-cluster (clusters) ((np.array (1)) pyNone 2.0 pyNone))
+        ! (bisecting-kmeans.remove-cluster (clusters) ((np.array (1)) pyNone 2.0 pyNone))
         """
     )[0][0]
     py_clusters = metta_clusters_to_py_clusters(result)
@@ -398,7 +398,7 @@ def test_remove_cluster(metta: MeTTa):
             )
         )
 
-        ! (remove-cluster (clusters) ((np.array (99)) pyNone 2.0 pyNone))
+        ! (bisecting-kmeans.remove-cluster (clusters) ((np.array (99)) pyNone 2.0 pyNone))
         """
     )[0][0]
     py_clusters = metta_clusters_to_py_clusters(result)
@@ -411,7 +411,7 @@ def test_remove_cluster(metta: MeTTa):
             ()
         )
 
-        ! (remove-cluster (clusters) ((np.array (99)) pyNone 2.0 pyNone))
+        ! (bisecting-kmeans.remove-cluster (clusters) ((np.array (99)) pyNone 2.0 pyNone))
         """
     )[0][0]
     py_clusters = metta_clusters_to_py_clusters(result)
@@ -444,7 +444,7 @@ def test_bisect_cluster(metta: MeTTa):
             )
         )
                         
-        ! (bisect-cluster (X) (find-max-cluster (clusters)) 100)
+        ! (bisecting-kmeans.bisect-cluster (X) (bisecting-kmeans.find-max-cluster (clusters)) 100)
         
         
         """
@@ -674,14 +674,14 @@ def test_bisecting_kmeans(metta: MeTTa):
         )
         (=
             (init-cluster)
-            (compute-initial-cluster (X))            
+            (bisecting-kmeans.compute-initial-cluster (X))            
         )
         (=
             (init-hierarchy)
             (append pyNone (init-cluster))
         )
                 
-        ! (bisecting-kmeans (X) (init-cluster) 1 10 (init-hierarchy))
+        ! (bisecting-kmeans.recursive-bisecting-kmeans (X) (init-cluster) 1 10 (init-hierarchy))
                                
         """
     )[0][0]
@@ -692,7 +692,7 @@ def test_bisecting_kmeans(metta: MeTTa):
     # test for splitting into 3 clusters.
     result: Atom = metta.run(
         """            
-        ! (bisecting-kmeans (X) (init-cluster) 3 10 (init-hierarchy))
+        ! (bisecting-kmeans.recursive-bisecting-kmeans (X) (init-cluster) 3 10 (init-hierarchy))
     
         """
     )[0][0]

@@ -14,8 +14,41 @@
     )
 )
 (=
-    (to-np $x)
-    ((py-dot np array) $x)
+    (length ())
+    0
+)
+(=
+    (length (:: ($indices $center $sse $hierarchy) $xs))
+    (+ 1 (length $xs))
+)
+(=
+    (get-first (:: $x $y))
+    $x
+)
+(=
+    (get-second (:: $x (:: $y ())))
+    $y
+)
+(=
+    (append pyNone $a)
+    (::
+        $a
+        ()
+    )
+)
+(=
+    (append () $a)
+    (::
+        $a
+        ()
+    )
+)
+(=
+    (append (:: $x $xs) $a)
+    (::
+        $x
+        (append $xs $a)
+    )
 )
 ; =========================================
 
@@ -84,7 +117,7 @@
 ; ===============================================
 
 (=
-    (compute-sse $X $indices $centers)
+    (bisecting-kmeans.compute-sse $X $indices $centers)
     (if (> (py-dot $indices size) 0)
         ((py-dot
             (np.power
@@ -101,7 +134,7 @@
 )
 
 (=
-    (compute-initial-cluster $X)
+    (bisecting-kmeans.compute-initial-cluster $X)
     (::
         (
             ; indices
@@ -113,7 +146,7 @@
             ((py-dot $X mean) 0)
 
             ; sse
-            (compute-sse
+            (bisecting-kmeans.compute-sse
                 $X
                 (np.arange
                     (py-getitem (py-dot $X shape) 0)
@@ -129,56 +162,48 @@
 )
 
 (=
-    (get-cluster-indices ($indices $center $sse $hierarchy))
+    (bisecting-kmeans.get-cluster-indices ($indices $center $sse $hierarchy))
     $indices
 )
 (=
-    (get-cluster-center ($indices $center $sse $hierarchy))
+    (bisecting-kmeans.get-cluster-center ($indices $center $sse $hierarchy))
     $center
 )
 (=
-    (get-cluster-sse ($indices $center $sse $hierarchy))
+    (bisecting-kmeans.get-cluster-sse ($indices $center $sse $hierarchy))
     $sse
 )
 (=
-    (get-cluster-hierarchy ($indices $center $sse $hierarchy))
+    (bisecting-kmeans.get-cluster-hierarchy ($indices $center $sse $hierarchy))
     $hierarchy
 )
 
 (=
-    (length ())
-    0
-)
-(=
-    (length (:: ($indices $center $sse $hierarchy) $xs))
-    (+ 1 (length $xs))
-)
-(=
-    (head (:: ($indices $center $sse $hierarchy) $xs))
-    ($indices $center $sse $hierarchy)
-)
-(=
-    (tail (:: ($indices $center $sse $hierarchy) $xs))
-    $xs
-)
-
-
-(=
-    (find-max-cluster (:: ($indices $center $sse $hierarchy) ()) )
+    (bisecting-kmeans.find-max-cluster (:: ($indices $center $sse $hierarchy) ()) )
     ($indices $center $sse $hierarchy)
 )
 
 (=
-    (find-max-cluster (:: ($indices1 $center1 $sse1 $hierarchy1) (:: ($indices2 $center2 $sse2 $hierarchy2) $xs)))
-    (if (> $sse1 (get-cluster-sse (find-max-cluster (:: ($indices2 $center2 $sse2 $hierarchy2) $xs))))
+    (bisecting-kmeans.find-max-cluster
+        (:: ($indices1 $center1 $sse1 $hierarchy1)
+        (:: ($indices2 $center2 $sse2 $hierarchy2) $xs))
+    )
+    (if (>
+        $sse1
+        (bisecting-kmeans.get-cluster-sse
+            (bisecting-kmeans.find-max-cluster (:: ($indices2 $center2 $sse2 $hierarchy2) $xs))
+        )
+    )
          ($indices1 $center1 $sse1 $hierarchy1)
-         (find-max-cluster (:: ($indices2 $center2 $sse2 $hierarchy2) $xs))
+         (bisecting-kmeans.find-max-cluster (:: ($indices2 $center2 $sse2 $hierarchy2) $xs))
     )
 )
 
-
 (=
-    (cluster-equal ($indices1 $center1 $sse1 $hierarchy1) ($indices2 $center2 $sse2 $hierarchy2))
+    (bisecting-kmeans.cluster-equal
+        ($indices1 $center1 $sse1 $hierarchy1)
+        ($indices2 $center2 $sse2 $hierarchy2)
+    )
     (if
         (and
             (and
@@ -192,43 +217,39 @@
     )
 )
 (=
-    (remove-cluster () $target)
+    (bisecting-kmeans.remove-cluster () $target)
     ()
 )
 (=
-    (remove-cluster (:: ($indices $center $sse $hierarchy) $xs) $target)
-    (if (cluster-equal ($indices $center $sse $hierarchy) $target)
-        (remove-cluster $xs $target)
-        (:: ($indices $center $sse $hierarchy) (remove-cluster $xs $target))
+    (bisecting-kmeans.remove-cluster (:: ($indices $center $sse $hierarchy) $xs) $target)
+    (if (bisecting-kmeans.cluster-equal ($indices $center $sse $hierarchy) $target)
+        (bisecting-kmeans.remove-cluster $xs $target)
+        (:: ($indices $center $sse $hierarchy) (bisecting-kmeans.remove-cluster $xs $target))
     )
 )
 
 (=
-    (get-first (:: $x $y))
-    $x
-)
-(=
-    (get-second (:: $x (:: $y ())))
-    $y
-)
-(=
-    (bisect-cluster $X $max-cluster $max-iter)
+    (bisecting-kmeans.bisect-cluster $X $max-cluster $max-iter)
     (let
         ; compute the clusters
         $centers
-        (kmeans (np.take $X (get-cluster-indices $max-cluster) 0) 2)
+        (kmeans (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0) 2)
 
         ; output tuple
         (::
             ; cluster 0
             (
                 (np.take
-                    (get-cluster-indices $max-cluster)
+                    (bisecting-kmeans.get-cluster-indices $max-cluster)
                     (np.slice
                         ((py-dot np where)
                             (np.equal
                                 (np.argmax
-                                    (kmeans.assign (np.take $X (get-cluster-indices $max-cluster) 0) $centers 2)
+                                    (kmeans.assign
+                                        (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0)
+                                        $centers
+                                        2
+                                    )
                                     0
                                 )
                                 0
@@ -239,13 +260,17 @@
                 )
 
                 (np.slice $centers [0])
-                (compute-sse
-                    (np.take $X (get-cluster-indices $max-cluster) 0)
+                (bisecting-kmeans.compute-sse
+                    (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0)
                     (np.slice
                         ((py-dot np where)
                             (np.equal
                                 (np.argmax
-                                    (kmeans.assign (np.take $X (get-cluster-indices $max-cluster) 0) $centers 2)
+                                    (kmeans.assign
+                                        (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0)
+                                        $centers
+                                        2
+                                    )
                                     0
                                 )
                                 0
@@ -261,12 +286,16 @@
                 ; cluster 1
                 (
                     (np.take
-                        (get-cluster-indices $max-cluster)
+                        (bisecting-kmeans.get-cluster-indices $max-cluster)
                         (np.slice
                             ((py-dot np where)
                                 (np.equal
                                     (np.argmax
-                                        (kmeans.assign (np.take $X (get-cluster-indices $max-cluster) 0) $centers 2)
+                                        (kmeans.assign
+                                            (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0)
+                                             $centers
+                                             2
+                                        )
                                         0
                                     )
                                     1
@@ -276,13 +305,17 @@
                         )
                     )
                     (np.slice $centers [1])
-                    (compute-sse
-                        (np.take $X (get-cluster-indices $max-cluster) 0)
+                    (bisecting-kmeans.compute-sse
+                        (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0)
                         (np.slice
                             ((py-dot np where)
                                 (np.equal
                                     (np.argmax
-                                        (kmeans.assign (np.take $X (get-cluster-indices $max-cluster) 0) $centers 2)
+                                        (kmeans.assign
+                                            (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0)
+                                            $centers
+                                            2
+                                        )
                                         0
                                     )
                                     1
@@ -301,41 +334,19 @@
 )
 
 (=
-    (append pyNone $a)
-    (::
-        $a
-        ()
-    )
-)
-(=
-    (append () $a)
-    (::
-        $a
-        ()
-    )
-)
-(=
-    (append (:: $x $xs) $a)
-    (::
-        $x
-        (append $xs $a)
-    )
-)
-
-(=
-    (bisecting-kmeans $X $clusters $max-cluster $max-iter $hierarchy)
+    (bisecting-kmeans.recursive-bisecting-kmeans $X $clusters $max-cluster $max-iter $hierarchy)
     (if (>= (length $clusters) $max-cluster)
         $hierarchy
 
         (let
             $bisect
-            (bisect-cluster $X (find-max-cluster $clusters) $max-iter)
+            (bisecting-kmeans.bisect-cluster $X (bisecting-kmeans.find-max-cluster $clusters) $max-iter)
 
-            (bisecting-kmeans
+            (bisecting-kmeans.recursive-bisecting-kmeans
                 $X
                 (append
                     (append
-                        (remove-cluster $clusters (find-max-cluster $clusters))
+                        (bisecting-kmeans.remove-cluster $clusters (bisecting-kmeans.find-max-cluster $clusters))
                         (get-first $bisect)
                     )
                     (get-second $bisect)
@@ -346,7 +357,7 @@
                     $hierarchy
                     (append
                         (append
-                            (remove-cluster $clusters (find-max-cluster $clusters))
+                            (bisecting-kmeans.remove-cluster $clusters (bisecting-kmeans.find-max-cluster $clusters))
                             (get-first $bisect)
                         )
                         (get-second $bisect)
