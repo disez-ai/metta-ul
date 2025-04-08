@@ -358,7 +358,7 @@ def test_remove_cluster(metta: MeTTa):
     result: Atom = metta.run(
         """
         (=
-            (clusters)
+            (clusters0)
             (::
                 ((np.array (0)) pyNone 1.0 pyNone)
                 (::
@@ -371,7 +371,7 @@ def test_remove_cluster(metta: MeTTa):
             )
         )
         
-        ! (bisecting-kmeans.remove-cluster (clusters) ((np.array (1)) pyNone 2.0 pyNone))
+        ! (bisecting-kmeans.remove-cluster (clusters0) ((np.array (1)) pyNone 2.0 pyNone))
         """
     )[0][0]
     py_clusters = metta_clusters_to_py_clusters(result)
@@ -385,7 +385,7 @@ def test_remove_cluster(metta: MeTTa):
     result: Atom = metta.run(
         """
         (=
-            (clusters)
+            (clusters1)
             (::
                 ((np.array (0)) pyNone 1.0 pyNone)
                 (::
@@ -398,7 +398,7 @@ def test_remove_cluster(metta: MeTTa):
             )
         )
 
-        ! (bisecting-kmeans.remove-cluster (clusters) ((np.array (99)) pyNone 2.0 pyNone))
+        ! (bisecting-kmeans.remove-cluster (clusters1) ((np.array (99)) pyNone 2.0 pyNone))
         """
     )[0][0]
     py_clusters = metta_clusters_to_py_clusters(result)
@@ -407,11 +407,11 @@ def test_remove_cluster(metta: MeTTa):
     result: Atom = metta.run(
         """
         (=
-            (clusters)
+            (clusters2)
             ()
         )
 
-        ! (bisecting-kmeans.remove-cluster (clusters) ((np.array (99)) pyNone 2.0 pyNone))
+        ! (bisecting-kmeans.remove-cluster (clusters2) ((np.array (99)) pyNone 2.0 pyNone))
         """
     )[0][0]
     py_clusters = metta_clusters_to_py_clusters(result)
@@ -692,9 +692,268 @@ def test_bisecting_kmeans(metta: MeTTa):
     # test for splitting into 3 clusters.
     result: Atom = metta.run(
         """            
-        ! (bisecting-kmeans.recursive-bisecting-kmeans (X) (init-cluster) 3 10 (init-hierarchy))
-    
+        ! (bisecting-kmeans.recursive-bisecting-kmeans (X) (init-cluster) 3 10 (init-hierarchy))        
         """
     )[0][0]
     hierarchy = parse_hierarchy(result)
     assert len(hierarchy) == 3, f"Expected 3 clusters, got {len(hierarchy)}"
+
+
+def test_bisecting_kmeans_fit(metta: MeTTa):
+    metta.run(
+        """
+        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+
+        """
+    )
+    # Start with one initial cluster containing all points.
+    result: Atom = metta.run(
+        """
+        (=
+            (X)
+            (np.array ((0.0 0.0) (0.0 1.0) (1.0 0.0) (1.0 1.0) (5.0 5.0) (5.0 6.0)))            
+        )
+        
+        ! (bisecting-kmeans.fit (X) 1 10)
+        """
+    )[0][0]
+    hierarchy = parse_hierarchy(result)
+
+    assert len(hierarchy) == 1, f"Expected hierarchy of length 1, got {len(hierarchy)}"
+
+    # test for splitting into 3 clusters.
+    result: Atom = metta.run(
+        """             
+        ! (bisecting-kmeans.fit (X) 3 10)       
+        """
+    )[0][0]
+    hierarchy = parse_hierarchy(result)
+    assert len(hierarchy) == 3, f"Expected 3 clusters, got {len(hierarchy)}"
+
+
+def test_assign_point_to_cluster(metta: MeTTa):
+    metta.run(
+        """
+        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+
+        """
+    )
+    result: Atom = metta.run(
+        """
+        (=
+            (clusters0)
+            (::
+                (pyNone (np.array (0.0 0.0)) pyNone pyNone)
+                (::
+                    (pyNone (np.array (5.0 0.0)) pyNone pyNone)
+                    (::
+                        (pyNone (np.array (0.0 5.0)) pyNone pyNone)
+                        ()
+                    )
+                )
+            )
+        )
+        (=
+            (p0)
+            (np.array (1.0 1.0))
+        )
+        
+        ! (bisecting-kmeans.assign-point-to-cluster (p0) (clusters0) 0 pyINF 0)        
+        """
+    )[0][0]
+    cluster_p0 = result.get_object().content
+    expected_cluster_p0 = 0  # distance ~1.414 from [0,0]; far from others.
+    assert cluster_p0 == expected_cluster_p0, f"Expected {expected_cluster_p0}, got {cluster_p0}"
+
+    result: Atom = metta.run(
+        """        
+        (=
+            (p1)
+            (np.array (4.5 0.1))
+        )
+
+        ! (bisecting-kmeans.assign-point-to-cluster (p1) (clusters0) 0 pyINF 0)        
+        """
+    )[0][0]
+    cluster_p1 = result.get_object().content
+    expected_cluster_p1 = 1  # distance ~0.5 from [5,0]
+    assert cluster_p1 == expected_cluster_p1, f"Expected {expected_cluster_p1}, got {cluster_p1}"
+
+    result: Atom = metta.run(
+        """        
+        (=
+            (p2)
+            (np.array (2.5 0.0))
+        )
+
+        ! (bisecting-kmeans.assign-point-to-cluster (p2) (clusters0) 0 pyINF 0)        
+        """
+    )[0][0]
+    cluster_p2 = result.get_object().content
+    expected_cluster_p2 = 0
+    assert cluster_p2 == expected_cluster_p2, f"Expected {expected_cluster_p2}, got {cluster_p2}"
+
+    result: Atom = metta.run(
+        """        
+        (=
+            (p3)
+            (np.array (0.0 4.9))
+        )
+
+        ! (bisecting-kmeans.assign-point-to-cluster (p3) (clusters0) 0 pyINF 0)        
+        """
+    )[0][0]
+    cluster_p3 = result.get_object().content
+    expected_cluster_p3 = 2
+    assert cluster_p3 == expected_cluster_p3, f"Expected {expected_cluster_p3}, got {cluster_p3}"
+
+    result: Atom = metta.run(
+        """        
+        (=
+            (clusters1)
+            ()
+        )
+
+        ! (bisecting-kmeans.assign-point-to-cluster (p0) (clusters1) 0 pyINF 0)        
+        """
+    )[0][0]
+    cluster_p0 = result.get_object().content
+    expected_cluster_p0 = 0
+    assert cluster_p0 == expected_cluster_p0, f"Expected {expected_cluster_p0}, got {cluster_p0}"
+
+    result: Atom = metta.run(
+        """        
+        (=
+            (clusters2)
+            (::
+                (pyNone (np.array (0.0 5.0)) pyNone pyNone)
+                ()
+            )
+        )
+
+        ! (bisecting-kmeans.assign-point-to-cluster (p0) (clusters2) 0 pyINF 0)        
+        """
+    )[0][0]
+    cluster_p0 = result.get_object().content
+    expected_cluster_p0 = 0
+    assert cluster_p0 == expected_cluster_p0, f"Expected {expected_cluster_p0}, got {cluster_p0}"
+
+
+def test_assign_all_points(metta: MeTTa):
+    metta.run(
+        """
+        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+
+        """
+    )
+    result: Atom = metta.run(
+        """
+        (=
+            (X)
+            (np.array ((0.1 0.2) (5.0 5.1) (0.0 -0.1) (5.1 4.9)))
+        )
+        (=
+            (clusters0)
+            (::
+                (pyNone (np.array (0.0 0.0)) pyNone pyNone)
+                (::
+                    (pyNone (np.array (5.0 5.0)) pyNone pyNone)
+                    ()
+                )
+            )
+        )
+        
+        ;! (>= 0 (py-getitem (py-dot (X) shape) 0))
+        ! (bisecting-kmeans.assign-all-points (X) (clusters0) 0 ())                
+        """
+    )[0][0]
+    cluster_indices = metta_clusters_to_py_clusters(result)
+    cluster_indices = [item for sublist in cluster_indices for item in sublist]
+
+    expected = [0, 1, 0, 1]
+    assert cluster_indices == expected, f"Expected {expected}, got {cluster_indices}"
+
+    # Edge case: no points in X.
+    result: Atom = metta.run(
+        """
+        (=
+            (X1)
+            (np.array () )
+        )
+        (=
+            (clusters1)
+            (::
+                (pyNone (np.array (0.0 0.0)) pyNone pyNone)
+                (::
+                    (pyNone (np.array (1.0 1.0)) pyNone pyNone)
+                    ()
+                )
+            )
+        )
+        ;! (X1)
+        ! (bisecting-kmeans.assign-all-points (X1) (clusters1) 0 ())                
+        """
+    )[0][0]
+    cluster_indices = metta_clusters_to_py_clusters(result)
+    cluster_indices = [item for sublist in cluster_indices for item in sublist]
+    assert len(cluster_indices) == 0, f"Expected empty labels, got {result}"
+
+    result: Atom = metta.run(
+        """        
+        (=
+            (clusters2)                            
+            (::
+                (pyNone (np.array (3.0 3.0)) pyNone pyNone)
+                ()
+            )
+            
+        )
+        ;! (X1)
+        ! (bisecting-kmeans.assign-all-points (X) (clusters2) 0 ())                
+        """
+    )[0][0]
+    cluster_indices = metta_clusters_to_py_clusters(result)
+    cluster_indices = [item for sublist in cluster_indices for item in sublist]
+    expected = [0, 0, 0, 0]
+    assert cluster_indices == expected, f"Expected {expected}, got {cluster_indices}"
+
+
+def test_bisecting_kmeans_predict(metta: MeTTa):
+    metta.run(
+        """
+        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+
+        """
+    )
+    # Start with one initial cluster containing all points.
+    result: Atom = metta.run(
+        """
+        (=
+            (X)
+            (np.array ((0.0 0.0) (0.0 1.0) (1.0 0.0) (1.0 1.0) (5.0 5.0) (5.0 6.0)))            
+        )
+        
+        (=
+            (hierarchy)
+            (bisecting-kmeans.fit (X) 2 10)
+        )
+        
+        ;! (get-last (hierarchy))
+        ! (bisecting-kmeans.predict (X) (hierarchy))                
+        """
+    )[0][0]
+    cluster_indices = metta_clusters_to_py_clusters(result)
+    cluster_indices = [item for sublist in cluster_indices for item in sublist]
+
+    assert len(cluster_indices) == 6, "cluster_indices must have exactly six elements."
+
+    assert all(x == cluster_indices[0] for x in cluster_indices[:4]), "First four elements of cluster_indices " \
+                                                                      "must be the same"
+
+    assert all(x == cluster_indices[4] for x in cluster_indices[4:]), "Last two elements of cluster_indices " \
+                                                                      "must be the same"
+
+    assert cluster_indices[0] != cluster_indices[4], "First four elements of cluster_indices must be " \
+                                                     "different from the last two."
+
+    assert set(cluster_indices) == {0, 1}, "Cluster labels must be either 0 or 1."
