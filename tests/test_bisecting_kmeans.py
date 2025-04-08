@@ -153,7 +153,7 @@ def parse_hierarchy(atom):
 def test_compute_sse(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
                 
         """
     )
@@ -253,7 +253,7 @@ def test_compute_sse(metta: MeTTa):
 def test_compute_initial_cluster(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -293,7 +293,7 @@ def test_compute_initial_cluster(metta: MeTTa):
 def test_find_max_cluster(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -351,7 +351,7 @@ def test_find_max_cluster(metta: MeTTa):
 def test_remove_cluster(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -421,7 +421,7 @@ def test_remove_cluster(metta: MeTTa):
 def test_bisect_cluster(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -463,7 +463,7 @@ def test_bisect_cluster(metta: MeTTa):
 def test_append_to_clusters(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -556,7 +556,7 @@ def test_append_to_clusters(metta: MeTTa):
 def test_append_to_hierarchy(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -661,7 +661,7 @@ def test_append_to_hierarchy(metta: MeTTa):
 def test_bisecting_kmeans(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -702,7 +702,7 @@ def test_bisecting_kmeans(metta: MeTTa):
 def test_bisecting_kmeans_fit(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -734,7 +734,7 @@ def test_bisecting_kmeans_fit(metta: MeTTa):
 def test_assign_point_to_cluster(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -842,7 +842,7 @@ def test_assign_point_to_cluster(metta: MeTTa):
 def test_assign_all_points(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
@@ -921,7 +921,7 @@ def test_assign_all_points(metta: MeTTa):
 def test_bisecting_kmeans_predict(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_bisecting_kmeans)
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
 
         """
     )
