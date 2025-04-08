@@ -84,12 +84,49 @@ def _np_atom_type(npobj):
 
 def wrapnpop(func):
     def wrapper(*args):
-        a = [arg.get_object().value for arg in args]
+        a = [arg.get_object().value if isinstance(arg, GroundedAtom)
+              else arg.get_name() for arg in args]
         res = func(*a)
         typ = _np_atom_type(res)
         return [G(NumpyValue(res), typ)]
 
     return wrapper
+
+
+def _slice(*args):
+    if args[0] is None:
+        return None
+    arr = args[0]
+    slice_str = parse_to_slice(args[1])
+    return arr[slice_str]
+
+
+def parse_to_slice(input_str):
+    """
+    Parses a string representing numpy indexing and returns the corresponding NumPy array slice.
+    Supports multi-dimensional indexing with missing values like "[:, :2]".
+    """
+    # Remove brackets and spaces
+    input_str = input_str.strip("[]").replace(" ", "")
+
+    # Split by commas to handle multiple dimensions
+    parts = input_str.split(",")
+    result = []
+
+    for part in parts:
+        if ":" in part:
+            # Handle cases like ":", ":2", "1:", "1:3:2"
+            slice_parts = part.split(":")
+            # Convert non-empty values to int
+            slice_values = [int(x) if x else None for x in slice_parts]
+            result.append(slice(*slice_values))  # Convert to slice object
+        else:
+            # Handle single integer indices
+            result.append(int(part))
+
+    # Convert result to tuple if multi-dimensional
+    return tuple(result) if len(result) > 1 else result[0]
+
 
 
 @register_atoms
@@ -160,6 +197,10 @@ def numme_atoms():
     nmArange = G(PatternOperation("np.arange", wrapnpop(np.arange), unwrap=False))
     nmTake = G(PatternOperation("np.take", wrapnpop(np.take), unwrap=False))
     nmArgmax = G(PatternOperation("np.argmax", wrapnpop(np.argmax), unwrap=False))
+    nmMean = G(PatternOperation("np.mean", wrapnpop(np.mean), unwrap=False))
+    nmWhere = G(PatternOperation("np.where", wrapnpop(np.where), unwrap=False))
+    nmEqual = G(PatternOperation("np.equal", wrapnpop(np.equal), unwrap=False))
+    nmSlice = G(PatternOperation("np.slice", wrapnpop(_slice), unwrap=False))
 
     return {
         "np.vector": nmVectorAtom,
@@ -193,4 +234,8 @@ def numme_atoms():
         "np.arange": nmArange,
         "np.take": nmTake,
         "np.argmax": nmArgmax,
+        "np.mean": nmMean,
+        "np.where": nmWhere,
+        "np.equal": nmEqual,
+        "np.slice": nmSlice
     }
