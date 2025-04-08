@@ -79,8 +79,6 @@ class PatternOperation(OperationObject):
 
 
 def _np_atom_type(npobj):
-    if not isinstance(npobj, np.ndarray):
-        return AtomType.UNDEFINED
     return E(S("NPArray"), E(*[ValueAtom(s, "Number") for s in npobj.shape]))
 
 
@@ -143,7 +141,7 @@ def numme_atoms():
     )
     nmArrayAtom = G(
         PatternOperation(
-            "np.array", wrapnpop(lambda *args: np.array(args, dtype='float')), unwrap=False, rec=True
+            "np.array", wrapnpop(lambda *args: np.array(args)), unwrap=False, rec=True
         )
     )
     nmAddAtom = G(PatternOperation("np.add", wrapnpop(np.add), unwrap=False))
@@ -199,12 +197,7 @@ def numme_atoms():
     nmArange = G(PatternOperation("np.arange", wrapnpop(np.arange), unwrap=False))
     nmTake = G(PatternOperation("np.take", wrapnpop(np.take), unwrap=False))
     nmArgmax = G(PatternOperation("np.argmax", wrapnpop(np.argmax), unwrap=False))
-    nmIx_ = G(PatternOperation("np.ix_", wrapnpop(np.ix_), unwrap=False, rec=False))
-    nmMin = G(PatternOperation("np.min", wrapnpop(np.min), unwrap=False))
-    nmMax = G(PatternOperation("np.max", wrapnpop(np.max), unwrap=False))
     nmMean = G(PatternOperation("np.mean", wrapnpop(np.mean), unwrap=False))
-    nmSqueeze = G(PatternOperation("np.squeeze", wrapnpop(np.squeeze), unwrap=False))
-    nmRandomSeed = G(PatternOperation("np.random.seed", wrapnpop(np.random.seed), unwrap=False))
     nmWhere = G(PatternOperation("np.where", wrapnpop(np.where), unwrap=False))
     nmEqual = G(PatternOperation("np.equal", wrapnpop(np.equal), unwrap=False))
     nmSlice = G(PatternOperation("np.slice", wrapnpop(_slice), unwrap=False))
@@ -241,12 +234,7 @@ def numme_atoms():
         "np.arange": nmArange,
         "np.take": nmTake,
         "np.argmax": nmArgmax,
-        "np.ix_": nmIx_,
         "np.mean": nmMean,
-        "np.min": nmMin,
-        "np.max": nmMax,
-        "np.squeeze": nmSqueeze,
-        "np.random.seed": nmRandomSeed,
         "np.where": nmWhere,
         "np.equal": nmEqual,
         "np.slice": nmSlice
