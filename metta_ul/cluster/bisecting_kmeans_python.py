@@ -100,25 +100,61 @@ def initial_cluster(data):
     return [(indices, center, sse, None)]
 
 
+def fit_bisecting_kmeans(X, n_clusters, n_init=10):
+    """
+    Functional 'fit' for bisecting k-means.
+    Returns final clusters and labels.
+    """
+    init_clusters = initial_cluster(X)
+    hierarchy = recursive_bisecting_hierarchy(X, init_clusters, n_clusters, n_init)
+    final_clusters = hierarchy[-1]
+    labels = get_final_labels(final_clusters, X.shape[0])
+    return final_clusters, labels
+
+
+def assign_point_to_cluster(point, clusters, best_idx=0, best_dist=None, idx=0):
+    if idx >= len(clusters):
+        return best_idx
+    center = clusters[idx][1]
+    dist = np.linalg.norm(point - center)
+    if best_dist is None or dist < best_dist:
+        return assign_point_to_cluster(point, clusters, idx, dist, idx + 1)
+    return assign_point_to_cluster(point, clusters, best_idx, best_dist, idx + 1)
+
+
+def assign_all_points(X, clusters, idx=0, labels=None):
+    if idx == 0:
+        labels = np.empty(X.shape[0], dtype=int)
+    if idx >= X.shape[0]:
+        return labels
+    point = X[idx]
+    cluster_idx = assign_point_to_cluster(point, clusters)
+    labels[idx] = cluster_idx
+    return assign_all_points(X, clusters, idx + 1, labels)
+
+
+def predict_bisecting_kmeans(clusters, X_new):
+    """
+    Functional 'predict' for bisecting k-means.
+    Assigns new points to the nearest cluster center.
+    """
+    return assign_all_points(X_new, clusters)
+
+
 def main():
     # Create synthetic data.
-    X, _ = make_blobs(n_samples=500, centers=4, cluster_std=0.60, random_state=0)
-    # Start with a single cluster containing all points.
-    init_clusters = initial_cluster(X)
-    # Build the hierarchy of clusters.
-    hierarchy = recursive_bisecting_hierarchy(data=X,
-                                              clusters=init_clusters,
-                                              max_clusters=4,
-                                              n_init=10,
-                                              hierarchy=None)
-    # The final set of clusters is the last level in the hierarchy.
-    final_clusters = hierarchy[-1]
-    # Assign labels based on final clusters.
-    labels = get_final_labels(final_clusters, X.shape[0])
+    X, _ = make_blobs(n_samples=550, centers=4, cluster_std=0.60, random_state=42)
+    X_test = X[-50:, :]
+    X = X[:-50, :]
+
+    # Fit
+    final_clusters, labels = fit_bisecting_kmeans(X, n_clusters=4)
+
+    # Score
     score = silhouette_score(X, labels)
     print("Silhouette Score: {:.3f}".format(score))
 
-    # Plot the clustering result.
+    # Plot
     plt.figure(figsize=(8, 6))
     plt.scatter(X[:, 0], X[:, 1], c=labels, s=30, cmap='viridis', alpha=0.7)
     plot_centers(final_clusters)
@@ -127,9 +163,19 @@ def main():
     plt.ylabel("Feature 2")
     plt.show()
 
-    # (Optional) Print information about the hierarchy levels.
-    for level, clusters in enumerate(hierarchy):
-        print("Level {}: {} clusters".format(level, len(clusters)))
+    # Predict on new data
+    new_labels = predict_bisecting_kmeans(final_clusters, X_test)
+    print("Predicted labels for new samples:", new_labels)
+
+    # Plot new points
+    plt.scatter(X[:, 0], X[:, 1], c=labels, s=30, cmap='viridis', alpha=0.5)
+    plt.scatter(X_test[:, 0], X_test[:, 1], c=new_labels, s=100, edgecolor='k', cmap='viridis', marker='D')
+    plot_centers(final_clusters)
+    plt.title("Predicted Labels for New Data Points")
+    plt.show()
+
+    # Print hierarchy info
+    print("Final Clusters:", len(final_clusters))
 
 
 if __name__ == "__main__":
