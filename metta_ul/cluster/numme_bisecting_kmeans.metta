@@ -4,6 +4,7 @@
 ! (bind! pyNone (py-atom "None"))
 ! (bind! pyTrue (py-atom "True"))
 ! (bind! pyFalse (py-atom "False"))
+! (bind! pyINF (py-atom "float('inf')"))
 
 ; ================= Utils =================
 (=
@@ -50,6 +51,31 @@
         (append $xs $a)
     )
 )
+(=
+    (get-index () $idx)
+    pyNone
+)
+
+(=
+    (get-index (:: $x $xs) $idx)
+    (if (== $idx 0)
+        $x
+        (get-index $xs (- $idx 1))
+    )
+)
+(=
+    (get-last ())
+    pyNone
+)
+(=
+    (get-last (:: $x ()))
+    $x
+)
+(=
+    (get-last (:: $x (:: $y $ys)))
+    (get-last (:: $y $ys))
+)
+
 ; =========================================
 
 ; TODO: Fix the import problem to include kmeans from kmeans.metta
@@ -365,5 +391,98 @@
                 )
             )
        )
+    )
+)
+
+(=
+    (bisecting-kmeans.fit $X $max-num-clusters $max-kmeans-iter)
+    (let
+        $init-cluster
+        (bisecting-kmeans.compute-initial-cluster $X)
+
+        (bisecting-kmeans.recursive-bisecting-kmeans
+            $X
+            $init-cluster
+            $max-num-clusters
+            $max-kmeans-iter
+            (append pyNone $init-cluster)
+        )
+    )
+)
+
+(=
+    (bisecting-kmeans.assign-point-to-cluster
+        $point
+        $clusters
+        $best-cluster-idx
+        $best-distance
+        $cluster-idx
+    )
+    (if (>= $cluster-idx (length $clusters))
+        $best-cluster-idx
+
+        (let
+            $dist
+            (np.linalg.norm
+                (np.sub
+                    $point
+                    (bisecting-kmeans.get-cluster-center (get-index $clusters $cluster-idx))
+                )
+            )
+            (if
+                (or
+                    (== $best-distance pyNone)
+                    (< $dist $best-distance)
+                )
+                (bisecting-kmeans.assign-point-to-cluster
+                    $point
+                    $clusters
+                    $cluster-idx
+                    $dist
+                    (+ $cluster-idx 1)
+                )
+                (bisecting-kmeans.assign-point-to-cluster
+                    $point
+                    $clusters
+                    $best-cluster-idx
+                    $best-distance
+                    (+ $cluster-idx 1)
+                )
+            )
+        )
+    )
+)
+
+(=
+    (bisecting-kmeans.assign-all-points $X $clusters $point-idx $labels)
+    (if (>= $point-idx (py-getitem (py-dot $X shape) 0))
+        $labels
+
+        (bisecting-kmeans.assign-all-points
+            $X
+            $clusters
+            (+ $point-idx 1)
+            (append
+                $labels
+                ; cluster_idx
+                (bisecting-kmeans.assign-point-to-cluster
+                    (np.take $X $point-idx 0)
+                    $clusters
+                    0
+                    pyINF
+                    0
+                )
+            )
+        )
+    )
+)
+
+(=
+    (bisecting-kmeans.predict $X $hierarchy)
+    (bisecting-kmeans.assign-all-points
+        $X
+        (get-last $hierarchy)
+        0
+        ()
     )
 )
