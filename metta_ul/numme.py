@@ -79,6 +79,8 @@ class PatternOperation(OperationObject):
 
 
 def _np_atom_type(npobj):
+    if not isinstance(npobj, np.ndarray):
+        return AtomType.UNDEFINED
     return E(S("NPArray"), E(*[ValueAtom(s, "Number") for s in npobj.shape]))
 
 
