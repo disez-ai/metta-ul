@@ -222,26 +222,30 @@
         (::
             ; cluster 0
             (
-                (np.slice
-                    ((py-dot np where)
-                        (np.equal
-                            (np.argmax
-                                (kmeans.assign $X $centers 2)
-                                0
-                            )
-                            0
-                        )
-                    )
-                    [0]
-                )
-                (np.slice $centers [0])
-                (compute-sse
-                    $X
+                (np.take
+                    (get-cluster-indices $max-cluster)
                     (np.slice
                         ((py-dot np where)
                             (np.equal
                                 (np.argmax
-                                    (kmeans.assign $X $centers 2)
+                                    (kmeans.assign (np.take $X (get-cluster-indices $max-cluster) 0) $centers 2)
+                                    0
+                                )
+                                0
+                            )
+                        )
+                        [0]
+                    )
+                )
+
+                (np.slice $centers [0])
+                (compute-sse
+                    (np.take $X (get-cluster-indices $max-cluster) 0)
+                    (np.slice
+                        ((py-dot np where)
+                            (np.equal
+                                (np.argmax
+                                    (kmeans.assign (np.take $X (get-cluster-indices $max-cluster) 0) $centers 2)
                                     0
                                 )
                                 0
@@ -256,26 +260,29 @@
             (::
                 ; cluster 1
                 (
-                    (np.slice
-                        ((py-dot np where)
-                            (np.equal
-                                (np.argmax
-                                    (kmeans.assign $X $centers 2)
-                                    0
-                                )
-                                1
-                            )
-                        )
-                        [0]
-                    )
-                    (np.slice $centers [1])
-                    (compute-sse
-                        $X
+                    (np.take
+                        (get-cluster-indices $max-cluster)
                         (np.slice
                             ((py-dot np where)
                                 (np.equal
                                     (np.argmax
-                                        (kmeans.assign $X $centers 2)
+                                        (kmeans.assign (np.take $X (get-cluster-indices $max-cluster) 0) $centers 2)
+                                        0
+                                    )
+                                    1
+                                )
+                            )
+                            [0]
+                        )
+                    )
+                    (np.slice $centers [1])
+                    (compute-sse
+                        (np.take $X (get-cluster-indices $max-cluster) 0)
+                        (np.slice
+                            ((py-dot np where)
+                                (np.equal
+                                    (np.argmax
+                                        (kmeans.assign (np.take $X (get-cluster-indices $max-cluster) 0) $centers 2)
                                         0
                                     )
                                     1
@@ -294,151 +301,58 @@
 )
 
 (=
-    (extend-clusters () ($indices0 $center0 $sse0 $hierarchy0) ($indices1 $center1 $sse1 $hierarchy1))
+    (append pyNone $a)
     (::
-        ($indices0 $center0 $sse0 $hierarchy0)
-        (::
-            ($indices1 $center1 $sse1 $hierarchy1)
-            ()
-        )
-    )
-)
-(=
-    (extend-clusters () () ($indices1 $center1 $sse1 $hierarchy1))
-    (::
-        ($indices1 $center1 $sse1 $hierarchy1)
+        $a
         ()
     )
 )
 (=
-    (extend-clusters () ($indices0 $center0 $sse0 $hierarchy0) ())
+    (append () $a)
     (::
-        ($indices0 $center0 $sse0 $hierarchy0)
+        $a
         ()
     )
 )
 (=
-    (extend-clusters () () ())
-    ()
-)
-(=
-    (extend-clusters (:: ($indices $center $sse $hierarchy) $xs) () ($indices1 $center1 $sse1 $hierarchy1))
+    (append (:: $x $xs) $a)
     (::
-        ($indices $center $sse $hierarchy)
-        (::
-            $xs
-            (::
-                ($indices1 $center1 $sse1 $hierarchy1)
-                ()
-            )
-        )
+        $x
+        (append $xs $a)
     )
 )
-(=
-    (extend-clusters (:: ($indices $center $sse $hierarchy) $xs) ($indices0 $center0 $sse0 $hierarchy0) ())
-    (::
-        ($indices $center $sse $hierarchy)
-        (::
-            $xs
-            (::
-                ($indices0 $center0 $sse0 $hierarchy0)
-                ()
-            )
-        )
-    )
-)
-(=
-    (extend-clusters (:: ($indices $center $sse $hierarchy) $xs) () ())
-    (:: ($indices $center $sse $hierarchy) $xs)
-)
-(=
-    (extend-clusters () ($indices0 $center0 $sse0 $hierarchy0) ($indices1 $center1 $sse1 $hierarchy1))
-    (::
-        ($indices0 $center0 $sse0 $hierarchy0)
-        (::
-            ($indices1 $center1 $sse1 $hierarchy1)
-            ()
-        )
-    )
-)
-(=
-    (extend-clusters (:: ($indices $center $sse $hierarchy) $xs) ($indices0 $center0 $sse0 $hierarchy0) ($indices1 $center1 $sse1 $hierarchy1))
-    (::
-        ($indices $center $sse $hierarchy)
-        (::
-            $xs
-            (::
-                ($indices0 $center0 $sse0 $hierarchy0)
-                (::
-                    ($indices1 $center1 $sse1 $hierarchy1)
-                    ()
-                )
-            )
-        )
-    )
-)
-
-
-(=
-    (append-to-hierarchy pyNone (:: ($indices $center $sse $hierarchy) $xs))
-    (::
-        (:: ($indices $center $sse $hierarchy) $xs)
-        ()
-    )
-)
-
-(=
-    (append-to-hierarchy (:: (:: ($indices $center $sse $hierarchy) $xs) $CS) (:: ($indices1 $center1 $sse1 $hierarchy1) $xs1))
-    (::
-        (:: ($indices $center $sse $hierarchy) $xs)
-        (::
-            $CS
-            (::
-                (:: ($indices1 $center1 $sse1 $hierarchy1) $xs1)
-                ()
-            )
-        )
-    )
-)
-
 
 (=
     (bisecting-kmeans $X $clusters $max-cluster $max-iter $hierarchy)
-    ;max_cluster = find_max_cluster(clusters)
-    ;(find-max-cluster $clusters)
-
-    ;clusters = remove_cluster(clusters, max_cluster)
-    ;(remove-cluster $clusters (find-max-cluster $clusters))
-
-    ;child0, child1 = bisect_cluster(data, max_cluster, n_init)
-    ;(bisect-cluster $X (find-max-cluster $clusters) $max-iter)
     (if (>= (length $clusters) $max-cluster)
         $hierarchy
 
-        ;(remove-cluster $clusters (find-max-cluster $clusters))
         (let
             $bisect
             (bisect-cluster $X (find-max-cluster $clusters) $max-iter)
 
             (bisecting-kmeans
                 $X
-                (extend-clusters
-                    (remove-cluster $clusters (find-max-cluster $clusters))
-                    (get-first $bisect)
+                (append
+                    (append
+                        (remove-cluster $clusters (find-max-cluster $clusters))
+                        (get-first $bisect)
+                    )
                     (get-second $bisect)
                 )
                 $max-cluster
                 $max-iter
-                (append-to-hierarchy
+                (append
                     $hierarchy
-                    (extend-clusters
-                        (remove-cluster $clusters (find-max-cluster $clusters))
-                        (get-first $bisect)
+                    (append
+                        (append
+                            (remove-cluster $clusters (find-max-cluster $clusters))
+                            (get-first $bisect)
+                        )
                         (get-second $bisect)
                     )
                 )
             )
-
        )
     )
 )
