@@ -63,7 +63,8 @@ class PatternOperation(OperationObject):
         if self.rec:
             args = args[0].get_children()
             args = [
-                self.execute(arg)[0] if isinstance(arg, ExpressionAtom) else arg
+                self.execute(arg)[0] if isinstance(
+                    arg, ExpressionAtom) else arg
                 for arg in args
             ]
         # If there is a variable or PatternValue in arguments, create PatternValue
@@ -87,7 +88,7 @@ def _np_atom_type(npobj):
 def wrapnpop(func):
     def wrapper(*args):
         a = [arg.get_object().value if isinstance(arg, GroundedAtom)
-              else arg.get_name() for arg in args]
+             else arg.get_name() for arg in args]
         res = func(*a)
         typ = _np_atom_type(res)
         return [G(NumpyValue(res), typ)]
@@ -130,8 +131,7 @@ def parse_to_slice(input_str):
     return tuple(result) if len(result) > 1 else result[0]
 
 
-
-@register_atoms
+@ register_atoms
 def numme_atoms():
 
     # FIXME: we don't add types for operations, because numpy operations types
@@ -147,16 +147,22 @@ def numme_atoms():
         )
     )
     nmAddAtom = G(PatternOperation("np.add", wrapnpop(np.add), unwrap=False))
-    nmSubAtom = G(PatternOperation("np.sub", wrapnpop(np.subtract), unwrap=False))
-    nmMulAtom = G(PatternOperation("np.mul", wrapnpop(np.multiply), unwrap=False))
-    nmDivAtom = G(PatternOperation("np.div", wrapnpop(np.divide), unwrap=False))
-    nmMMulAtom = G(PatternOperation("np.matmul", wrapnpop(np.matmul), unwrap=False))
-    nmArgmin = G(PatternOperation("np.argmin", wrapnpop(np.argmin), unwrap=False))
+    nmSubAtom = G(PatternOperation(
+        "np.sub", wrapnpop(np.subtract), unwrap=False))
+    nmMulAtom = G(PatternOperation(
+        "np.mul", wrapnpop(np.multiply), unwrap=False))
+    nmDivAtom = G(PatternOperation(
+        "np.div", wrapnpop(np.divide), unwrap=False))
+    nmMMulAtom = G(PatternOperation(
+        "np.matmul", wrapnpop(np.matmul), unwrap=False))
+    nmArgmin = G(PatternOperation(
+        "np.argmin", wrapnpop(np.argmin), unwrap=False))
     nmTranspose = G(
         PatternOperation("np.transpose", wrapnpop(np.transpose), unwrap=False)
     )
     nmNorm = G(
-        PatternOperation("np.linalg.norm", wrapnpop(np.linalg.norm), unwrap=False)
+        PatternOperation("np.linalg.norm", wrapnpop(
+            np.linalg.norm), unwrap=False)
     )
     nmSum = G(PatternOperation("np.sum", wrapnpop(np.sum), unwrap=False))
     nmOneHot = G(
@@ -165,12 +171,14 @@ def numme_atoms():
         )
     )
     nmExpandDims = G(
-        PatternOperation("np.expand_dims", wrapnpop(np.expand_dims), unwrap=False)
+        PatternOperation("np.expand_dims", wrapnpop(
+            np.expand_dims), unwrap=False)
     )
     nmChoose = G(
         PatternOperation(
             "np.choose",
-            wrapnpop(lambda x, k: x[np.random.choice(x.shape[0], k, replace=False)]),
+            wrapnpop(lambda x, k: x[np.random.choice(
+                x.shape[0], k, replace=False)]),
             unwrap=False,
         )
     )
@@ -181,28 +189,46 @@ def numme_atoms():
             unwrap=False,
         )
     )
-    nmInv = G(PatternOperation("np.linalg.inv", wrapnpop(np.linalg.inv), unwrap=False))
-    nmEinsum = G(PatternOperation("np.einsum", wrapnpop(np.einsum), unwrap=False))
+    nmInv = G(PatternOperation("np.linalg.inv",
+                               wrapnpop(np.linalg.inv), unwrap=False))
+    nmEinsum = G(PatternOperation(
+        "np.einsum", wrapnpop(np.einsum), unwrap=False))
     nmExp = G(PatternOperation("np.exp", wrapnpop(np.exp), unwrap=False))
     nmLog = G(PatternOperation("np.log", wrapnpop(np.log), unwrap=False))
     nmCov = G(PatternOperation("np.cov", wrapnpop(np.cov), unwrap=False))
-    nmRepeat = G(PatternOperation("np.repeat", wrapnpop(np.repeat), unwrap=False))
+    nmRepeat = G(PatternOperation(
+        "np.repeat", wrapnpop(np.repeat), unwrap=False))
     nmEye = G(PatternOperation("np.eye", wrapnpop(np.eye), unwrap=False))
     nmOnes = G(PatternOperation("np.ones", wrapnpop(np.ones), unwrap=False))
     nmPower = G(PatternOperation("np.power", wrapnpop(np.power), unwrap=False))
     nmRandomRand = G(
-        PatternOperation("np.random.rand", wrapnpop(np.random.rand), unwrap=False)
+        PatternOperation("np.random.rand", wrapnpop(
+            np.random.rand), unwrap=False)
     )
     nmDiag = G(PatternOperation("np.diag", wrapnpop(np.diag), unwrap=False))
     nmSqrt = G(PatternOperation("np.sqrt", wrapnpop(np.sqrt), unwrap=False))
-    nmArgsort = G(PatternOperation("np.argsort", wrapnpop(np.argsort), unwrap=False))
-    nmArange = G(PatternOperation("np.arange", wrapnpop(np.arange), unwrap=False))
+    nmArgsort = G(PatternOperation(
+        "np.argsort", wrapnpop(np.argsort), unwrap=False))
+    nmArange = G(PatternOperation(
+        "np.arange", wrapnpop(np.arange), unwrap=False))
     nmTake = G(PatternOperation("np.take", wrapnpop(np.take), unwrap=False))
-    nmArgmax = G(PatternOperation("np.argmax", wrapnpop(np.argmax), unwrap=False))
+
+    nmSlice = G(PatternOperation("np.slice", wrapnpop(_slice), unwrap=False))
+    nmArgmax = G(PatternOperation(
+        "np.argmax", wrapnpop(np.argmax), unwrap=False))
+    nmIx_ = G(PatternOperation("np.ix_", wrapnpop(
+        np.ix_), unwrap=False, rec=False))
+    nmMin = G(PatternOperation("np.min", wrapnpop(np.min), unwrap=False))
+    nmMax = G(PatternOperation("np.max", wrapnpop(np.max), unwrap=False))
     nmMean = G(PatternOperation("np.mean", wrapnpop(np.mean), unwrap=False))
+    nmSqueeze = G(PatternOperation(
+        "np.squeeze", wrapnpop(np.squeeze), unwrap=False))
+    nmRandomSeed = G(PatternOperation("np.random.seed",
+                     wrapnpop(np.random.seed), unwrap=False))
+    nmShape = G(PatternOperation("np.shape", wrapnpop(
+        lambda _x, _i: _x.shape[_i]), unwrap=False))
     nmWhere = G(PatternOperation("np.where", wrapnpop(np.where), unwrap=False))
     nmEqual = G(PatternOperation("np.equal", wrapnpop(np.equal), unwrap=False))
-    nmSlice = G(PatternOperation("np.slice", wrapnpop(_slice), unwrap=False))
 
     return {
         "np.vector": nmVectorAtom,
@@ -236,8 +262,14 @@ def numme_atoms():
         "np.arange": nmArange,
         "np.take": nmTake,
         "np.argmax": nmArgmax,
+        "np.slice": nmSlice,
+        "np.ix_": nmIx_,
         "np.mean": nmMean,
+        "np.min": nmMin,
+        "np.max": nmMax,
+        "np.squeeze": nmSqueeze,
+        "np.random.seed": nmRandomSeed,
+        "np.shape": nmShape,
         "np.where": nmWhere,
-        "np.equal": nmEqual,
-        "np.slice": nmSlice
+        "np.equal": nmEqual
     }
