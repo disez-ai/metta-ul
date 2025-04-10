@@ -117,7 +117,7 @@
 )
 
 (=
-    (spectral-clustering.rbf-affinity-matrix $sqr-distance-matrix-X $sigma)
+    (spectral-clustering.rbf-affinity-matrix $sqr-distance-matrix-X $rbf-kernel-sigma)
     (np.exp
         (np.div
             (np.mul
@@ -127,7 +127,7 @@
             (np.mul
                 2
                 (np.power
-                    (np.array ($sigma))
+                    (np.array ($rbf-kernel-sigma))
                     2
                 )
             )
@@ -210,7 +210,7 @@
 )
 
 (=
-    (spectral-clustering.spectral-clustering $X $k $sigma $max-iter)
+    (spectral-clustering.cluster $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter)
     (kmeans
         (spectral-clustering.row-normalize
             (spectral-clustering.spectral-embeddings
@@ -221,7 +221,7 @@
                                 (spectral-clustering.square-norm $X)
                                 $X
                             )
-                            $sigma
+                            $rbf-kernel-sigma
                         )
                         (spectral-clustering.inverse-degree-matrix
                             (spectral-clustering.degree
@@ -230,16 +230,70 @@
                                         (spectral-clustering.square-norm $X)
                                         $X
                                     )
-                                    $sigma
+                                    $rbf-kernel-sigma
                                 )
                             )
                         )
                     )
                 )
-                $k
+                $num-clusters
             )
         )
-        $k
-        $max-iter
+        $num-clusters
+        $max-kmeans-iter
+    )
+)
+
+
+(=
+    (spectral-clustering.fit $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter)
+    (let
+        $embeddings
+        (spectral-clustering.spectral-embeddings
+            (spectral-clustering.eigh
+                (spectral-clustering.normalized-laplacian
+                    (spectral-clustering.rbf-affinity-matrix
+                        (spectral-clustering.square-distance-matrix
+                            (spectral-clustering.square-norm $X)
+                            $X
+                        )
+                        $rbf-kernel-sigma
+                    )
+                    (spectral-clustering.inverse-degree-matrix
+                        (spectral-clustering.degree
+                            (spectral-clustering.rbf-affinity-matrix
+                                (spectral-clustering.square-distance-matrix
+                                    (spectral-clustering.square-norm $X)
+                                    $X
+                                )
+                                $rbf-kernel-sigma
+                            )
+                        )
+                    )
+                )
+            )
+            $num-clusters
+        )
+        ($embeddings (spectral-clustering.cluster $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter))
+    )
+
+)
+
+(=
+    (spectral-clustering.fit $X $num-clusters)
+    (spectral-clustering.fit $X $num-clusters 0.1 100)
+)
+
+(=
+    (spectral-clustering.predict ($embeddings $centroids) $num-clusters)
+    (np.argmax
+        (np.transpose
+            (kmeans.assign
+                $embeddings
+                $centroids
+                $num-clusters
+            )
+        )
+        1
     )
 )

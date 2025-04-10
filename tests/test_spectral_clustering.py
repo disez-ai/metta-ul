@@ -444,7 +444,7 @@ def test_row_normalize(metta: MeTTa):
     assert np.allclose(D_norm, expected), "Row normalization failed for ones matrix."
 
 
-def test_spectral_clustering(metta: MeTTa):
+def test_spectral_clustering_cluster(metta: MeTTa):
     metta.run(
         """        
         !(import! &self metta_ul:cluster:spectral_clustering)                
@@ -493,7 +493,7 @@ def test_spectral_clustering(metta: MeTTa):
                 (np.transpose
                     (kmeans.assign 
                         (embeddings) 
-                        (spectral-clustering.spectral-clustering (X1) (K1) 0.1 100) 
+                        (spectral-clustering.cluster (X1) (K1) 0.1 100) 
                         (K1)
                     )
                 )
@@ -550,7 +550,7 @@ def test_spectral_clustering(metta: MeTTa):
                 (np.transpose
                     (kmeans.assign 
                         (embeddings) 
-                        (spectral-clustering.spectral-clustering (X2) (K2) 0.1 100) 
+                        (spectral-clustering.cluster (X2) (K2) 0.1 100) 
                         (K2)
                     )
                 )
@@ -562,3 +562,38 @@ def test_spectral_clustering(metta: MeTTa):
     ground_truth = np.array([0, 0, 1, 1])
     ari = adjusted_rand_score(ground_truth, labels)
     assert ari == 1.0, f"Expected ARI of 1.0, but got {ari}"
+
+
+def test_spectral_clustering_fit_and_predict(metta: MeTTa):
+    metta.run(
+        """
+        ! (import! &self metta_ul:cluster:spectral_clustering)
+        """
+    )
+    result: Atom = metta.run(
+        """
+        (= 
+            (X)
+            (np.array ((0.0 0.0) (0.1 0) (1.0 1.0) (1.1 1.0)))
+        )
+        (=
+            (fit-outputs)
+            (spectral-clustering.fit (X) 2)
+        )
+
+        ! (spectral-clustering.predict (fit-outputs) 2)
+        """
+    )[0][0]
+    cluster_labels = result.get_object().value
+    # 1. Assert that the first two elements are the same and the last two elements are the same
+    assert cluster_labels[0] == cluster_labels[1], "The first two elements are not the same!"
+    assert cluster_labels[-2] == cluster_labels[-1], "The last two elements are not the same!"
+
+    # 2. Assert that the value in the first two elements is distinct from the value in the last two elements
+    assert cluster_labels[0] != cluster_labels[-2], "The first two and last two elements should be distinct!"
+
+    # 3. Assert that the unique values in the array are 0 and 1
+    unique_values = np.unique(cluster_labels)
+    expected_values = np.array([0, 1])
+    # Ensure unique_values match the expected values
+    assert np.array_equal(unique_values, expected_values), "The unique values in the array are not [0, 1]!"
