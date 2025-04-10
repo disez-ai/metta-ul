@@ -75,9 +75,9 @@ def test_agglomerative_closest_clusters(metta: MeTTa):
         (=
             (distance-matrix)
             (
-                (0 1 2)
-                (1 0 3)
-                (2 3 0)
+                (0.0 1.0 2.0)
+                (1.0 0.0 3.0)
+                (2.0 3.0 0.0)
             )
         )
 
@@ -117,9 +117,9 @@ def test_agglomerative_merge_clusters(metta: MeTTa):
         (=
             (distance-matrix)
             (
-                (0 1 2)
-                (1 0 3)
-                (2 3 0)
+                (0.0 1.0 2.0)
+                (1.0 0.0 3.0)
+                (2.0 3.0 0.0)
             )
         )
 
@@ -174,9 +174,9 @@ def test_agglomerative_recursion(metta: MeTTa):
         (=
             (distance-matrix)
             (
-                (0 1 2)
-                (1 0 3)
-                (2 3 0)
+                (0.0 1.0 2.0)
+                (1.0 0.0 3.0)
+                (2.0 3.0 0.0)
             )
         )
 

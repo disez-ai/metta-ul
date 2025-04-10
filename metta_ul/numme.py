@@ -143,7 +143,7 @@ def numme_atoms():
     )
     nmArrayAtom = G(
         PatternOperation(
-            "np.array", wrapnpop(lambda *args: np.array(args, dtype='float')), unwrap=False, rec=True
+            "np.array", wrapnpop(lambda *args: np.array(args)), unwrap=False, rec=True
         )
     )
     nmAddAtom = G(PatternOperation("np.add", wrapnpop(np.add), unwrap=False))
@@ -227,6 +227,8 @@ def numme_atoms():
                      wrapnpop(np.random.seed), unwrap=False))
     nmShape = G(PatternOperation("np.shape", wrapnpop(
         lambda _x, _i: _x.shape[_i]), unwrap=False))
+    nmWhere = G(PatternOperation("np.where", wrapnpop(np.where), unwrap=False))
+    nmEqual = G(PatternOperation("np.equal", wrapnpop(np.equal), unwrap=False))
 
     return {
         "np.vector": nmVectorAtom,
@@ -268,4 +270,6 @@ def numme_atoms():
         "np.squeeze": nmSqueeze,
         "np.random.seed": nmRandomSeed,
         "np.shape": nmShape,
+        "np.where": nmWhere,
+        "np.equal": nmEqual
     }
