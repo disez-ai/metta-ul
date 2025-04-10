@@ -362,6 +362,7 @@ def test_gmm(metta: MeTTa):
     metta.run(
         """
         ! (import! &self metta_ul:cluster:gmm)
+        ! (np.random.seed 0)
 
         (=
             (X)
@@ -376,7 +377,7 @@ def test_gmm(metta: MeTTa):
         atom.get_object().value for atom in result.get_children()
     )
     weights_true = np.ones(2) / 2
-    means_true = np.array([[0.73105858, 0.26894142], [0.26894142, 0.73105858]])
+    means_true = np.array([[0.26894142, 0.73105858], [0.73105858, 0.26894142]])
     covariances_true = np.repeat(
         [[[0.19661193, -0.19661193], [-0.19661193, 0.19661193]]], 2, axis=0
     )

@@ -143,7 +143,7 @@ def numme_atoms():
     )
     nmArrayAtom = G(
         PatternOperation(
-            "np.array", wrapnpop(lambda *args: np.array(args)), unwrap=False, rec=True
+            "np.array", wrapnpop(lambda *args: np.array(args, dtype='float')), unwrap=False, rec=True
         )
     )
     nmAddAtom = G(PatternOperation("np.add", wrapnpop(np.add), unwrap=False))
