@@ -8,7 +8,7 @@ from sklearn.metrics import adjusted_rand_score
 def test_compute_affinity(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_spectral_clustering)
+        !(import! &self metta_ul:cluster:spectral_clustering)
         
         (=
             (X-1D-Single)
@@ -32,9 +32,9 @@ def test_compute_affinity(metta: MeTTa):
     )
     result: Atom = metta.run(
         """
-        ! (rbf-affinity-matrix 
-                (square-distance-matrix 
-                    (square-norm 
+        ! (spectral-clustering.rbf-affinity-matrix 
+                (spectral-clustering.square-distance-matrix 
+                    (spectral-clustering.square-norm 
                         (np.array (X-1D-Single)) 
                     ) 
                     (np.array (X-1D-Single))
@@ -51,9 +51,9 @@ def test_compute_affinity(metta: MeTTa):
 
     result: Atom = metta.run(
         """
-        ! (rbf-affinity-matrix 
-                (square-distance-matrix 
-                    (square-norm 
+        ! (spectral-clustering.rbf-affinity-matrix 
+                (spectral-clustering.square-distance-matrix 
+                    (spectral-clustering.square-norm 
                         (np.array (X-1D-Multiple)) 
                     ) 
                     (np.array (X-1D-Multiple))
@@ -68,9 +68,9 @@ def test_compute_affinity(metta: MeTTa):
 
     result: Atom = metta.run(
         """
-        ! (rbf-affinity-matrix 
-                (square-distance-matrix 
-                    (square-norm 
+        ! (spectral-clustering.rbf-affinity-matrix 
+                (spectral-clustering.square-distance-matrix 
+                    (spectral-clustering.square-norm 
                         (np.array (X-2D-Multiple)) 
                     ) 
                     (np.array (X-2D-Multiple))
@@ -93,9 +93,9 @@ def test_compute_affinity(metta: MeTTa):
 
     result: Atom = metta.run(
         """
-        ! (rbf-affinity-matrix 
-                (square-distance-matrix 
-                    (square-norm 
+        ! (spectral-clustering.rbf-affinity-matrix 
+                (spectral-clustering.square-distance-matrix 
+                    (spectral-clustering.square-norm 
                         (X-2D-Random)
                     ) 
                     (X-2D-Random)
@@ -109,9 +109,9 @@ def test_compute_affinity(metta: MeTTa):
 
     result: Atom = metta.run(
         """        
-        ! (rbf-affinity-matrix 
-                (square-distance-matrix 
-                    (square-norm 
+        ! (spectral-clustering.rbf-affinity-matrix 
+                (spectral-clustering.square-distance-matrix 
+                    (spectral-clustering.square-norm 
                         (np.array (X-1D-Multiple)) 
                     ) 
                     (np.array (X-1D-Multiple))
@@ -124,9 +124,9 @@ def test_compute_affinity(metta: MeTTa):
 
     result: Atom = metta.run(
         """        
-        ! (rbf-affinity-matrix 
-                (square-distance-matrix 
-                    (square-norm 
+        ! (spectral-clustering.rbf-affinity-matrix 
+                (spectral-clustering.square-distance-matrix 
+                    (spectral-clustering.square-norm 
                         (np.array (X-1D-Multiple)) 
                     ) 
                     (np.array (X-1D-Multiple))
@@ -144,7 +144,7 @@ def test_compute_affinity(metta: MeTTa):
 def test_compute_normalized_laplacian(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:numme_spectral_clustering)
+        !(import! &self metta_ul:cluster:spectral_clustering)
         
         (=
             (I)
@@ -168,7 +168,14 @@ def test_compute_normalized_laplacian(metta: MeTTa):
     )
     result: Atom = metta.run(
         """        
-        ! (normalized-laplacian (np.array (I)) (inverse-degree-matrix (degree (np.array (I)))))
+        ! (spectral-clustering.normalized-laplacian 
+            (np.array (I)) 
+            (spectral-clustering.inverse-degree-matrix 
+                (spectral-clustering.degree 
+                    (np.array (I))
+                )
+            )
+        )
         """
     )[0][0]
     L_norm: int = result.get_object().value
@@ -179,7 +186,14 @@ def test_compute_normalized_laplacian(metta: MeTTa):
 
     result: Atom = metta.run(
         """        
-        ! (normalized-laplacian (np.array (W-2)) (inverse-degree-matrix (degree (np.array (W-2)))))
+        ! (spectral-clustering.normalized-laplacian 
+            (np.array (W-2)) 
+            (spectral-clustering.inverse-degree-matrix 
+                (spectral-clustering.degree 
+                    (np.array (W-2))
+                )
+            )
+        )
         """
     )[0][0]
     L_norm: int = result.get_object().value
@@ -190,7 +204,14 @@ def test_compute_normalized_laplacian(metta: MeTTa):
 
     result: Atom = metta.run(
         """        
-        ! (normalized-laplacian (np.array (W-3)) (inverse-degree-matrix (degree (np.array (W-3)))))
+        ! (spectral-clustering.normalized-laplacian 
+            (np.array (W-3)) 
+            (spectral-clustering.inverse-degree-matrix 
+                (spectral-clustering.degree 
+                    (np.array (W-3))
+                )
+            )
+        )
         """
     )[0][0]
     L_norm: int = result.get_object().value
@@ -209,9 +230,9 @@ def test_compute_normalized_laplacian(metta: MeTTa):
         """ 
         (=
             (W-X-2D-Random)
-            (rbf-affinity-matrix 
-                (square-distance-matrix 
-                    (square-norm 
+            (spectral-clustering.rbf-affinity-matrix 
+                (spectral-clustering.square-distance-matrix 
+                    (spectral-clustering.square-norm 
                         (X-2D-Random)
                     ) 
                     (X-2D-Random)
@@ -219,10 +240,14 @@ def test_compute_normalized_laplacian(metta: MeTTa):
                 1.0
             )
         )
-        ;! (W-X-2D-Random)
-        ! (normalized-laplacian
+        
+        ! (spectral-clustering.normalized-laplacian
             (W-X-2D-Random)
-            (inverse-degree-matrix (degree (W-X-2D-Random)))
+            (spectral-clustering.inverse-degree-matrix 
+                (spectral-clustering.degree 
+                    (W-X-2D-Random)
+                )
+            )
         )
         """
     )[0][0]
@@ -233,7 +258,7 @@ def test_compute_normalized_laplacian(metta: MeTTa):
 def test_spectral_embedding(metta: MeTTa):
     metta.run(
         """        
-        !(import! &self metta_ul:cluster:numme_spectral_clustering)
+        !(import! &self metta_ul:cluster:spectral_clustering)
         
         (=
             (I)
@@ -245,10 +270,10 @@ def test_spectral_embedding(metta: MeTTa):
         """
         (=
             (eigh-I)
-            (eigh ((py-dot (I) tolist)))
+            (spectral-clustering.eigh ((py-dot (I) tolist)))
         )
 
-        ! (spectral-embeddings (eigh-I) 2)
+        ! (spectral-clustering.spectral-embeddings (eigh-I) 2)
         """
     )[0][0]
     U = result.get_object().value
@@ -271,10 +296,10 @@ def test_spectral_embedding(metta: MeTTa):
         )
         (=
             (eigh-L1)
-            (eigh ((py-dot (np.array (L1)) tolist)))
+            (spectral-clustering.eigh ((py-dot (np.array (L1)) tolist)))
         )
 
-        ! (spectral-embeddings (eigh-L1) 2)
+        ! (spectral-clustering.spectral-embeddings (eigh-L1) 2)
         """
     )[0][0]
     U = result.get_object().value
@@ -303,10 +328,10 @@ def test_spectral_embedding(metta: MeTTa):
         )
         (=            
             (eigh-L2)         
-            (eigh ((py-dot (np.array (L2)) tolist)))
+            (spectral-clustering.eigh ((py-dot (np.array (L2)) tolist)))
         )
         
-        ! (spectral-embeddings (eigh-L2) 2)                       
+        ! (spectral-clustering.spectral-embeddings (eigh-L2) 2)                       
         """
     )[0][0]
     U = result.get_object().value
@@ -334,10 +359,10 @@ def test_spectral_embedding(metta: MeTTa):
         )
         (=            
             (eigh-L3)         
-            (eigh ((py-dot (np.array (L3)) tolist)))
+            (spectral-clustering.eigh ((py-dot (np.array (L3)) tolist)))
         )
 
-        ! (spectral-embeddings (eigh-L2) 0)                       
+        ! (spectral-clustering.spectral-embeddings (eigh-L2) 0)                       
         """
     )[0][0]
     U = result.get_object().value
@@ -348,7 +373,7 @@ def test_spectral_embedding(metta: MeTTa):
 def test_row_normalize(metta: MeTTa):
     metta.run(
         """        
-        !(import! &self metta_ul:cluster:numme_spectral_clustering)
+        !(import! &self metta_ul:cluster:spectral_clustering)
 
         (=
             (A)
@@ -370,7 +395,7 @@ def test_row_normalize(metta: MeTTa):
     )
     result: Atom = metta.run(
         """
-        ! (row-normalize (A))
+        ! (spectral-clustering.row-normalize (A))
         """
     )[0][0]
     A_norm = result.get_object().value
@@ -380,7 +405,7 @@ def test_row_normalize(metta: MeTTa):
 
     result: Atom = metta.run(
         """
-        ! (row-normalize (B))
+        ! (spectral-clustering.row-normalize (B))
         """
     )[0][0]
     B_norm = result.get_object().value
@@ -391,7 +416,7 @@ def test_row_normalize(metta: MeTTa):
     with np.errstate(divide="ignore", invalid="ignore"):
         result: Atom = metta.run(
             """
-            ! (row-normalize (C))
+            ! (spectral-clustering.row-normalize (C))
             """
         )[0][0]
     C_norm = result.get_object().value
@@ -407,7 +432,7 @@ def test_row_normalize(metta: MeTTa):
 
     result: Atom = metta.run(
         """
-        ! (row-normalize (D))
+        ! (spectral-clustering.row-normalize (D))
         """
     )[0][0]
     D_norm = result.get_object().value
@@ -422,7 +447,7 @@ def test_row_normalize(metta: MeTTa):
 def test_spectral_clustering(metta: MeTTa):
     metta.run(
         """        
-        !(import! &self metta_ul:cluster:numme_spectral_clustering)                
+        !(import! &self metta_ul:cluster:spectral_clustering)                
         """
     )
     result: Atom = metta.run(
@@ -437,21 +462,21 @@ def test_spectral_clustering(metta: MeTTa):
         )      
         (=
             (embeddings)
-            (spectral-embeddings
-                (eigh
-                    (normalized-laplacian
-                        (rbf-affinity-matrix
-                            (square-distance-matrix
-                                (square-norm (X1))
+            (spectral-clustering.spectral-embeddings
+                (spectral-clustering.eigh
+                    (spectral-clustering.normalized-laplacian
+                        (spectral-clustering.rbf-affinity-matrix
+                            (spectral-clustering.square-distance-matrix
+                                (spectral-clustering.square-norm (X1))
                                 (X1)
                             )
                             0.1
                         )
-                        (inverse-degree-matrix
-                            (degree
-                                (rbf-affinity-matrix
-                                    (square-distance-matrix
-                                        (square-norm (X1))
+                        (spectral-clustering.inverse-degree-matrix
+                            (spectral-clustering.degree
+                                (spectral-clustering.rbf-affinity-matrix
+                                    (spectral-clustering.square-distance-matrix
+                                        (spectral-clustering.square-norm (X1))
                                         (X1)
                                     )
                                     0.1
@@ -468,7 +493,7 @@ def test_spectral_clustering(metta: MeTTa):
                 (np.transpose
                     (kmeans.assign 
                         (embeddings) 
-                        (spectral-clustering (X1) (K1) 0.1 100) 
+                        (spectral-clustering.spectral-clustering (X1) (K1) 0.1 100) 
                         (K1)
                     )
                 )
@@ -494,21 +519,21 @@ def test_spectral_clustering(metta: MeTTa):
                 
         (=
             (embeddings)
-            (spectral-embeddings
-                (eigh
-                    (normalized-laplacian
-                        (rbf-affinity-matrix
-                            (square-distance-matrix
-                                (square-norm (X2))
+            (spectral-clustering.spectral-embeddings
+                (spectral-clustering.eigh
+                    (spectral-clustering.normalized-laplacian
+                        (spectral-clustering.rbf-affinity-matrix
+                            (spectral-clustering.square-distance-matrix
+                                (spectral-clustering.square-norm (X2))
                                 (X2)
                             )
                             0.1
                         )
-                        (inverse-degree-matrix
-                            (degree
-                                (rbf-affinity-matrix
-                                    (square-distance-matrix
-                                        (square-norm (X2))
+                        (spectral-clustering.inverse-degree-matrix
+                            (spectral-clustering.degree
+                                (spectral-clustering.rbf-affinity-matrix
+                                    (spectral-clustering.square-distance-matrix
+                                        (spectral-clustering.square-norm (X2))
                                         (X2)
                                     )
                                     0.1
@@ -525,7 +550,7 @@ def test_spectral_clustering(metta: MeTTa):
                 (np.transpose
                     (kmeans.assign 
                         (embeddings) 
-                        (spectral-clustering (X2) (K2) 0.1 100) 
+                        (spectral-clustering.spectral-clustering (X2) (K2) 0.1 100) 
                         (K2)
                     )
                 )
