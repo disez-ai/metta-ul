@@ -162,29 +162,52 @@
 )
 
 (=
-    (agglomerative.recursion $linkage $clusters $distance-matrix $length)
-    (if (== 1 $length)
-        (:: $clusters ())
-        (:: 
-            $clusters
-            (agglomerative.recursion
-                $linkage
-                (agglomerative.merge-clusters $clusters $distance-matrix $linkage)
-                $distance-matrix
-                (- $length 1)
-            )
+    (agglomerative.recursion $k $linkage $clusters $distance-matrix $length)
+    (if (== $k $length)
+        $clusters
+        (agglomerative.recursion
+            $k
+            $linkage
+            (agglomerative.merge-clusters $clusters $distance-matrix $linkage)
+            $distance-matrix
+            (- $length 1)
         )
     )
 )
 
 (=
-    (agglomerative $X $linkage)
+    (agglomerative $X $k $linkage)
     (let $n (np.shape $X 0)
         (agglomerative.recursion
+            $k
             $linkage
             (agglomerative.init-clusters $n)
             (agglomerative.distance-matrix $X)
             $n
         )
+    )
+)
+
+(=
+    (agglomerative.assign $clusters $assignment $index)
+    (case $clusters
+        (
+            (() $assignment)
+            ((:: $c $cs)
+                (let $_ (np.put $assignment $c $index)
+                    (agglomerative.assign $cs $assignment (+ 1 $index))
+                )
+            )
+        )
+    )
+    ; (println! $assignment)
+)
+
+(=
+    (agglomerative.fit-predict $X $k $linkage)
+    (agglomerative.assign
+        (agglomerative $X $k $linkage)
+        (np.ones (np.shape $X 0))
+        0
     )
 )
