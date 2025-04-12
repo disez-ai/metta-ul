@@ -89,13 +89,18 @@ class PatternOperation(OperationObject):
 def _dataframe_atom_type(df):
     return S("PDDataFrame")
 
+def _dataframe_atom_value(df, typ):
+    if not isinstance(df, pd.DataFrame):
+        raise RuntimeError(f"Expected DataFrame, got {type(df)}")
+    return G(DataFrameValue(df), typ)
+
 
 def wrapnpop(func):
     def wrapper(*args):
         a, k = unwrap_args(args)
         res = func(*a, **k)
         typ = _dataframe_atom_type(res)
-        return [G(DataFrameValue(res), typ)]
+        return [_dataframe_atom_value(res, typ)]
 
     return wrapper
 
