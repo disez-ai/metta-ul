@@ -3,25 +3,13 @@ from hyperon.atoms import E,S,G, OperationAtom, ValueAtom,NoReduceError
 from hyperon.ext import register_atoms
 
 from sklearn.preprocessing import normalize, StandardScaler
-from sklearn.datasets import load_wine, load_iris
+import sklearn.datasets
 from sklearn.decomposition import PCA
 from .numme import PatternOperation
 from .numme import wrapnpop, _np_atom_type, _np_atom_value
 from .pdm import unwrap_args, _dataframe_atom_type, _dataframe_atom_value
 import pandas as pd
 import numpy as np
-
-
-def _load_wine_data():
-    return load_wine().data
-
-
-def _load_iris_data():
-    return load_iris().data
-
-
-def _load_iris_target():
-    return load_iris().target
 
 
 def _slk_scaler_fit_transform(X, y=None, **fit_params):
@@ -107,8 +95,21 @@ def dataset_wrapnpop(func):
         else:
             return [_atom_value(res)]
     return wrapper
-    
-@ register_atoms
+
+def map_dataset_atoms():
+    dataset_functions = inspect.getmembers(sklearn.datasets, inspect.isfunction)
+    mapping = {}
+    for name,  func in dataset_functions:
+        if name.startswith("load_") or name.startswith("make_"):
+            func_name = f"skl.datasets.{name}"
+            func = dataset_wrapnpop(func)
+            skl_dataset = OperationAtom(
+                    func_name, func, unwrap=False
+            )
+            mapping[rf"skl\.datasets\.{name}"] = skl_dataset
+    return mapping
+
+@register_atoms
 def skl_atoms():
 
     skl_pca = OperationAtom("skl.decomposition.PCA",
@@ -118,7 +119,7 @@ def skl_atoms():
 
     slk_pca_fit_transform = OperationAtom(
         "skl.decomposition.PCA.fit_transform", method_wrapnpop("fit_transform", wrapnpop), unwrap=False
-    )
+    ) 
 
     slk_scaler_fit_transform = G(
         PatternOperation(
@@ -132,32 +133,21 @@ def skl_atoms():
         )
     )
 
-    skl_dataset_wine = G(
-        PatternOperation(
-            "skl.datasets.load_wine", dataset_wrapnpop(load_wine), unwrap=False
-        )
-    )
-
-    skl_dataset_iris = G(
-        PatternOperation(
-            "skl.datasets.load_iris", dataset_wrapnpop(load_iris), unwrap=False
-        )
-    )
-
     skl_dot = G(
         PatternOperation(
             "skl.dot", dot(), unwrap=False
         )
     )
 
+    skl_datasets = map_dataset_atoms()
+
 
     return {
         r"skl\.dot": skl_dot,
         r"skl\.preprocessing\.normalize": skl_normalize,
-        r"skl\.datasets\.load_wine": skl_dataset_wine,
-        r"skl\.datasets\.load_iris": skl_dataset_iris,
         r"skl\.preprocessing\.Scaler\.fit_transform": slk_scaler_fit_transform,
         r"skl\.decomposition\.PCA": skl_pca,
         r"skl\.decomposition\.PCA\.fit": skl_pca_fit,
         r"skl\.decomposition\.PCA\.fit_transform": slk_pca_fit_transform,
+        **skl_datasets
     }

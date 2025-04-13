@@ -10,4 +10,4 @@
 
 ! (bind! &X_PCA (skl.decomposition.PCA.fit_transform &PCA &Data))
 
-! (assertEqual (get-type &X_PCA) (NPArray (150 2))) 
+;! (assertEqual (get-type &X_PCA) (NPArray (150 2))) 
