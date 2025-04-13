@@ -84,6 +84,8 @@ def _np_atom_type(npobj):
         return AtomType.UNDEFINED
     return E(S("NPArray"), E(*[ValueAtom(s, "Number") for s in npobj.shape]))
 
+def _np_atom_value(npobj, typ):
+    return G(NumpyValue(npobj), typ)
 
 def wrapnpop(func):
     def wrapper(*args):
@@ -91,7 +93,7 @@ def wrapnpop(func):
              else arg.get_name() for arg in args]
         res = func(*a)
         typ = _np_atom_type(res)
-        return [G(NumpyValue(res), typ)]
+        return [_np_atom_value(res, typ)]
 
     return wrapper
 

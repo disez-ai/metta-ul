@@ -1,12 +1,15 @@
-from hyperon.atoms import G, OperationAtom, ValueAtom
+import inspect
+from hyperon.atoms import E,S,G, OperationAtom, ValueAtom,NoReduceError
 from hyperon.ext import register_atoms
 
 from sklearn.preprocessing import normalize, StandardScaler
 from sklearn.datasets import load_wine, load_iris
 from sklearn.decomposition import PCA
 from .numme import PatternOperation
-from .numme import wrapnpop, _np_atom_type
-from .pdm import unwrap_args, _dataframe_atom_type
+from .numme import wrapnpop, _np_atom_type, _np_atom_value
+from .pdm import unwrap_args, _dataframe_atom_type, _dataframe_atom_value
+import pandas as pd
+import numpy as np
 
 
 def _load_wine_data():
@@ -26,11 +29,11 @@ def _slk_scaler_fit_transform(X, y=None, **fit_params):
     return scaler.fit_transform(X, y, **fit_params)
 
 
-def va_wrapnpop(func, dtype):
+def va_wrapnpop(func, dtype="PCA"):
     def wrapper(*args):
         a, k = unwrap_args(args)
         res = func(*a, **k)
-        return [ValueAtom(res, "PCA")]
+        return [ValueAtom(res, dtype)]
     return wrapper
 
 
@@ -43,6 +46,25 @@ def method_wrapnpop(func_name, npop):
         return res
     return wrapper
 
+def dot():
+    def wrapper(*args):
+        obj = args[0].get_object().value
+        attr_name = args[1].get_name()
+        if not hasattr(obj, attr_name):
+            raise NoReduceError()
+        attr = getattr(obj, attr_name)
+        if not callable(attr):
+            print(f"attr: {type(attr)}")
+            res = _atom_value(attr)
+            print(f"res: {type(res)}")
+            return [res]
+        else:
+            m_args = args[2].get_children()
+            a, k = unwrap_args(m_args)
+            res = attr(*a, **k)
+            return [_atom_value(res)]
+    return wrapper
+
 def _type_of_atom(value):
     if isinstance(value, np.ndarray):
         return _np_atom_type(value)
@@ -53,15 +75,39 @@ def _type_of_atom(value):
     else:
         return "py-object"
     
+def _atom_value(value):
+    if isinstance(value, np.ndarray):
+        return _np_atom_value(value, _np_atom_type(value))
+    elif isinstance(value, pd.DataFrame):
+        return _dataframe_atom_value(value, _dataframe_atom_type(value))
+    elif isinstance(value, list):
+        return ValueAtom(value, "py-list")
+    else:
+        return ValueAtom(value, "py-object")
+    
 
 def _tuple_to_Expr(tup):
-    def type_of_atom(tup):
-        return E(S("DataSet"), E(*[ValueAtom(s, s) for s in tup.shape]))
-    if isinstance(tup, tuple):
-        return [ValueAtom(tup[0], "PCA"), ValueAtom(tup[1], "PCA")]
-    else:
-        return ValueAtom(tup, "PCA")
+    if not isinstance(tup, tuple):
+        return RuntimeError(f"Expected tuple, got {type(tup)}")
+    return E(S("DataSetTuple"), *[_atom_value(s) for s in tup])
 
+def _class_to_Expr(cls):
+    if hasattr(cls, "items"):
+        return E(S("DataSetObject"), *[E(S(key), _atom_value(value)) for key, value in cls.items()])
+    elif hasattr(cls, "__dict__"):
+        return E(S("DataSetObject"), *[E(S(key), _atom_value(value)) for key, value in cls.__dict__.items()])
+    return RuntimeError(f"Expected class, got {type(cls)}")
+
+def dataset_wrapnpop(func):
+    def wrapper(*args):
+        a, k = unwrap_args(args)
+        res = func(*a, **k)
+        if isinstance(res, tuple):
+            return [_tuple_to_Expr(res)]
+        else:
+            return [_atom_value(res)]
+    return wrapper
+    
 @ register_atoms
 def skl_atoms():
 
@@ -86,29 +132,30 @@ def skl_atoms():
         )
     )
 
-    skl_windata = G(
+    skl_dataset_wine = G(
         PatternOperation(
-            "skl.datasets.load_wine", wrapnpop(_load_wine_data), unwrap=False
+            "skl.datasets.load_wine", dataset_wrapnpop(load_wine), unwrap=False
         )
     )
 
-    skl_iris_data = G(
+    skl_dataset_iris = G(
         PatternOperation(
-            "skl.datasets.load_iris.data", wrapnpop(_load_iris_data), unwrap=False
+            "skl.datasets.load_iris", dataset_wrapnpop(load_iris), unwrap=False
         )
     )
 
-    load_iris_target = G(
+    skl_dot = G(
         PatternOperation(
-            "skl.datasets.load_iris.target", wrapnpop(_load_iris_target), unwrap=False
+            "skl.dot", dot(), unwrap=False
         )
     )
+
 
     return {
+        r"skl\.dot": skl_dot,
         r"skl\.preprocessing\.normalize": skl_normalize,
-        r"skl\.datasets\.load_wine": skl_windata,
-        r"skl\.datasets\.load_iris\.data": skl_iris_data,
-        r"skl\.datasets\.load_iris\.target": load_iris_target,
+        r"skl\.datasets\.load_wine": skl_dataset_wine,
+        r"skl\.datasets\.load_iris": skl_dataset_iris,
         r"skl\.preprocessing\.Scaler\.fit_transform": slk_scaler_fit_transform,
         r"skl\.decomposition\.PCA": skl_pca,
         r"skl\.decomposition\.PCA\.fit": skl_pca_fit,
