@@ -79,12 +79,6 @@ def _tuple_to_Expr(tup):
         return RuntimeError(f"Expected tuple, got {type(tup)}")
     return E(S("DataSetTuple"), *[_atom_value(s) for s in tup])
 
-def _class_to_Expr(cls):
-    if hasattr(cls, "items"):
-        return E(S("DataSetObject"), *[E(S(key), _atom_value(value)) for key, value in cls.items()])
-    elif hasattr(cls, "__dict__"):
-        return E(S("DataSetObject"), *[E(S(key), _atom_value(value)) for key, value in cls.__dict__.items()])
-    return RuntimeError(f"Expected class, got {type(cls)}")
 
 def dataset_wrapnpop(func):
     def wrapper(*args):
@@ -108,6 +102,7 @@ def map_dataset_atoms():
             )
             mapping[rf"skl\.datasets\.{name}"] = skl_dataset
     return mapping
+
 
 @register_atoms
 def skl_atoms():
