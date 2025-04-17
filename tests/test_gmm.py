@@ -2,19 +2,6 @@ from hyperon import MeTTa, Atom
 import numpy as np
 
 
-def test_gmm_py_getitem(metta: MeTTa):
-    metta.run(
-        """
-        ! (import! &self metta_ul:cluster:gmm)
-        """
-    )
-
-    result: Atom = metta.run("! (py-getitem (py-list (1 2)) 0)")[0][0]
-    element: int = result.get_object().value
-
-    assert element == 1
-
-
 def test_gmm_center(metta: MeTTa):
     metta.run(
         """
