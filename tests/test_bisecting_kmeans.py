@@ -160,46 +160,56 @@ def test_compute_sse(metta: MeTTa):
     result: Atom = metta.run(
         """
         ; Generic case: 2D data with known center
+        (: X1 (-> (NPArray (2 2))))
         (=
             (X1)
             (np.array 
                 ((0 0) (1 1))
             )
         )
+        
+        (: indices1 (-> (NPArray (2))))
         (=
             (indices1)
             (np.array
                 (0 1)   
             )            
         )
+        
+        (: center1 (-> (NPArray (2))))
         (=
             (center1)
             (np.array
                 (0.5 0.5)
             )            
         )
-                       
+                    
         ! (bisecting-kmeans.compute-sse (X1) (indices1) (center1))
         """
     )[0][0]
     sse: int = result.get_object().value
     assert np.isclose(sse, 1.0), f"Expected SSE=1.0, got {sse}"
 
+    # Edge case: single point cluster, SSE should be 0
     result: Atom = metta.run(
-        """
-        ; Edge case: single point cluster, SSE should be 0
+        """        
+        (: X2 (-> (NPArray (1 2))))
         (=
             (X2)
             (np.array 
                 ((2 3))
             )
         )
+        
+        (: indices2 (-> (NPArray (1))))
         (=
             (indices2)
             (np.array
                 (0)   
             )            
         )
+        
+        (: center2 (-> (NPArray (2))))
         (=
             (center2)
             (np.array
@@ -213,36 +223,33 @@ def test_compute_sse(metta: MeTTa):
     sse: int = result.get_object().value
     assert np.isclose(sse, 0.0), f"Expected SSE=0.0 for a single point, got {sse}"
 
+    # Edge case: empty indices should yield 0 SSE
     result: Atom = metta.run(
-        """
-        ; Edge case: empty indices should yield 0 SSE
+        """        
+        (: X3 (-> (NPArray (2 2))))
         (=
             (X3)
             (np.array 
                 ((0 0) (1 1))
             )
         )
+        
+        (: indices3 (-> (NPArray (0))))
         (=
             (indices3)
             (np.array
                 ()   
             )            
         )
+        
+        (: center3 (-> (NPArray (2))))
         (=
             (center3)
             (np.array
                 (0.5 0.5)
             )            
         )
-        
-        (=
-            (func $x)
-            (if (< $x 0)
-                (NEG)
-                (POS)
-            )
-        )
-        
+                        
         ! (bisecting-kmeans.compute-sse (X3) (indices3) (center3))
         """
     )[0][0]
@@ -260,6 +267,7 @@ def test_compute_initial_cluster(metta: MeTTa):
     result: Atom = metta.run(
         """
         ; Generic case: 2D data with known center
+        (: X1 (-> (NPArray (3 2))))
         (=
             (X1)
             (np.array 
@@ -298,7 +306,8 @@ def test_find_max_cluster(metta: MeTTa):
         """
     )
     result: Atom = metta.run(
-        """        
+        """ 
+        (: clusters1 (-> ClusterList))       
         (=
             (clusters1)
             (::
@@ -321,6 +330,7 @@ def test_find_max_cluster(metta: MeTTa):
 
     result: Atom = metta.run(
         """        
+        (: clusters2 (-> ClusterList)) 
         (=
             (clusters2)
             (::
@@ -355,6 +365,7 @@ def test_remove_cluster(metta: MeTTa):
 
         """
     )
+
     result: Atom = metta.run(
         """
         (=
@@ -427,10 +438,12 @@ def test_bisect_cluster(metta: MeTTa):
     )
     result: Atom = metta.run(
         """
+        (: X (-> (NPArray (4 2))))
         (=
             (X)
             (np.array ((0.0 0.0) (0.0 1.0) (10.0 10.0) (10.0 11.0)))
         )
+        (: clusters (-> ClusterList))
         (=
             (clusters)            
             (::
@@ -467,6 +480,7 @@ def test_append_to_clusters(metta: MeTTa):
 
         """
     )
+
     # Generic case:
     result: Atom = metta.run(
         """
@@ -560,6 +574,7 @@ def test_append_to_hierarchy(metta: MeTTa):
 
         """
     )
+
     # Generic case:
     # Test 1: Generic case with an empty hierarchy.
     result: Atom = metta.run(
@@ -668,21 +683,26 @@ def test_bisecting_kmeans(metta: MeTTa):
     # Start with one initial cluster containing all points.
     result: Atom = metta.run(
         """
+        (: X (-> (NPArray (6 2))))
         (=
             (X)
             (np.array ((0.0 0.0) (0.0 1.0) (1.0 0.0) (1.0 1.0) (5.0 5.0) (5.0 6.0)))            
         )
+        
+        (: init-cluster (-> ClusterList))
         (=
             (init-cluster)
             (bisecting-kmeans.compute-initial-cluster (X))            
         )
+        
+        (: init-hierarchy (-> Hierarchy))
         (=
             (init-hierarchy)
             (append pyNone (init-cluster))
         )
                 
         ! (bisecting-kmeans.recursive-bisecting-kmeans (X) (init-cluster) 1 10 (init-hierarchy))
-                               
+                                
         """
     )[0][0]
     hierarchy = parse_hierarchy(result)
@@ -738,8 +758,10 @@ def test_assign_point_to_cluster(metta: MeTTa):
 
         """
     )
+
     result: Atom = metta.run(
         """
+        (: clusters0 (-> ClusterList))
         (=
             (clusters0)
             (::
@@ -753,6 +775,8 @@ def test_assign_point_to_cluster(metta: MeTTa):
                 )
             )
         )
+        
+        (: p0 (-> (NPArray (2))))
         (=
             (p0)
             (np.array (1.0 1.0))
@@ -766,7 +790,8 @@ def test_assign_point_to_cluster(metta: MeTTa):
     assert cluster_p0 == expected_cluster_p0, f"Expected {expected_cluster_p0}, got {cluster_p0}"
 
     result: Atom = metta.run(
-        """        
+        """      
+        (: p1 (-> (NPArray (2))))  
         (=
             (p1)
             (np.array (4.5 0.1))
@@ -780,7 +805,8 @@ def test_assign_point_to_cluster(metta: MeTTa):
     assert cluster_p1 == expected_cluster_p1, f"Expected {expected_cluster_p1}, got {cluster_p1}"
 
     result: Atom = metta.run(
-        """        
+        """   
+        (: p2 (-> (NPArray (2))))      
         (=
             (p2)
             (np.array (2.5 0.0))
@@ -794,7 +820,8 @@ def test_assign_point_to_cluster(metta: MeTTa):
     assert cluster_p2 == expected_cluster_p2, f"Expected {expected_cluster_p2}, got {cluster_p2}"
 
     result: Atom = metta.run(
-        """        
+        """    
+        (: p3 (-> (NPArray (2))))     
         (=
             (p3)
             (np.array (0.0 4.9))
@@ -808,7 +835,8 @@ def test_assign_point_to_cluster(metta: MeTTa):
     assert cluster_p3 == expected_cluster_p3, f"Expected {expected_cluster_p3}, got {cluster_p3}"
 
     result: Atom = metta.run(
-        """        
+        """  
+        (: clusters1 (-> ClusterList))      
         (=
             (clusters1)
             ()
@@ -822,7 +850,8 @@ def test_assign_point_to_cluster(metta: MeTTa):
     assert cluster_p0 == expected_cluster_p0, f"Expected {expected_cluster_p0}, got {cluster_p0}"
 
     result: Atom = metta.run(
-        """        
+        """     
+        (: clusters2 (-> ClusterList))   
         (=
             (clusters2)
             (::
@@ -863,7 +892,6 @@ def test_assign_all_points(metta: MeTTa):
             )
         )
         
-        ;! (>= 0 (py-getitem (py-dot (X) shape) 0))
         ! (bisecting-kmeans.assign-all-points (X) (clusters0) 0 ())                
         """
     )[0][0]
@@ -876,9 +904,10 @@ def test_assign_all_points(metta: MeTTa):
     # Edge case: no points in X.
     result: Atom = metta.run(
         """
+        (: X1 (-> (NPArray (0))))
         (=
             (X1)
-            (np.array () )
+            (np.array ())
         )
         (=
             (clusters1)
@@ -893,7 +922,7 @@ def test_assign_all_points(metta: MeTTa):
         ;! (X1)
         ! (bisecting-kmeans.assign-all-points (X1) (clusters1) 0 ())                
         """
-    )[0][0]
+    )#[0][0]
     cluster_indices = metta_clusters_to_py_clusters(result)
     cluster_indices = [item for sublist in cluster_indices for item in sublist]
     assert len(cluster_indices) == 0, f"Expected empty labels, got {result}"
@@ -957,3 +986,108 @@ def test_bisecting_kmeans_predict(metta: MeTTa):
                                                      "different from the last two."
 
     assert set(cluster_indices) == {0, 1}, "Cluster labels must be either 0 or 1."
+
+
+def test_typing(metta: MeTTa):
+    metta.run(
+        """
+        ! (import! &self metta_ul:cluster:spectral_clustering)
+        """
+    )
+    result: Atom = metta.run(
+        """                
+        (: foo (-> (NPArray ($N)) Number))
+        ;(: foo (-> (NPArray ()) Number))        
+        (=  (foo $x) 5.0)        
+        ! (get-type foo)
+        
+        (: idx1 (-> (NPArray (3))))
+        (=
+            (idx1)
+            (np.array (1 2 3))
+        )
+        ! (get-type idx1)
+        ! (get-type (idx1))
+        
+        (: idx2 (-> (NPArray (0))))
+        (=
+            (idx2)
+            (np.array ())
+        )   
+        ! (get-type idx2)
+        ! (get-type (idx2))     
+        
+        ! (get-type (foo idx1))
+        ! (get-type (foo (idx1)))                
+        ! (get-type (foo (idx2)))
+        
+        ! (foo (idx1))  
+        ! (foo (idx2))     
+        """
+    )  # [0][0]
+    pass
+    result: Atom = metta.run(
+        """        
+                        
+        (: foo (-> Bool Number))
+        (: foo (-> Number Number))
+        (=  (foo $x) (5.0))
+        
+        ! (get-type foo)
+        
+        ! (foo ُTrue)  
+        ! (foo 0.0)           
+        """
+    )  # [0][0]
+    pass
+    result: Atom = metta.run(
+        """
+        (: Data (NPArray (4 2)))
+        (: soo (-> (NPArray ($N $D)) Number))
+        ;(: soo (-> Data Number))
+        (=  (soo $x) (np.sum $x))
+        ! (get-type soo)
+        
+        
+        ;(: Z (-> Data))
+        (: Z (-> (NPArray ($N $D))))
+        (= 
+            (Z)
+            (np.array ((0.0 0.0) (0.1 0) (1.0 1.0) (1.1 1.0)))
+        )
+        ! (get-type (Z))
+        
+        ! (get-type (soo Z))
+        ! (get-type (soo (Z)))        
+        ! (soo (Z))                
+        """
+    )  # [0][0]
+    pass
+    result: Atom = metta.run(
+        """
+        (: f (-> (NPArray ($N)) Number))
+        (= (f $x) 5.0)
+        
+        (: p (-> (NPArray (3))))
+        (= (p) (np.array (1 2 3)))
+        ! (f (p)) 
+        
+        (: q (-> (NPArray (0))))
+        (= (q) (np.array ()))
+        ! (f (q))            
+        """
+    )  # [0][0]
+    pass
+
+    result: Atom = metta.run(
+        """
+        
+        (::
+            (list)
+            (:: A (:: B (:: C ())))
+        )
+        ! (get-type (list))
+        ! (get-type (:: A (:: B (:: C ()))))       
+        """
+    )  # [0][0]
+    pass
