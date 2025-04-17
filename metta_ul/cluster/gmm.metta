@@ -6,13 +6,17 @@
 ! (bind! pyTrue (py-atom "True"))
 ! (bind! pyFalse (py-atom "False"))
 
-(=
-    (py-getitem $iterable $index)
-    (
-        (py-dot $iterable __getitem__)
-        $index
-    )
-)
+(: gmm.center (-> (NPArray ($n $d)) (NPArray ($k $d)) (NPArray ($n $k $d))))
+(: gmm.mahalanobis (-> (NPArray ($n $d)) (NPArray ($k $d)) (NPArray ($k $d $d)) (NPArray ($n $k))))
+(: gmm.gaussian-pdf (-> (NPArray ($n $d)) (NPArray ($k $d)) (NPArray ($k $d $d)) (NPArray ($n $k))))
+(: gmm.log-likelihood (-> (NPArray ($n $d)) (NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)) Number))
+(: gmm.init (-> (NPArray ($n $d)) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
+(: gmm.e-step (-> (NPArray ($n $d)) (NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)) (NPArray ($n $k))))
+(: gmm.m-step (-> (NPArray ($n $d)) (NPArray ($n $k)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
+(: gmm.recursion (-> (NPArray ($n $d)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d))) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
+
+(: gmm (-> (NPArray ($n $d)) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
+(: gmm (-> (NPArray ($n $d)) Number Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 
 ; X_centered = X[:, np.newaxis, :] - means
 (=
@@ -46,7 +50,7 @@
                 (np.add
                     (gmm.mahalanobis-term $X $means $covariances)
                     (np.mul
-                        (py-getitem (py-dot $X shape) 1)
+                        (np.shape $X 1)
                         (np.log (np.mul (np.array (2)) (py-dot np pi)))
                     )
                 )
@@ -94,7 +98,7 @@
             )
             (np.mul
                 0.000001
-                (np.eye (py-getitem (py-dot $X shape) 1))
+                (np.eye (np.shape $X 1))
             )
         )
     )
@@ -131,7 +135,7 @@
             )
             (let $X-centered (gmm.center $X $means)
                 (
-                    (np.div $Nk (py-getitem (py-dot $X shape) 0))
+                    (np.div $Nk (np.shape $X 0))
                     $means
                     (np.div
                         (np.einsum
