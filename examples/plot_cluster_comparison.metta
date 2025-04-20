@@ -1,5 +1,6 @@
 ! (import! &self metta_ul)
-! (import! &self metta_ul:cluster:kmeans)
+;! (import! &self metta_ul:cluster:kmeans)
+! (import! &self metta_ul:cluster:gmm)
 
 (= (get-cons $n) (match &self (Cons $n $y) $y))
 
@@ -49,7 +50,7 @@
 
 
 (Cons seed 30)
-(Cons n_samples 50)
+(Cons n_samples 500)
 (Param default (Cons n_clusters 3))
 
 (ToyData noisy_circles
@@ -57,22 +58,25 @@
 (Param noisy_circles (Cons n_clusters 2)) 
 
 (ToyData noisy_moon (skl.datasets.make_moons (n_samples (get-cons n_samples)) (noise 0.05) (random_state (get-cons seed))))
-(Param noisy_moon (Cons n_clusters 3))
+(Param noisy_moon (Cons n_clusters 2))
 
 (= (normalize (DataSetTuple $x $y)) (skl.preprocessing.Scaler.fit_transform $x))
 
-(= (fit-predict $x ) 
+(= (fit-predict $x)  
   (let* (
     (() (println! ("start kmeans: " $x)))
-    ((KmeansModel $X $centers $lables) (kmeans.fit $x (get-param n_clusters)))
-    (() (println! ("model fitted: " $x)))
+    ((KmeansModel $X $centers $labels) (kmeans.fit $x (get-param n_clusters)))
+    (() (println! "kmeans done" $labels))
   ) ($x $labels "Kmeans"))
 )
 
+
 (= (fit-predict $x) 
   (let* (
-    ($model (kmeans.fit $x (get-param n_clusters)))
-    ($labels (kmeans.labels $model))
+    (() (println! ("start GMM: " $x)))
+    ($model (gmm $x (get-param n_clusters)))
+    ($labels (gmm.predict $x $model))
+    (() (println! ("GMM done: " $labels)))
   ) ($x $labels "GMM"))
 )
 
