@@ -49,7 +49,7 @@
 
 
 (Cons seed 30)
-(Cons n_samples 500)
+(Cons n_samples 50)
 (Param default (Cons n_clusters 3))
 
 (ToyData noisy_circles
@@ -59,9 +59,9 @@
 (ToyData noisy_moon (skl.datasets.make_moons (n_samples (get-cons n_samples)) (noise 0.05) (random_state (get-cons seed))))
 (Param noisy_moon (Cons n_clusters 3))
 
+(= (normalize (DataSetTuple $x $y)) (skl.preprocessing.Scaler.fit_transform $x))
 
-
-(= (fit-predict (DataSetTuple $x $y)) 
+(= (fit-predict $x ) 
   (let* (
     (() (println! ("start kmeans: " $x)))
     ((KmeansModel $X $centers $lables) (kmeans.fit $x (get-param n_clusters)))
@@ -69,7 +69,7 @@
   ) ($x $labels "Kmeans"))
 )
 
-(= (fit-predict (DataSetTuple $x $y)) 
+(= (fit-predict $x) 
   (let* (
     ($model (kmeans.fit $x (get-param n_clusters)))
     ($labels (kmeans.labels $model))
@@ -87,20 +87,19 @@
 
 
 !(let* (
-  (() (println! "sege"))
   (($ds-idx  $alg-idx) ((new-state -1) (new-state -1)))
-  (() (println! "sege"))
   (($dn $d) (match &self (ToyData $name $dataset) ($name $dataset)))
-  (() (println! "sege"))
+  (() (println! ("match " $dn)))
   ($_ (change-idx $ds-idx &tdc))
-  (() (println! "soote"))
-  (($X $labels $N) (fit-predict $d))
-  (() (println! "soote1"))
+  ($data (normalize $d))
+  (() (println! ("data normalized" $data)))
+  (($X $labels $N) (fit-predict $data))
+  (() (println! ("fit predict" $N)))
   ($_ (change-idx $alg-idx &agn))
   (() (println! "sege"))
   (() (skl.mathplotlib.plt.subplot &tdc &agn, &pltn))
   (() (if (== &tdc 0) (skl.mathplotlib.plt.title $N (size 18))))
-  (() (skl.mathplotlib.plt.scatter (np.slice [:, 0]) (np.slice [:, 2]) (s 10) (color (make-color $labels))))
+  (() (skl.mathplotlib.plt.scatter (np.slice $data [:, 0]) (np.slice $data [:, 2]) (s 10) (color (make-color $labels))))
   (() (skl.mathplotlib.plt.xlim -2.5 2.5))
   (() (skl.mathplotlib.plt.ylim -2.5 2.5))
   (() (skl.mathplotlib.plt.xticks ()))
