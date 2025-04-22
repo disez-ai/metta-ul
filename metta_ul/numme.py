@@ -191,6 +191,8 @@ def numme_atoms():
             unwrap=False,
         )
     )
+    nmEigh = G(PatternOperation("np.linalg.eigh",wrapnpop(np.linalg.eigh), unwrap=False))
+
     nmInv = G(PatternOperation("np.linalg.inv",
                                wrapnpop(np.linalg.inv), unwrap=False))
     nmEinsum = G(PatternOperation(
@@ -250,6 +252,7 @@ def numme_atoms():
         "np.choose": nmChoose,
         "np.linalg.slogabsdet": nmLogDet,
         "np.linalg.inv": nmInv,
+        "np.linalg.eigh": nmEigh,
         "np.einsum": nmEinsum,
         "np.exp": nmExp,
         "np.log": nmLog,

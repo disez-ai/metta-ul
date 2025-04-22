@@ -1,6 +1,6 @@
-!(import! &self metta_ul:numme)
+!(import! &self metta_ul)
 
-! (bind! np (py-atom numpy))
+;! (bind! np (py-atom numpy))
 
 ! (bind! pyNone (py-atom "None"))
 ! (bind! pyTrue (py-atom "True"))
@@ -47,7 +47,7 @@
                     (gmm.mahalanobis-term $X $means $covariances)
                     (np.mul
                         (py-getitem (py-dot $X shape) 1)
-                        (np.log (np.mul (np.array (2)) (py-dot np pi)))
+                        (np.log (np.mul (np.array (2)) 3.141592653589793))
                     )
                 )
                 (np.linalg.slogabsdet $covariances)
