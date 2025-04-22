@@ -234,6 +234,7 @@ def numme_atoms():
     nmWhere = G(PatternOperation("np.where", wrapnpop(np.where), unwrap=False))
     nmEqual = G(PatternOperation("np.equal", wrapnpop(np.equal), unwrap=False))
     nmAppend = G(PatternOperation("np.append", wrapnpop(np.append)))
+    nmPut = G(PatternOperation("np.put", wrapnpop(np.put), unwrap=False))
 
     return {
         "np.vector": nmVectorAtom,
@@ -278,5 +279,6 @@ def numme_atoms():
         "np.shape": nmShape,
         "np.where": nmWhere,
         "np.equal": nmEqual,
-        "np.append": nmAppend
+        "np.append": nmAppend,
+        "np.put": nmPut,
     }

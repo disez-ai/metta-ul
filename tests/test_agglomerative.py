@@ -183,14 +183,14 @@ def test_agglomerative_recursion(metta: MeTTa):
         """
     )
 
-    result: Atom = metta.run('! (agglomerative.recursion "single" (flat-clusters) (np.array (distance-matrix)) 1)')[0][0]
+    result: Atom = metta.run('! (agglomerative.recursion 1 "single" (flat-clusters) (np.array (distance-matrix)) 1)')[0][0]
     history = str(result)
-    history_true = '(:: (:: [0, 1, 2] ()) ())'
+    history_true = '(:: [0, 1, 2] ())'
     assert history == history_true
 
-    result: Atom = metta.run('! (agglomerative.recursion "single" (clusters) (np.array (distance-matrix)) 2)')[0][0]
+    result: Atom = metta.run('! (agglomerative.recursion 1 "single" (clusters) (np.array (distance-matrix)) 2)')[0][0]
     history = str(result)
-    history_true = '(:: (:: [2] (:: [0, 1] ())) (:: (:: [2, 0, 1] ()) ()))'
+    history_true = '(:: [2, 0, 1] ())'
     assert history == history_true
 
 
@@ -206,9 +206,28 @@ def test_agglomerative(metta: MeTTa):
         """
     )
 
-    result: Atom = metta.run('! (agglomerative (np.array (X)) "single")')[0][0]
+    result: Atom = metta.run('! (agglomerative (np.array (X)) 1 "single")')[0][0]
 
     clusters = str(result)
-    clusters_true = '(:: (:: [1] (:: [0] ())) (:: (:: [1, 0] ()) ()))'
+    clusters_true = '(:: [1, 0] ())'
 
     assert clusters == clusters_true
+
+
+def test_agglomerative_fit_predict(metta: MeTTa):
+    metta.run(
+        """
+        ! (import! &self metta_ul:cluster:agglomerative)
+
+        (=
+            (X)
+            ((1 0) (0 1))
+        )
+        """
+    )
+
+    result: Atom = metta.run('! (agglomerative.fit-predict (np.array (X)) 1 "single")')[0][0]
+    assignments = result.get_object().value
+    assignments_true = np.zeros(2)
+
+    assert np.allclose(assignments, assignments_true)
