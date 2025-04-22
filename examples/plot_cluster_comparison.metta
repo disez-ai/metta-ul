@@ -119,6 +119,7 @@
   ) ($labels "NEW"))
 )
 
+
 !(bind! &tdc (count (ToyData $s $y)))
 !(bind! &agn (let* (
       ($count (new-state 0))
@@ -130,40 +131,34 @@
     (get-state $count)
 ))
 
+(= (plot $data $labels $algn $plt-idx) (
+  let* (
+    ($splt (skl.mathplotlib.plot.subplot &tdc &agn (get-state $plt-idx)))
+    ($t (if (<= (get-state $plt-idx) &agn) (skl.mathplotlib.plot.title $algn (size 18)) $algn))
+    ($plt (skl.mathplotlib.plot.scatter (np.slice $data [:,0]) (np.slice $data [:,1]) (s 10) (color (make-color $labels))))
+    ($xl (skl.mathplotlib.plot.xlim -2.5 2.5))
+    ($yl (skl.mathplotlib.plot.ylim -2.5 2.5))
+    ($yt (skl.mathplotlib.plot.xticks (py-list ())))
+    ($xt (skl.mathplotlib.plot.yticks (py-list ())))
+    ($count (inc $plt-idx))
+  )
+  ()
+))
+
+
 !(skl.mathplotlib.plot.figure (figsize (py-tuple ((+ 3 (*  9 2)) 13))))
 
 !(skl.mathplotlib.plot.subplots_adjust (left 0.02) (right 0.98) (top 0.95) (wspace 0.05) (hspace 0.01))
 
-(= (plot $data $labels $algn $plt-idx $st) (
-  let* (
-    ($a (skl.mathplotlib.plot.subplot &tdc &agn (get-state $plt-idx)))
-    (() (println! ("plot step 0" $a "type" (get-type $a))))
-    ($t (if (== (get-state $st) False) (skl.mathplotlib.plot.title $algn (size 18)) $algn))
-    ($b (skl.mathplotlib.plot.title $algn (size 18)))
-    (() (println! ("plot step 1" $b "type" (get-type $b))))
-    ($d (skl.mathplotlib.plot.scatter (np.slice $data [:,0]) (np.slice $data [:,1]) (s 10) (color (make-color $labels))))
-    (() (println! ("plot step 2" (get-type $d))))
-    ($xl (skl.mathplotlib.plot.xlim -2.5 2.5))
-    ($yl (skl.mathplotlib.plot.ylim -2.5 2.5))
-    (() (println! "plot step 3"))
-    ($yt (skl.mathplotlib.plot.xticks (py-list ())))
-    ($xt (skl.mathplotlib.plot.yticks (py-list ())))
-    (() (println! ("plot step 4")))
-    ($count (inc $plt-idx))
-    (() (println! "plot step 5"))
-  )
-  $count
-))
-
 !(collapse(let* (
-  (($plt-count  $st) ((new-state 1) (new-state False)))
+  ($plt-idx  (new-state 1))
   (() (println! ("datasets count:" &tdc "alg count" &agn)))
   (($dn $ds) (match &self (ToyData $name $dataset) ($name $dataset)))
   (() (println! ($dn "matched")))
   ($norm (normalize $ds))
   (() (println! ($dn "normalized")))
   ((($labels $algn) $dur) (timeit fit-predict $dn $norm))
-  (() (println! ("fit predict" $algn "on" $dn "take" $dur "set title state" (get-state $st))))
-  ($count (plot $norm $labels $algn $plt-count $st))
-) $count))
+  (() (println! ("fit predict" $algn "on" $dn "take" $dur)))
+  (() (plot $norm $labels $algn $plt-idx))
+) ()))
 !(skl.mathplotlib.plot.savefig "out.png")
