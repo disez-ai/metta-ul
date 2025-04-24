@@ -1,7 +1,8 @@
 ! (import! &self metta_ul)
-! (import! &self metta_ul)
+! (ul-import pandas)
+! (ul-import sklearn.preprocessing)
 
-! (bind! &df (pdm.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
+! (bind! &df (read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
 
 ! (assertEqual (get-type &df) PDDataFrame)
 
@@ -9,7 +10,7 @@
 
 ! (assertEqual (get-type &norm) (NPArray (20640 2)))
 
-! (bind! &n (skl.preprocessing.normalize &norm))
+! (bind! &n (normalize &norm))
 
 ! (assertEqual (get-type &n) (NPArray (20640 2)))
 

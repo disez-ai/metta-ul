@@ -6,10 +6,8 @@ from sklearn.preprocessing import normalize, StandardScaler
 import sklearn.datasets
 from sklearn.decomposition import PCA
 from .numme import PatternOperation
-from .numme import wrapnpop, _np_atom_type, _np_atom_value
-from .pdm import unwrap_args, _dataframe_atom_type, _dataframe_atom_value
-import pandas as pd
-import numpy as np
+from .numme import wrapnpop
+from .grounding_tools import unwrap_args
 
 
 def _slk_scaler_fit_transform(X, y=None, **fit_params):
@@ -33,51 +31,6 @@ def method_wrapnpop(func_name, npop):
         res = func(*args[1:])
         return res
     return wrapper
-
-def dot():
-    def wrapper(*args):
-        obj = args[0].get_object().value
-        attr_name = args[1].get_name()
-        if not hasattr(obj, attr_name):
-            raise NoReduceError()
-        attr = getattr(obj, attr_name)
-        if not callable(attr):
-            print(f"attr: {type(attr)}")
-            res = _atom_value(attr)
-            print(f"res: {type(res)}")
-            return [res]
-        else:
-            m_args = args[2].get_children()
-            a, k = unwrap_args(m_args)
-            res = attr(*a, **k)
-            return [_atom_value(res)]
-    return wrapper
-
-def _type_of_atom(value):
-    if isinstance(value, np.ndarray):
-        return _np_atom_type(value)
-    elif isinstance(value, pd.DataFrame):
-        return _dataframe_atom_type(value)
-    elif isinstance(value, list):
-        return "py-list"
-    else:
-        return "py-object"
-    
-def _atom_value(value):
-    if isinstance(value, np.ndarray):
-        return _np_atom_value(value, _np_atom_type(value))
-    elif isinstance(value, pd.DataFrame):
-        return _dataframe_atom_value(value, _dataframe_atom_type(value))
-    elif isinstance(value, list):
-        return ValueAtom(value, "py-list")
-    else:
-        return ValueAtom(value, "py-object")
-    
-
-def _tuple_to_Expr(tup):
-    if not isinstance(tup, tuple):
-        return RuntimeError(f"Expected tuple, got {type(tup)}")
-    return E(S("DataSetTuple"), *[_atom_value(s) for s in tup])
 
 
 def dataset_wrapnpop(func):
@@ -128,17 +81,10 @@ def skl_atoms():
         )
     )
 
-    skl_dot = G(
-        PatternOperation(
-            "skl.dot", dot(), unwrap=False
-        )
-    )
-
     skl_datasets = map_dataset_atoms()
 
 
     return {
-        r"skl\.dot": skl_dot,
         r"skl\.preprocessing\.normalize": skl_normalize,
         r"skl\.preprocessing\.Scaler\.fit_transform": slk_scaler_fit_transform,
         r"skl\.decomposition\.PCA": skl_pca,

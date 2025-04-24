@@ -1,20 +1,27 @@
 ! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:kmeans)
 ! (import! &self metta_ul:cluster:gmm)
+; ! (import! &self metta_ul:cluster:agglomerative)
+; ! (import! &self metta_ul:cluster:spectral_clustering)
+; ! (import! &self metta_ul:cluster:bisecting_kmeans)
+! (ul-import sklearn.datasets)
+! (ul-import sklearn.preprocessing.StandardScaler)
+! (ul-import matplotlib.pyplot)
+
 
 ;time functions
-! (bind! time.now (py-atom datetime.datetime.now))
-! (bind! time.perf_counter (py-atom time.perf_counter))
+! (ul-import datetime.datetime.now)
+! (ul-import time.perf_counter)
 
 (= (time.sub $t1 $t2) ((py-dot $t1 __sub__)$t2))
-(= (time.fmt $t) ((py-dot &t strftime) "%Y/%m/%d %H:%M:%S" ))
+(= (time.fmt $t) ((py-dot $t strftime) "%Y/%m/%d %H:%M:%S" ))
 (= (timedelta.fmt $td) ((py-dot $td total_seconds)))
 
 (= (timeit $f $dn $ds) (
   let* (
-    ($t1 (time.perf_counter))
+    ($t1 (perf_counter))
     ($res ($f $dn $ds))
-    ($t2 (time.perf_counter))
+    ($t2 (perf_counter))
     ($t (time.sub $t1 $t2))
   )
   ($res $t)
@@ -80,17 +87,17 @@
 (Param default (Cons n_clusters 3))
 
 (ToyData noisy_circles
- (skl.datasets.make_circles (n_samples (get-cons n_samples)) (factor 0.5) (noise 0.05) (random_state (get-cons seed))))
+ (make_circles (n_samples (get-cons n_samples)) (factor 0.5) (noise 0.05) (random_state (get-cons seed))))
 (Param noisy_circles (Cons n_clusters 2)) 
 
-(ToyData noisy_moon (skl.datasets.make_moons (n_samples (get-cons n_samples)) (noise 0.05) (random_state (get-cons seed))))
+(ToyData noisy_moon (make_moons (n_samples (get-cons n_samples)) (noise 0.05) (random_state (get-cons seed))))
 (Param noisy_moon (Cons n_clusters 2))
 
-(ToyData blobs (skl.datasets.make_blobs (n_samples (get-cons n_samples)) (random_state (get-cons seed))))
+(ToyData blobs (make_blobs (n_samples (get-cons n_samples)) (random_state (get-cons seed))))
 
-(ToyData varied (skl.datasets.make_blobs (n_samples (get-cons n_samples)) (cluster_std (py-list (1.0 2.5 0.5))) (random_state (get-cons random_state))))
+(ToyData varied (make_blobs (n_samples (get-cons n_samples)) (cluster_std (py-list (1.0 2.5 0.5))) (random_state (get-cons random_state))))
 
-(= (normalize (DataSetTuple $x $y)) (skl.preprocessing.Scaler.fit_transform $x))
+(= (normalize ($x $y)) (StandardScaler.fit_transform (StandardScaler) $x))
 
 (= (fit-predict $dn $ds)  
   (let* (
@@ -110,14 +117,31 @@
   ) ($labels "GMM"))
 )
 
-(= (fit-predict $dn $ds) 
-  (let* (
-    (() (println! ("start NEW on " $dn "data type" (get-type $ds))))
-    ($model (gmm $ds (get-param $dn n_clusters)))
-    ($labels (gmm.predict $ds $model))
-    (() (println! ("New done on " $dn)))
-  ) ($labels "NEW"))
-)
+; (= (fit-predict $dn $ds) 
+;   (let* (
+;     (() (println! ("start bisecting on " $dn "data type" (get-type $ds))))
+;     ($model (bisecting-kmeans.fit $ds (get-param $dn n_clusters) 10))
+;     ($labels (bisecting-kmeans.predict $ds $model))
+;     (() (println! ("bisecting done on " $dn)))
+;   ) ($labels "bisecting"))
+; )
+
+; (= (fit-predict $dn $ds) 
+;   (let* (
+;     (() (println! ("start spectral-clustering on " $dn "data type" (get-type $ds))))
+;     ($model (spectral-clustering.fit $ds (get-param $dn n_clusters)))
+;     ($labels (spectral-clustering.predict $ds $model))
+;     (() (println! ("spectral-clustering done on " $dn)))
+;   ) ($labels "SpectralClustering"))
+; )
+
+; (= (fit-predict $dn $ds) 
+;   (let* (
+;     (() (println! ("start Agglomerative on " $dn "data type" (get-type $ds))))
+;     ($labels (agglomerative.fit-predict $ds (get-param $dn n_clusters) "single"))
+;     (() (println! ("Agglomerative done on " $dn)))
+;   ) ($labels "NEW"))
+; )
 
 
 !(bind! &tdc (count (ToyData $s $y)))
@@ -131,24 +155,24 @@
     (get-state $count)
 ))
 
-(= (plot $data $labels $algn $plt-idx) (
+(= (plot-it $data $labels $algn $plt-idx) (
   let* (
-    ($splt (skl.mathplotlib.plot.subplot &tdc &agn (get-state $plt-idx)))
-    ($t (if (<= (get-state $plt-idx) &agn) (skl.mathplotlib.plot.title $algn (size 18)) $algn))
-    ($plt (skl.mathplotlib.plot.scatter (np.slice $data [:,0]) (np.slice $data [:,1]) (s 10) (color (make-color $labels))))
-    ($xl (skl.mathplotlib.plot.xlim -2.5 2.5))
-    ($yl (skl.mathplotlib.plot.ylim -2.5 2.5))
-    ($yt (skl.mathplotlib.plot.xticks (py-list ())))
-    ($xt (skl.mathplotlib.plot.yticks (py-list ())))
+    ($splt (subplot &tdc &agn (get-state $plt-idx)))
+    ($t (if (<= (get-state $plt-idx) &agn) (title $algn (size 18)) $algn))
+    ($plt (scatter (np.slice $data [:,0]) (np.slice $data [:,1]) (s 10) (color (make-color $labels))))
+    ($xl (xlim -2.5 2.5))
+    ($yl (ylim -2.5 2.5))
+    ($yt (xticks (py-list ())))
+    ($xt (yticks (py-list ())))
     ($count (inc $plt-idx))
   )
   ()
 ))
 
 
-!(skl.mathplotlib.plot.figure (figsize (py-tuple ((+ 3 (*  9 2)) 13))))
+!(figure (figsize (py-tuple ((+ 3 (*  9 2)) 13))))
 
-!(skl.mathplotlib.plot.subplots_adjust (left 0.02) (right 0.98) (top 0.95) (wspace 0.05) (hspace 0.01))
+!(subplots_adjust (left 0.02) (right 0.98) (top 0.95) (wspace 0.05) (hspace 0.01))
 
 !(collapse(let* (
   ($plt-idx  (new-state 1))
@@ -159,6 +183,6 @@
   (() (println! ($dn "normalized")))
   ((($labels $algn) $dur) (timeit fit-predict $dn $norm))
   (() (println! ("fit predict" $algn "on" $dn "take" $dur)))
-  (() (plot $norm $labels $algn $plt-idx))
+  (() (plot-it $norm $labels $algn $plt-idx))
 ) ()))
-!(skl.mathplotlib.plot.savefig "out.png")
+!(savefig "out.png")
