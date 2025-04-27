@@ -104,20 +104,6 @@ def prop_wrapnpop(pname):
         return [atom_value(getattr(cls, pname))]
     return wrapper
 
-def ground_class_atoms(cls):
-    prefix = f"{cls.__name__}"
-    rprefix = rf"{cls.__name__}"
-    yield rprefix, OperationAtom(prefix, func_wrapnpop(cls), unwrap=False)
-    for name, val in inspect.getmembers(cls):
-        if name.startswith('_'):
-            continue
-        a_name = f"{prefix}.{name}"
-        ar_name = rf"{rprefix}\.{name}" 
-        if callable(val):
-            yield ar_name, OperationAtom(a_name, class_wrapnpop(name), unwrap=False)
-        else:
-            yield ar_name, OperationAtom(a_name, prop_wrapnpop(name), unwrap=False)
-
 def func_wrapnpop(func):
     def wrapper(*args):
         a, k = unwrap_args(args)
@@ -127,29 +113,56 @@ def func_wrapnpop(func):
         return [atom_value(res)]
     return wrapper
 
-def ground_module_atoms(module):
-    prefix = f"{module.__name__}"
-    rprefix = rf"{escape_dots(module.__name__)}"
-    members = inspect.getmembers(module, predicate=lambda f:  isinstance(f, (types.FunctionType, types.BuiltinFunctionType)))
-    for name, func in members:
+def ground_object_atoms(cls, gname = None):
+    if isinstance(cls, type):
+        prefix = cls.__name__
+    else:    
+        prefix = type(cls).__name__
+    if gname:     
+        yield escape_dots(gname), OperationAtom(gname, func_wrapnpop(cls), unwrap=False)
+    else:
+        yield escape_dots(prefix), OperationAtom(prefix, func_wrapnpop(cls), unwrap=False)
+    for name, val in inspect.getmembers(cls):
         if name.startswith('_'):
             continue
-        func_name = f"{name}"
-        func = func_wrapnpop(func)
-        skl_dataset = OperationAtom(
-                func_name, func, unwrap=False
-        )
-        yield rf"{name}", skl_dataset  
+        if gname:
+            a_name = f"{gname}.{name}"
+        else:    
+            a_name = f"{prefix}.{name}"
+        if callable(val):
+            yield escape_dots(a_name), OperationAtom(a_name, class_wrapnpop(name), unwrap=False)
+        else:
+            yield escape_dots(a_name), OperationAtom(a_name, prop_wrapnpop(name), unwrap=False)
 
-def ground_function_atom(func):
-        func_name = f"{func.__name__}"
+def ground_module_atoms(module, gname = None):
+    # prefix = f"{module.__name__}"
+    # rprefix = rf"{escape_dots(module.__name__)}"
+    members = inspect.getmembers(module)
+    for name, mem in members:
+        if name.startswith('_'):
+            continue
+
+        if callable(mem):
+            for item in ground_function_atom(mem, f"{gname}.{name}"):
+                yield item
+        else:
+            for item in ground_object_atoms(mem, f"{gname}.{name}"):
+                yield item
+
+
+
+def ground_function_atom(func, gname=None):
+        if gname:
+             func_name = f"{gname}"
+        else:
+             func_name = f"{func.__name__}"
         func = func_wrapnpop(func)
         atom = OperationAtom(
                 func_name, func, unwrap=False
         )
-        yield rf"{func_name}", atom  
+        yield rf"{escape_dots(func_name)}", atom  
 
-def import_as_atom(path: str):
+def import_as_atom(path: str, name = None):
     parts = path.split(".")
 
     if len(parts)== 1 and hasattr(builtins, path):
@@ -173,24 +186,46 @@ def import_as_atom(path: str):
 
     # Describe the type
     if isinstance(obj, type):
-        return ground_class_atoms(obj)
+        return ground_object_atoms(obj,name)
     elif isinstance(obj, types.FunctionType):
-        return ground_function_atom(obj)
+        return ground_function_atom(obj, name)
     elif isinstance(obj, types.ModuleType):
-        return ground_module_atoms(obj)
+        return ground_module_atoms(obj, name)
     elif callable(obj):
-        return ground_function_atom(obj)
+        return ground_function_atom(obj,name)
     else:
         raise IncorrectArgumentError("not found")
         
-def register_atom(run_context):
+def register_ul_import(run_context):
     def wrapper(*args):
         a, k = unwrap_args(args)
-        a = a[0]
-        for rex, atom in  import_as_atom(a):
+        if len(a) == 1:
+            path = a[0]
+            name = a[0]
+        elif len(a) == 3 and a[1] == "as":
+            path = a[0]
+            name = a[2]
+        else:    
+            raise IncorrectArgumentError("not found")
+
+        for rex, atom in  import_as_atom(path,name):
             run_context.register_atom(rex, atom)
         return []
-    return wrapper   
+    return wrapper
+
+def register_ul_from(run_context):
+    def wrapper(*args):
+        a, k = unwrap_args(args)
+        if len(a) == 3 and a[1] == "import" :
+            path = f"{a[0]}.{a[2]}"
+            name = a[2]
+        else:    
+            raise IncorrectArgumentError("not found")
+
+        for rex, atom in  import_as_atom(path,name):
+            run_context.register_atom(rex, atom)
+        return []
+    return wrapper      
 
 def dot():
     def wrapper(*args):
@@ -221,7 +256,8 @@ def _slice(*args):
 @register_atoms(pass_metta=True)
 def gtools(run_context):
     return {
-        r"ul-import": OperationAtom("ul-import", register_atom(run_context), unwrap=False),
+        r"ul-import": OperationAtom("ul-import", register_ul_import(run_context), unwrap=False),
+        r"ul-from": OperationAtom("ul-from", register_ul_from(run_context), unwrap=False),
         r"ul-dot": OperationAtom("ul-dot", dot(), unwrap=False),
         r"ul-slice": OperationAtom("ul-slice", func_wrapnpop(_slice), unwrap=False)
     }

@@ -1,8 +1,9 @@
 ! (import! &self metta_ul)
-! (ul-import pandas)
-! (ul-import sklearn.preprocessing)
+! (ul-import pandas as pd)
+! (ul-from pandas import DataFrame)
+! (ul-from sklearn.preprocessing import normalize)
 
-! (bind! &df (read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
+! (bind! &df (pd.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
 
 ! (assertEqual (get-type &df) PDDataFrame)
 
