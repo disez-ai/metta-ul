@@ -1,4 +1,4 @@
-!(import! &self metta_ul:numme)
+!(import! &self metta_ul)
 
 ! (bind! np (py-atom numpy))
 ! (bind! pyNone (py-atom "None"))

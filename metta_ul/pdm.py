@@ -5,10 +5,8 @@ from hyperon.atoms import (
     VariableAtom,
     S,
     G,
-    get_string_value,
     AtomType,
     OperationObject,
-    NoReduceError,
 )
 from hyperon.ext import register_atoms
 
@@ -89,52 +87,25 @@ class PatternOperation(OperationObject):
 def _dataframe_atom_type(df):
     return S("PDDataFrame")
 
+def _dataframe_atom_value(df, typ):
+    if not isinstance(df, pd.DataFrame):
+        raise RuntimeError(f"Expected DataFrame, got {type(df)}")
+    return G(DataFrameValue(df), typ)
+
 
 def wrapnpop(func):
     def wrapper(*args):
         a, k = unwrap_args(args)
         res = func(*a, **k)
         typ = _dataframe_atom_type(res)
-        return [G(DataFrameValue(res), typ)]
+        return [_dataframe_atom_value(res, typ)]
 
     return wrapper
-
-
-def unwrap_args(atoms):
-    args = []
-    kwargs = {}
-    for a in atoms:
-        if isinstance(a, ExpressionAtom):
-            ch = a.get_children()
-            if len(ch) > 0:
-                try:
-                    kwarg = ch
-                    assert len(kwarg) == 2
-                except:
-                    raise RuntimeError(f"Incorrect kwarg format {kwarg}")
-                try:
-                    kwargs[get_string_value(
-                        kwarg[0])] = kwarg[1].get_object().content
-                except:
-                    raise NoReduceError()
-                continue
-        if hasattr(a, "get_object"):
-            args.append(a.get_object().content)
-        else:
-            # NOTE:
-            # Currently, applying grounded operations to pure atoms is not reduced.
-            # If we want, we can raise an exception, or form an error expression instead,
-            # so a MeTTa program can catch and analyze it.
-            # raise RuntimeError("Grounded operation " + self.name + " with unwrap=True expects only grounded arguments")
-            raise NoReduceError()
-    return args, kwargs
-
 
 def _to_numme(*args):
     res = args[0].get_object().content.values
     typ = _np_atom_type(res)
     return [G(NumpyValue(res), typ)]
-
 
 @register_atoms
 def pdme_atoms():
