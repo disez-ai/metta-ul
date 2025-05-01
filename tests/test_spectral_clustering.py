@@ -275,9 +275,9 @@ def test_spectral_embedding(metta: MeTTa):
         """
         (=
             (eigh-I)
-            (spectral-clustering.eigh ((py-dot (I) tolist)))
+            (spectral-clustering.eigh (I))
         )
-
+        
         ! (spectral-clustering.spectral-embeddings (eigh-I) 2)
         """
     )[0][0]
@@ -297,11 +297,11 @@ def test_spectral_embedding(metta: MeTTa):
         """
         (=
             (L1)
-            ((0 0 0) (0 1 0) (0 0 2))
+            (np.array ((0 0 0) (0 1 0) (0 0 2)))
         )
         (=
             (eigh-L1)
-            (spectral-clustering.eigh ((py-dot (np.array (L1)) tolist)))
+            (spectral-clustering.eigh (L1))
         )
 
         ! (spectral-clustering.spectral-embeddings (eigh-L1) 2)
@@ -329,11 +329,11 @@ def test_spectral_embedding(metta: MeTTa):
         """        
         (=            
             (L2)         
-            ((0.5 -0.5) (-0.5 0.5))
+            (np.array ((0.5 -0.5) (-0.5 0.5)))
         )
         (=            
             (eigh-L2)         
-            (spectral-clustering.eigh ((py-dot (np.array (L2)) tolist)))
+            (spectral-clustering.eigh (L2))
         )
         
         ! (spectral-clustering.spectral-embeddings (eigh-L2) 2)                       
@@ -360,11 +360,11 @@ def test_spectral_embedding(metta: MeTTa):
         """        
         (=            
             (L3)         
-            ((0 0) (0 0))
+            (np.array ((0 0) (0 0)))
         )
         (=            
             (eigh-L3)         
-            (spectral-clustering.eigh ((py-dot (np.array (L3)) tolist)))
+            (spectral-clustering.eigh (L3))
         )
 
         ! (spectral-clustering.spectral-embeddings (eigh-L2) 0)                       
@@ -444,7 +444,7 @@ def test_row_normalize(metta: MeTTa):
     norm_value = np.sqrt(3)
     expected = np.ones((3, 3)) / norm_value
     assert (
-        D_norm.shape == expected.shape
+            D_norm.shape == expected.shape
     ), "Output shape must match input shape for ones matrix."
     assert np.allclose(D_norm, expected), "Row normalization failed for ones matrix."
 
@@ -466,7 +466,7 @@ def test_spectral_clustering_cluster(metta: MeTTa):
             3
         )      
         (=
-            (embeddings)
+            (embeddings1)
             (spectral-clustering.spectral-embeddings
                 (spectral-clustering.eigh
                     (spectral-clustering.normalized-laplacian
@@ -497,8 +497,8 @@ def test_spectral_clustering_cluster(metta: MeTTa):
         ! (np.argmax
                 (np.transpose
                     (kmeans.assign 
-                        (embeddings) 
-                        (spectral-clustering.cluster (X1) (K1) 0.1 100) 
+                        (embeddings1) 
+                        (spectral-clustering.cluster (embeddings1) (K1) 0.1 100) 
                         (K1)
                     )
                 )
@@ -523,7 +523,7 @@ def test_spectral_clustering_cluster(metta: MeTTa):
         )    
                 
         (=
-            (embeddings)
+            (embeddings2)
             (spectral-clustering.spectral-embeddings
                 (spectral-clustering.eigh
                     (spectral-clustering.normalized-laplacian
@@ -554,8 +554,8 @@ def test_spectral_clustering_cluster(metta: MeTTa):
         ! (np.argmax
                 (np.transpose
                     (kmeans.assign 
-                        (embeddings) 
-                        (spectral-clustering.cluster (X2) (K2) 0.1 100) 
+                        (embeddings2) 
+                        (spectral-clustering.cluster (embeddings2) (K2) 0.1 100) 
                         (K2)
                     )
                 )

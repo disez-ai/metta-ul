@@ -1,27 +1,8 @@
 !(import! &self metta_ul)
 !(import! &self kmeans)
 
-! (bind! nnp (py-atom numpy))
-
-; redundant bind is bad!!
-;! (bind! pyNone (py-atom "None"))
-;! (bind! pyTrue (py-atom "True"))
-;! (bind! pyFalse (py-atom "False"))
-
-; ===================== UTILS ===================
-(=
-    (to-np $x)
-    ((py-dot nnp array) $x)
-)
-
-(=
-    (py-getitem $iterable $index)
-    (
-        (py-dot $iterable __getitem__)
-        $index
-    )
-)
-; ===============================================
+; import name is set to sc-np (spectral-clustering np) to avoid conflicts due to importing redundant modules
+! (bind! sc-np (py-atom numpy))
 
 (: X (-> (NPArray ($N $D))))
 
@@ -115,7 +96,7 @@
 (=
     (spectral-clustering.normalized-laplacian $W $inverse-degree-matrix-W)
     (np.sub
-        (np.eye (py-getitem (py-dot $W shape) 0))
+        (np.eye (np.shape $W 0))
         (np.matmul
             $inverse-degree-matrix-W
             (np.matmul
@@ -128,10 +109,12 @@
 
 ; Python code: np.linalg.eigh(L_sym)
 ; Compute eigenvalues and eigenvectors of the symmetric Laplacian matrix for spectral embedding.
+; TODO: py-dot had to be used because np.linalg.eigh in numme.py,
+; resulted into fatal errors when combined with slice
 (: spectral-clustering.eigh (-> (NPArray ($N $N)) EighResult))
 (=
     (spectral-clustering.eigh $X)
-    ((py-dot nnp linalg.eigh) (to-np $X))
+    ((py-dot sc-np linalg.eigh) $X)
 )
 
 ; Python code: np.linalg.eigh(L_sym)[0]
