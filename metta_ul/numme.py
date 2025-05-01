@@ -230,6 +230,12 @@ def numme_atoms():
     nmWhere = G(PatternOperation("np.where", wrapnpop(np.where), unwrap=False))
     nmEqual = G(PatternOperation("np.equal", wrapnpop(np.equal), unwrap=False))
     nmPut = G(PatternOperation("np.put", wrapnpop(np.put), unwrap=False))
+    nmConcat = G(PatternOperation("np.concat", wrapnpop(np.concat), unwrap=False))
+
+    pyNone = ValueAtom(None)
+    pyPINF = ValueAtom(float('inf'))
+
+    atomPi = ValueAtom(np.pi)
 
     return {
         "np.vector": nmVectorAtom,
@@ -274,4 +280,8 @@ def numme_atoms():
         "np.where": nmWhere,
         "np.equal": nmEqual,
         "np.put": nmPut,
+        "np.concat": nmConcat,
+        "py.none": pyNone,
+        "py.pinf": pyPINF,
+        "math.pi": atomPi,
     }
