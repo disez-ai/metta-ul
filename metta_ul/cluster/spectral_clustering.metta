@@ -203,44 +203,41 @@
 (=
     (spectral-clustering.fit $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter)
     (let
-        $embeddings
-        (spectral-clustering.row-normalize
-            (spectral-clustering.spectral-embeddings
-                (spectral-clustering.eigh
-                    (spectral-clustering.normalized-laplacian
-                        (spectral-clustering.rbf-affinity-matrix
-                            (spectral-clustering.square-distance-matrix
-                                (spectral-clustering.square-norm $X)
-                                $X
-                            )
-                            $rbf-kernel-sigma
-                        )
-                        (spectral-clustering.inverse-degree-matrix
-                            (spectral-clustering.degree
-                                (spectral-clustering.rbf-affinity-matrix
-                                    (spectral-clustering.square-distance-matrix
-                                        (spectral-clustering.square-norm $X)
-                                        $X
-                                    )
-                                    $rbf-kernel-sigma
+        $affinity-matrix
+        (spectral-clustering.rbf-affinity-matrix
+            (spectral-clustering.square-distance-matrix
+                (spectral-clustering.square-norm $X)
+                $X
+            )
+            $rbf-kernel-sigma
+        )
+        (let
+            $embeddings
+            (spectral-clustering.row-normalize
+                (spectral-clustering.spectral-embeddings
+                    (spectral-clustering.eigh
+                        (spectral-clustering.normalized-laplacian
+                            $affinity-matrix
+                            (spectral-clustering.inverse-degree-matrix
+                                (spectral-clustering.degree
+                                    $affinity-matrix
                                 )
                             )
                         )
                     )
+                    $num-clusters
                 )
-                $num-clusters
             )
+            ($embeddings (spectral-clustering.cluster $embeddings $num-clusters $rbf-kernel-sigma $max-kmeans-iter))
         )
-        ($embeddings (spectral-clustering.cluster $embeddings $num-clusters $rbf-kernel-sigma $max-kmeans-iter))
     )
-
 )
 
 ; Fit spectral clustering algorithm and return spectral embedding and cluster centroids.
 (: spectral-clustering.fit (-> (NPArray ($N $D)) Number ((NPArray ($N $C)) (NPArray ($K $C)))))
 (=
     (spectral-clustering.fit $X $num-clusters)
-    (spectral-clustering.fit $X $num-clusters 0.1 100)
+    (spectral-clustering.fit $X $num-clusters 0.1 10)
 )
 
 ; Predict the cluster assignments of data given spectral embeddings, centroids and number of clusters.
