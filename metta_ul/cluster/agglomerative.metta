@@ -1,7 +1,10 @@
 !(import! &self metta_ul:numme)
 !(import! &self metta_ul:linkedlist)
 
-(: agglomerative.init-clusters (-> Number (List $a)))
+(: PyList Type)
+(: py-list (-> Expression PyList))
+
+(: agglomerative.init-clusters (-> Number (List PyList)))
 (=
     (agglomerative.init-clusters $n)
     (let $n-1 (- $n 1)
@@ -25,7 +28,7 @@
     )
 )
 
-(: agglomerative.linkage-distance (-> (NPArray ($n $n)) (NPArray ($a)) (NPArray ($b)) String Number))
+(: agglomerative.linkage-distance (-> (NPArray ($n $n)) PyList PyList String Number))
 (=
     (agglomerative.linkage-distance $distance-matrix $cluster1 $cluster2 $linkage)
     (let $distances ((py-dot $distance-matrix __getitem__) (np.ix_ $cluster1 $cluster2))
@@ -39,13 +42,13 @@
     )
 )
 
-(: agglomerative.closest-clusters (-> (List $a) (List $a) (NPArray ($n $n)) String Number ((NPArray ($b)) (NPArray ($c))) ((NPArray ($d)) (NPArray ($e)))))
-(: agglomerative.closest-clusters (-> (List $a) (NPArray ($n $n)) String Number ((NPArray ($b)) (NPArray ($c))) ((NPArray ($d)) (NPArray ($e)))))
+(: agglomerative.closest-clusters (-> (List PyList) (NPArray ($n $n)) String Number (PyList PyList) (PyList PyList)))
 (= (agglomerative.closest-clusters Nil $distance-matrix $linkage $min-distance $closest-pair) $closest-pair)
 (= 
     (agglomerative.closest-clusters (Cons $c $cs) $distance-matrix $linkage $min-distance $closest-pair)
     (agglomerative.closest-clusters (Cons $c $cs) $cs $distance-matrix $linkage $min-distance $closest-pair)
 )
+(: agglomerative.closest-clusters (-> (List PyList) (List PyList) (NPArray ($n $n)) String Number (PyList PyList) (PyList PyList)))
 (=
     (agglomerative.closest-clusters $clusters1 $clusters2 $distance-matrix $linkage $min-distance $closest-pair)
     (case ($clusters1 $clusters2)
@@ -91,7 +94,7 @@
     )
 )
 
-(: agglomerative.merge-clusters (-> (List $a) (NPArray ($n $n)) String (List $a)))
+(: agglomerative.merge-clusters (-> (List PyList) (NPArray ($n $n)) String (List PyList)))
 (=
     (agglomerative.merge-clusters $clusters $distance-matrix $linkage)
     (let 
@@ -113,7 +116,7 @@
     )
 )
 
-(: agglomerative.recursion (-> Number String (List $a) (NPArray ($n $n)) Number (List $a)))
+(: agglomerative.recursion (-> Number String (List PyList) (NPArray ($n $n)) Number (List PyList)))
 (=
     (agglomerative.recursion $k $linkage $clusters $distance-matrix $length)
     (if (== $k $length)
@@ -128,7 +131,7 @@
     )
 )
 
-(: agglomerative (-> (NPArray ($n $d)) Number String (List $a)))
+(: agglomerative (-> (NPArray ($n $d)) Number String (List PyList)))
 (=
     (agglomerative $X $k $linkage)
     (let $n (np.shape $X 0)
@@ -143,7 +146,7 @@
 )
 
 
-(: agglomerative.assign (-> (List $a) (NPArray ($n)) Number (NPArray ($n))))
+(: agglomerative.assign (-> (List PyList) (NPArray ($n)) Number (NPArray ($n))))
 (=
     (agglomerative.assign $clusters $assignment $index)
     (case $clusters
