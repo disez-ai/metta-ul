@@ -10,10 +10,13 @@ Centers the data points by subtracting the means.
 
 **Parameters:**
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$means`: Mean vectors of the clusters.
+    - Type: `(NPArray ($k $d))`
 
 **Returns:**
 - Centered data matrix.
+    - Type: `(NPArray ($n $k $d))`
 
 ---
 
@@ -22,11 +25,15 @@ Computes the Mahalanobis distance term for the Gaussian probability density func
 
 **Parameters:**
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$means`: Mean vectors of the clusters.
+    - Type: `(NPArray ($k $d))`
 - `$covariances`: Covariance matrices for each cluster.
+    - Type: `(NPArray ($k $d $d))`
 
 **Returns:**
 - Mahalanobis distance matrix.
+    - Type: `(NPArray ($n $k))`
 
 ---
 
@@ -35,11 +42,15 @@ Computes the probability density function (PDF) for a multivariate Gaussian dist
 
 **Parameters:**
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$means`: Mean vectors of the clusters.
+    - Type: `(NPArray ($k $d))`
 - `$covariances`: Covariance matrices for each cluster.
+    - Type: `(NPArray ($k $d $d))`
 
 **Returns:**
 - Matrix of Gaussian probabilities for each point and cluster.
+    - Type: `(NPArray ($n $k))`
 
 ---
 
@@ -48,12 +59,17 @@ Computes the log-likelihood of the dataset given the current GMM parameters.
 
 **Parameters:**
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$weights`: Mixture component weights.
+    - Type: `(NPArray ($k))`
 - `$means`: Mean vectors of the clusters.
+    - Type: `(NPArray ($k $d))`
 - `$covariances`: Covariance matrices for each cluster.
+    - Type: `(NPArray ($k $d $d))`
 
 **Returns:**
 - Log-likelihood scalar value.
+    - Type: `Number`
 
 ---
 
@@ -62,10 +78,12 @@ Initializes the GMM parameters (weights, means, and covariances).
 
 **Parameters:**
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$k`: Number of Gaussian components.
 
 **Returns:**
 - Initial weights, means, and covariance matrices.
+    - Type: `((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))`
 
 ---
 
@@ -74,12 +92,17 @@ Performs the Expectation (E) step of the EM algorithm, computing responsibilitie
 
 **Parameters:**
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$weights`: Mixture component weights.
+    - Type: `(NPArray ($k))`
 - `$means`: Mean vectors of the clusters.
+    - Type: `(NPArray ($k $d))`
 - `$covariances`: Covariance matrices for each cluster.
+    - Type: `(NPArray ($k $d $d))`
 
 **Returns:**
 - Responsibility matrix.
+    - Type: `(NPArray ($n $k))`
 
 ---
 
@@ -88,10 +111,13 @@ Performs the Maximization (M) step of the EM algorithm, updating parameters.
 
 **Parameters:**
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$responsibilities`: Responsibility matrix from the E-step.
+    - Type: `(NPArray ($n $k))`
 
 **Returns:**
 - Updated weights, means, and covariance matrices.
+    - Type: `((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))`
 
 ---
 
@@ -100,30 +126,35 @@ Recursively applies the EM steps until the maximum number of iterations is reach
 
 **Parameters:**
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `($weights, $means, $covariances)`: Current GMM parameters.
+    - Type: `((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))`
 - `$max-iter`: Maximum number of iterations.
+    - Type: `Number`
 
 **Returns:**
 - Final weights, means, and covariance matrices.
+    - Type: `((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))`
 
 ---
 
 ### `gmm`
 Main function to train a GMM on a dataset.
 
-**Usage:**
-```metta
-(gmm $X $k)
-```
-- Clusters `$X` into `k` Gaussian components with the default 100 iterations.
+**Parameters**
+- `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
+- `$k`: Count of components.
+    - Type: `Number`
+- `$max-iter`: Maximum number of iterations.
+    - Type: `Number`
 
-```metta
-(gmm $X $k $max-iter)
-```
-- Specifies a custom maximum number of iterations.
+**Returns:**
+- Final weights, means, and covariance matrices.
+    - Type: `((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))`
 
 ## Usage
-To cluster a dataset `S` of type `(NPArray (n, d))` into 3 clusters with default settings:
+To cluster a dataset `S` of type `(NPArray ($n $d))` into 3 clusters with default settings:
 ```metta
 (=
     (params)
@@ -134,7 +165,7 @@ To specify a maximum number of 50 iterations:
 ```metta
 (gmm (S) 3 50)
 ```
-To assign a dataset `X` of type `(NPArray (m, d))` using `params`:
+To assign a dataset `X` of type `(NPArray ($m $d))` using `params`:
 ```
 (=
     (assignments)

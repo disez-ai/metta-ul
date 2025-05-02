@@ -1,20 +1,6 @@
 !(import! &self metta_ul)
 
-;! (bind! np (py-atom numpy))
-
-! (bind! pyNone (py-atom "None"))
-! (bind! pyTrue (py-atom "True"))
-! (bind! pyFalse (py-atom "False"))
-
-(=
-    (py-getitem $iterable $index)
-    (
-        (py-dot $iterable __getitem__)
-        $index
-    )
-)
-
-; X_centered = X[:, np.newaxis, :] - means
+(: gmm.center (-> (NPArray ($n $d)) (NPArray ($k $d)) (NPArray ($n $k $d))))
 (=
     (gmm.center $X $means)
     (np.sub
@@ -23,7 +9,8 @@
     )
 )
 
-; mahalanobis_term = np.einsum('nkd,kde,nke->nk', X_centered, cov_inv, X_centered)  # (N, K)
+
+(: gmm.mahalanobis (-> (NPArray ($n $d)) (NPArray ($k $d)) (NPArray ($k $d $d)) (NPArray ($n $k))))
 (=
     (gmm.mahalanobis-term $X $means $covariances)
     (let $X-centered (gmm.center $X $means)
@@ -36,7 +23,8 @@
     )
 )
 
-; gaussian_pdf = np.exp(-0.5 * (mahalanobis_term + D * np.log(2 * np.pi) + log_det_cov))
+
+(: gmm.gaussian-pdf (-> (NPArray ($n $d)) (NPArray ($k $d)) (NPArray ($k $d $d)) (NPArray ($n $k))))
 (=
     (gmm.gaussian-pdf $X $means $covariances)
     (np.exp
@@ -46,8 +34,8 @@
                 (np.add
                     (gmm.mahalanobis-term $X $means $covariances)
                     (np.mul
-                        (py-getitem (py-dot $X shape) 1)
-                        (np.log (np.mul (np.array (2)) 3.141592653589793))
+                        (np.shape $X 1)
+                        (np.log (np.mul (np.array (2)) math.pi))
                     )
                 )
                 (np.linalg.slogabsdet $covariances)
@@ -56,7 +44,8 @@
     )
 )
 
-; log_likelihood = np.sum(np.log(np.sum(weighted_pdfs, axis=1)))
+
+(: gmm.log-likelihood (-> (NPArray ($n $d)) (NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)) Number))
 (=
     (gmm.log-likelihood $X $weights $means $covariances)
     (np.sum
@@ -70,12 +59,14 @@
             )
         )
         0
-        pyNone
-        pyNone
-        pyTrue
+        py.none
+        py.none
+        True
     )
 )
 
+
+(: gmm.init (-> (NPArray ($n $d)) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
     (gmm.init $X $k)
     (
@@ -88,18 +79,20 @@
 
         (np.add
             (np.repeat
-                (np.expand_dims (np.cov $X pyNone pyFalse) 0)
+                (np.expand_dims (np.cov $X py.none False) 0)
                 $k
                 0
             )
             (np.mul
                 0.000001
-                (np.eye (py-getitem (py-dot $X shape) 1))
+                (np.eye (np.shape $X 1))
             )
         )
     )
 )
 
+
+(: gmm.e-step (-> (NPArray ($n $d)) (NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)) (NPArray ($n $k))))
 (=
     (gmm.e-step $X $weights $means $covariances)
     (let $weighted-pdfs
@@ -113,14 +106,16 @@
             (np.sum
                 $weighted-pdfs
                 1
-                pyNone
-                pyNone
-                pyTrue
+                py.none
+                py.none
+                True
             )
         )
     )
 )
 
+
+(: gmm.m-step (-> (NPArray ($n $d)) (NPArray ($n $k)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
     (gmm.m-step $X $responsibilities)
     (let $Nk (np.sum $responsibilities 0)
@@ -131,7 +126,7 @@
             )
             (let $X-centered (gmm.center $X $means)
                 (
-                    (np.div $Nk (py-getitem (py-dot $X shape) 0))
+                    (np.div $Nk (np.shape $X 0))
                     $means
                     (np.div
                         (np.einsum
@@ -148,6 +143,8 @@
     )
 )
 
+
+(: gmm.recursion (-> (NPArray ($n $d)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d))) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
     (gmm.recursion $X ($weights $means $covariances) $max-iter)
     (if (> $max-iter 0)
@@ -163,6 +160,7 @@
     )
 )
 
+(: gmm (-> (NPArray ($n $d)) Number Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
     (gmm $X $k $max-iter)
     (gmm.recursion
@@ -172,6 +170,7 @@
     )
 )
 
+(: gmm (-> (NPArray ($n $d)) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
     (gmm $X $k)
     (gmm $X $k 100)
