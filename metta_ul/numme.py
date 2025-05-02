@@ -1,7 +1,8 @@
 from hyperon.atoms import *
 from hyperon.ext import register_atoms
-
 import numpy as np
+
+from .array_like_tools import parse_to_slice
 
 
 class NumpyValue(MatchableObject):
@@ -84,6 +85,8 @@ def _np_atom_type(npobj):
         return AtomType.UNDEFINED
     return E(S("NPArray"), E(*[ValueAtom(s, "Number") for s in npobj.shape]))
 
+def _np_atom_value(npobj, typ):
+    return G(NumpyValue(npobj), typ)
 
 def wrapnpop(func):
     def wrapper(*args):
@@ -91,7 +94,7 @@ def wrapnpop(func):
              else arg.get_name() for arg in args]
         res = func(*a)
         typ = _np_atom_type(res)
-        return [G(NumpyValue(res), typ)]
+        return [_np_atom_value(res, typ)]
 
     return wrapper
 
@@ -102,33 +105,6 @@ def _slice(*args):
     arr = args[0]
     slice_str = parse_to_slice(args[1])
     return arr[slice_str]
-
-
-def parse_to_slice(input_str):
-    """
-    Parses a string representing numpy indexing and returns the corresponding NumPy array slice.
-    Supports multi-dimensional indexing with missing values like "[:, :2]".
-    """
-    # Remove brackets and spaces
-    input_str = input_str.strip("[]").replace(" ", "")
-
-    # Split by commas to handle multiple dimensions
-    parts = input_str.split(",")
-    result = []
-
-    for part in parts:
-        if ":" in part:
-            # Handle cases like ":", ":2", "1:", "1:3:2"
-            slice_parts = part.split(":")
-            # Convert non-empty values to int
-            slice_values = [int(x) if x else None for x in slice_parts]
-            result.append(slice(*slice_values))  # Convert to slice object
-        else:
-            # Handle single integer indices
-            result.append(int(part))
-
-    # Convert result to tuple if multi-dimensional
-    return tuple(result) if len(result) > 1 else result[0]
 
 
 @ register_atoms
@@ -189,6 +165,8 @@ def numme_atoms():
             unwrap=False,
         )
     )
+    nmEigh = G(PatternOperation("np.linalg.eigh",wrapnpop(np.linalg.eigh), unwrap=False))
+
     nmInv = G(PatternOperation("np.linalg.inv",
                                wrapnpop(np.linalg.inv), unwrap=False))
     nmEinsum = G(PatternOperation(
@@ -229,6 +207,7 @@ def numme_atoms():
         lambda _x, _i: _x.shape[_i]), unwrap=False))
     nmWhere = G(PatternOperation("np.where", wrapnpop(np.where), unwrap=False))
     nmEqual = G(PatternOperation("np.equal", wrapnpop(np.equal), unwrap=False))
+    nmAppend = G(PatternOperation("np.append", wrapnpop(np.append)))
     nmPut = G(PatternOperation("np.put", wrapnpop(np.put), unwrap=False))
     nmConcat = G(PatternOperation("np.concat", wrapnpop(np.concat), unwrap=False))
 
@@ -254,6 +233,7 @@ def numme_atoms():
         "np.choose": nmChoose,
         "np.linalg.slogabsdet": nmLogDet,
         "np.linalg.inv": nmInv,
+        "np.linalg.eigh": nmEigh,
         "np.einsum": nmEinsum,
         "np.exp": nmExp,
         "np.log": nmLog,
@@ -279,6 +259,7 @@ def numme_atoms():
         "np.shape": nmShape,
         "np.where": nmWhere,
         "np.equal": nmEqual,
+        "np.append": nmAppend,
         "np.put": nmPut,
         "np.concat": nmConcat,
         "py.none": pyNone,

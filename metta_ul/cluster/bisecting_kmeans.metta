@@ -1,4 +1,4 @@
-!(import! &self metta_ul:numme)
+!(import! &self metta_ul)
 
 ! (bind! np (py-atom numpy))
 ! (bind! pyNone (py-atom "None"))
@@ -22,14 +22,22 @@
     (length (:: ($indices $center $sse $hierarchy) $xs))
     (+ 1 (length $xs))
 )
+
+(: get-first (-> ClusterList Cluster))
 (=
     (get-first (:: $x $y))
     $x
 )
+
+(: get-second (-> ClusterList Cluster))
 (=
     (get-second (:: $x (:: $y ())))
     $y
 )
+
+(: append (-> ClusterList Cluster ClusterList))
+(: append (-> Hierarchy ClusterList Hierarchy))
+(: append (-> LabelList Number LabelList))
 (=
     (append pyNone $a)
     (::
@@ -51,6 +59,7 @@
         (append $xs $a)
     )
 )
+
 (=
     (get-index () $idx)
     pyNone
@@ -142,6 +151,10 @@
 
 ; ===============================================
 
+; Python code:
+; pts = data[indices]
+; np.sum((pts - center) ** 2)
+(: bisecting-kmeans.compute-sse (-> (NPArray ($N $D)) (NPArray ($M)) (NPArray ($C)) Number))
 (=
     (bisecting-kmeans.compute-sse $X $indices $centers)
     (if (> (py-dot $indices size) 0)
@@ -159,6 +172,12 @@
     )
 )
 
+; Python code:
+; n_samples = data.shape[0]
+; indices = np.arange(n_samples)
+; center = np.mean(data, axis=0)
+; sse = compute_sse(data, indices, center)
+(: bisecting-kmeans.compute-initial-cluster (-> (NPArray ($N $D)) ClusterList))
 (=
     (bisecting-kmeans.compute-initial-cluster $X)
     (::
@@ -187,28 +206,35 @@
     )
 )
 
+(: bisecting-kmeans.get-cluster-indices (-> Cluster (NPArray ($M))))
 (=
     (bisecting-kmeans.get-cluster-indices ($indices $center $sse $hierarchy))
     $indices
 )
+
+(: bisecting-kmeans.get-cluster-center (-> Cluster (NPArray ($K $D))))
 (=
     (bisecting-kmeans.get-cluster-center ($indices $center $sse $hierarchy))
     $center
 )
+
+(: bisecting-kmeans.get-cluster-sse (-> Cluster Number))
 (=
     (bisecting-kmeans.get-cluster-sse ($indices $center $sse $hierarchy))
     $sse
 )
+
+(: bisecting-kmeans.get-cluster-hierarchy (-> Cluster Hierarchy))
 (=
     (bisecting-kmeans.get-cluster-hierarchy ($indices $center $sse $hierarchy))
     $hierarchy
 )
 
+(: bisecting-kmeans.find-max-cluster (-> ClusterList Cluster))
 (=
     (bisecting-kmeans.find-max-cluster (:: ($indices $center $sse $hierarchy) ()) )
     ($indices $center $sse $hierarchy)
 )
-
 (=
     (bisecting-kmeans.find-max-cluster
         (:: ($indices1 $center1 $sse1 $hierarchy1)
@@ -225,6 +251,8 @@
     )
 )
 
+
+(: bisecting-kmeans.cluster-equal (-> Cluster Cluster Bool))
 (=
     (bisecting-kmeans.cluster-equal
         ($indices1 $center1 $sse1 $hierarchy1)
@@ -242,6 +270,8 @@
         False
     )
 )
+
+(: bisecting-kmeans.remove-cluster (-> ClusterList Cluster ClusterList))
 (=
     (bisecting-kmeans.remove-cluster () $target)
     ()
@@ -254,6 +284,7 @@
     )
 )
 
+(: bisecting-kmeans.bisect-cluster (-> (NPArray ($N $D)) Cluster Number ClusterList))
 (=
     (bisecting-kmeans.bisect-cluster $X $max-cluster $max-iter)
     (let
@@ -359,9 +390,10 @@
     )
 )
 
+(: bisecting-kmeans.recursive-bisecting-kmeans (-> (NPArray ($N $D)) ClusterList Number Number Hierarchy Hierarchy))
 (=
-    (bisecting-kmeans.recursive-bisecting-kmeans $X $clusters $max-cluster $max-iter $hierarchy)
-    (if (>= (length $clusters) $max-cluster)
+    (bisecting-kmeans.recursive-bisecting-kmeans $X $clusters $max-num-clusters $max-iter $hierarchy)
+    (if (>= (length $clusters) $max-num-clusters)
         $hierarchy
 
         (let
@@ -377,7 +409,7 @@
                     )
                     (get-second $bisect)
                 )
-                $max-cluster
+                $max-num-clusters
                 $max-iter
                 (append
                     $hierarchy
@@ -394,6 +426,7 @@
     )
 )
 
+(: bisecting-kmeans.fit (-> (NPArray ($N $D)) Number Number Hierarchy))
 (=
     (bisecting-kmeans.fit $X $max-num-clusters $max-kmeans-iter)
     (let
@@ -410,6 +443,8 @@
     )
 )
 
+
+(: bisecting-kmeans.assign-point-to-cluster (-> (NPArray ($D)) ClusterList Number Number Number Number))
 (=
     (bisecting-kmeans.assign-point-to-cluster
         $point
@@ -453,6 +488,7 @@
     )
 )
 
+(: bisecting-kmeans.assign-all-points (-> (NPArray ($N $D)) ClusterList Number LabelList LabelList))
 (=
     (bisecting-kmeans.assign-all-points $X $clusters $point-idx $labels)
     (if (>= $point-idx (py-getitem (py-dot $X shape) 0))
@@ -477,6 +513,7 @@
     )
 )
 
+(: bisecting-kmeans.predict (-> (NPArray ($N $D)) Hierarchy LabelList))
 (=
     (bisecting-kmeans.predict $X $hierarchy)
     (bisecting-kmeans.assign-all-points

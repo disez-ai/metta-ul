@@ -10,20 +10,25 @@ def test_compute_affinity(metta: MeTTa):
         """
         !(import! &self metta_ul:cluster:spectral_clustering)
         
+        (: X-1D-Single (-> (NPArray (1 1))))
         (=
             (X-1D-Single)
-            ((1))
+            (np.array ((1)))
         )
         
+        (: X-1D-Multiple (-> (NPArray (2 1))))
         (=
             (X-1D-Multiple)
-            ((0) (1))
+            (np.array ((0) (1)))
         )
         
+        (: X-2D-Multiple (-> (NPArray (3 2))))
         (=
             (X-2D-Multiple)
-            ((0 0) (0 1) (1 0))
+            (np.array ((0 0) (0 1) (1 0)))
         )
+        
+        (: X-2D-Random (-> (NPArray (10 3))))
         (=
             (X-2D-Random)
             (np.random.rand 10 3)
@@ -35,9 +40,9 @@ def test_compute_affinity(metta: MeTTa):
         ! (spectral-clustering.rbf-affinity-matrix 
                 (spectral-clustering.square-distance-matrix 
                     (spectral-clustering.square-norm 
-                        (np.array (X-1D-Single)) 
+                        (X-1D-Single) 
                     ) 
-                    (np.array (X-1D-Single))
+                    (X-1D-Single)
                 )  
                 1.0
             )
@@ -54,9 +59,9 @@ def test_compute_affinity(metta: MeTTa):
         ! (spectral-clustering.rbf-affinity-matrix 
                 (spectral-clustering.square-distance-matrix 
                     (spectral-clustering.square-norm 
-                        (np.array (X-1D-Multiple)) 
+                        (X-1D-Multiple) 
                     ) 
-                    (np.array (X-1D-Multiple))
+                    (X-1D-Multiple)
                 )  
                 1.0
             )
@@ -71,9 +76,9 @@ def test_compute_affinity(metta: MeTTa):
         ! (spectral-clustering.rbf-affinity-matrix 
                 (spectral-clustering.square-distance-matrix 
                     (spectral-clustering.square-norm 
-                        (np.array (X-2D-Multiple)) 
+                        (X-2D-Multiple) 
                     ) 
-                    (np.array (X-2D-Multiple))
+                    (X-2D-Multiple)
                 )  
                 1.0
             )
@@ -112,9 +117,9 @@ def test_compute_affinity(metta: MeTTa):
         ! (spectral-clustering.rbf-affinity-matrix 
                 (spectral-clustering.square-distance-matrix 
                     (spectral-clustering.square-norm 
-                        (np.array (X-1D-Multiple)) 
+                        (X-1D-Multiple) 
                     ) 
-                    (np.array (X-1D-Multiple))
+                    (X-1D-Multiple)
                 )  
                 1.0
             )
@@ -127,9 +132,9 @@ def test_compute_affinity(metta: MeTTa):
         ! (spectral-clustering.rbf-affinity-matrix 
                 (spectral-clustering.square-distance-matrix 
                     (spectral-clustering.square-norm 
-                        (np.array (X-1D-Multiple)) 
+                        (X-1D-Multiple) 
                     ) 
-                    (np.array (X-1D-Multiple))
+                    (X-1D-Multiple)
                 )  
                 -1.0
             )
@@ -148,17 +153,17 @@ def test_compute_normalized_laplacian(metta: MeTTa):
         
         (=
             (I)
-            ((1 0 0) (0 1 0) (0 0 1))
+            (np.array ((1 0 0) (0 1 0) (0 0 1)))
         )
         
         (=
             (W-2)
-            ((1 1) (1 1))
+            (np.array ((1 1) (1 1)))
         )
         
         (=
             (W-3)
-            ((1 1 1) (1 1 1) (1 1 1))
+            (np.array ((1 1 1) (1 1 1) (1 1 1)))
         )
         (=
             (X-2D-Random)
@@ -169,10 +174,10 @@ def test_compute_normalized_laplacian(metta: MeTTa):
     result: Atom = metta.run(
         """        
         ! (spectral-clustering.normalized-laplacian 
-            (np.array (I)) 
+            (I) 
             (spectral-clustering.inverse-degree-matrix 
                 (spectral-clustering.degree 
-                    (np.array (I))
+                    (I)
                 )
             )
         )
@@ -187,10 +192,10 @@ def test_compute_normalized_laplacian(metta: MeTTa):
     result: Atom = metta.run(
         """        
         ! (spectral-clustering.normalized-laplacian 
-            (np.array (W-2)) 
+            (W-2) 
             (spectral-clustering.inverse-degree-matrix 
                 (spectral-clustering.degree 
-                    (np.array (W-2))
+                    (W-2)
                 )
             )
         )
@@ -205,10 +210,10 @@ def test_compute_normalized_laplacian(metta: MeTTa):
     result: Atom = metta.run(
         """        
         ! (spectral-clustering.normalized-laplacian 
-            (np.array (W-3)) 
+            (W-3) 
             (spectral-clustering.inverse-degree-matrix 
                 (spectral-clustering.degree 
-                    (np.array (W-3))
+                    (W-3)
                 )
             )
         )
@@ -576,6 +581,7 @@ def test_spectral_clustering_fit_and_predict(metta: MeTTa):
             (X)
             (np.array ((0.0 0.0) (0.1 0) (1.0 1.0) (1.1 1.0)))
         )
+        (: fit-outputs (-> ((NPArray (4 2)) (NPArray (2 2)))))
         (=
             (fit-outputs)
             (spectral-clustering.fit (X) 2)

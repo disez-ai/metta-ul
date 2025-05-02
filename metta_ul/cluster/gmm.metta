@@ -1,4 +1,4 @@
-!(import! &self metta_ul:numme)
+!(import! &self metta_ul)
 
 (: gmm.center (-> (NPArray ($n $d)) (NPArray ($k $d)) (NPArray ($n $k $d))))
 (=

@@ -1,4 +1,4 @@
-!(import! &self metta_ul:numme)
+!(import! &self metta_ul)
 
 (: kmeans.update (-> (NPArray ($n $d)) (NPArray ($k $n)) (NPArray ($k $d))))
 (=

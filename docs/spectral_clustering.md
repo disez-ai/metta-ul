@@ -10,10 +10,10 @@ Computes the square norm for each row (data point) in the dataset.
 
 #### Parameters:
 - `$X`: The dataset, represented as an array of data points.
-
+  - Type: `(NPArray ($N $D))`
 #### Returns:
 - A vector where each element is the sum of squares of the components of the corresponding data point.
-
+  - Type: `(NPArray ($N 1)`
 ---
 
 ### `spectral-clustering.square-distance-matrix`
@@ -21,10 +21,13 @@ Computes the matrix of squared Euclidean distances between each pair of data poi
 
 #### Parameters:
 - `$square-norm-X`: The vector of square norms computed from `$X`.
+  - Type: `(NPArray ($N 1))`
 - `$X`: The dataset.
+  - Type: `(NPArray ($N $D))`
 
 #### Returns:
 - A square matrix where the entry at (i, j) is the squared Euclidean distance between data point *i* and *j*.
+  - Type: `(NPArray ($N $N))`
 
 ---
 
@@ -33,11 +36,13 @@ Generates the RBF (Radial Basis Function) affinity matrix from a squared distanc
 
 #### Parameters:
 - `$sqr-distance-matrix-X`: The matrix of squared distances between data points.
+  - Type: `(NPArray ($N $N))`
 - `$rbf-kernel-sigma`: The sigma parameter for the RBF kernel.
+  - Type: `Number`
 
 #### Returns:
 - A symmetric affinity matrix where each entry represents the similarity between a pair of data points based on the RBF kernel.
-
+  - Type: `(NPArray ($N $N))`
 ---
 
 ### `spectral-clustering.degree`
@@ -45,10 +50,10 @@ Computes the degree of each node (data point) based on the affinity matrix.
 
 #### Parameters:
 - `$W`: The affinity matrix.
-
+  - Type: `(NPArray ($N $N))`
 #### Returns:
 - A vector where each element is the sum of the corresponding row in `$W`.
-
+  - Type: `(NPArray ($N 1))`
 ---
 
 ### `spectral-clustering.inverse-degree-matrix`
@@ -56,10 +61,10 @@ Constructs the inverse degree matrix used for normalization.
 
 #### Parameters:
 - `$degree-W`: The vector of node degrees computed from `$W`.
-
+  - Type: `(NPArray ($N 1))`
 #### Returns:
 - A diagonal matrix where each diagonal element is the inverse square root of the corresponding degree.
-
+  - Type: `(NPArray ($N $N))`
 ---
 
 ### `spectral-clustering.normalized-laplacian`
@@ -67,11 +72,12 @@ Computes the normalized graph Laplacian from the affinity matrix and its inverse
 
 #### Parameters:
 - `$W`: The RBF affinity matrix.
+  - Type: `(NPArray ($N $N))`
 - `$inverse-degree-matrix-W`: The inverse degree matrix computed from `$W`.
-
+  - Type: `(NPArray ($N $N))`
 #### Returns:
 - The normalized Laplacian matrix defined as *I - D^{-1/2} W D^{-1/2}*, where *I* is the identity matrix.
-
+  - Type: (NPArray ($N $N))
 ---
 
 ### `spectral-clustering.eigh`
@@ -79,10 +85,10 @@ Performs eigen-decomposition on a given matrix.
 
 #### Parameters:
 - `$X`: The matrix to decompose (typically the normalized Laplacian).
-
+  - Type: `(NPArray ($N $N))`
 #### Returns:
 - A tuple containing the eigenvalues and eigenvectors of `$X`.
-
+  - Type: `EighResult`
 ---
 
 ### `spectral-clustering.eigenvalues`
@@ -90,10 +96,11 @@ Extracts the eigenvalues from the result of the eigen-decomposition.
 
 #### Parameters:
 - `$eigh-X`: The tuple returned from `spectral-clustering.eigh`.
+  - Type: `EighResult`
 
 #### Returns:
 - A vector containing the eigenvalues.
-
+  - Type: `(NPArray ($N))`
 ---
 
 ### `spectral-clustering.eigenvectors`
@@ -101,10 +108,10 @@ Extracts the eigenvectors from the result of the eigen-decomposition.
 
 #### Parameters:
 - `$eigh-X`: The tuple returned from `spectral-clustering.eigh`.
-
+  - Type: `EighResult`
 #### Returns:
 - A matrix whose columns correspond to the eigenvectors of `$X`.
-
+  - Type: `(NPArray ($N $N))`
 ---
 
 ### `spectral-clustering.eigval-top-k-index`
@@ -112,11 +119,13 @@ Finds the indices corresponding to the smallest *k* eigenvalues (after sorting).
 
 #### Parameters:
 - `$eigval-L`: The vector of eigenvalues.
+  - Type: `(NPArray ($N))`
 - `$k`: The number of top eigenvalue indices to select.
+  - Type: `Number`
 
 #### Returns:
 - A vector of indices for the top *k* eigenvalues.
-
+  - Type: `(NPArray ($N))`
 ---
 
 ### `spectral-clustering.spectral-embeddings`
@@ -124,11 +133,12 @@ Computes the spectral embeddings by selecting the top *k* eigenvectors based on 
 
 #### Parameters:
 - `$eigh-I`: The eigen-decomposition result of the normalized Laplacian.
+  - Type: `EighResult`
 - `$k`: The number of clusters (and hence dimensions for the embeddings).
-
+  - Type: `Number`
 #### Returns:
 - A matrix of spectral embeddings extracted from the selected eigenvectors.
-
+  - Type: `(NPArray ($N $D))`
 ---
 
 ### `spectral-clustering.row-normalize`
@@ -136,9 +146,11 @@ Normalizes each row of a matrix to have unit norm.
 
 #### Parameters:
 - `$X`: A matrix (such as the spectral embeddings).
+  - Type: `(NPArray ($N $D))`
 
 #### Returns:
 - The row-normalized version of `$X`.
+  - Type: `(NPArray ($N $D))`
 
 ---
 
@@ -147,13 +159,17 @@ Clusters the spectral embeddings using the k-means algorithm.
 
 #### Parameters:
 - `$X`: The original dataset.
+  - Type: `(NPArray ($N $D))`
 - `$num-clusters`: The desired number of clusters.
+  - Type: `Number`
 - `$rbf-kernel-sigma`: The sigma parameter for constructing the RBF affinity matrix.
+  - Type: `Number`
 - `$max-kmeans-iter`: The maximum number of iterations for the k-means algorithm.
+  - Type: `Number`
 
 #### Returns:
 - The centroids obtained after clustering the row-normalized spectral embeddings with k-means.
-
+  - Type: `(NPArray ($K $D))`
 ---
 
 ### `spectral-clustering.fit`
@@ -161,13 +177,17 @@ Performs the full spectral clustering process on the dataset.
 
 #### Parameters:
 - `$X`: The dataset, represented as an array of data points.
+  - Type: `(NPArray ($N $D))`
 - `$num-clusters`: The desired number of clusters.
+  - Type: `Number`
 - `$rbf-kernel-sigma`: The sigma parameter for the RBF kernel (default example: `0.1`).
+  - Type: `Number`
 - `$max-kmeans-iter`: The maximum number of iterations for the k-means algorithm (default example: `100`).
+  - Type: `Number`
 
 #### Returns:
 - The tuple containing spectral embeddings and the final centroids computed from clustering the spectral embeddings.
-
+  - Type: `((NPArray ($N $C)) (NPArray ($K $C)))`
 ---
 
 ### `spectral-clustering.predict`
@@ -175,13 +195,15 @@ Predicts the cluster assignment for each data point in the dataset using the spe
 
 #### Parameters:
 - A tuple `($embeddings $centroids)`, where:
-  - `$embeddings`: The spectral embedding matrix.
-  - `$centroids`: The centroids obtained from the clustering step.
+  1. `$embeddings`: The spectral embedding matrix.
+  2. `$centroids`: The centroids obtained from the clustering step.
+  - Type: `((NPArray ($N $C)) (NPArray ($K $C)))`
 - `$num-clusters`: The number of clusters.
+  - Type: `Number`
 
 #### Returns:
 - A vector of cluster labels, one for each data point, determined by assigning each point to the nearest centroid.
-
+  - Type: `((NPArray ($N)))`
 ## Usage
 To perform spectral clustering on a dataset `S` (an `NPArray` of shape `(n, d)`) with a specified number of clusters (e.g., 3), RBF kernel sigma (e.g., `0.1`), and a maximum of 100 iterations for k-means, you can use:
 ```metta
