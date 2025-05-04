@@ -12,10 +12,13 @@ This function updates the centroids based on the current cluster assignments. It
 
 #### Parameters:
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$assignments`: One-hot encoded cluster assignment matrix.
+    - Type: `(NPArray ($n $k))`
 
 #### Returns:
 - Updated cluster centroids.
+    - Type: `(NPArray ($k $d))`
 
 ---
 
@@ -26,11 +29,13 @@ Assigns each data point to the nearest centroid.
 
 #### Parameters:
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$centroids`: Current centroids.
-- `$k`: Number of clusters.
+    - Type: `(NPArray ($k $d))`
 
 #### Returns:
 - A one-hot encoded assignment matrix indicating which cluster each point belongs to.
+    - Type: `(NPArray ($k $n))`
 
 ---
 
@@ -41,12 +46,15 @@ Recursively updates the centroids until the maximum number of iterations is reac
 
 #### Parameters:
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $d))`
 - `$centroids`: Initial centroids.
-- `$k`: Number of clusters.
+    - Type: `(NPArray ($k $d))`
 - `$max-iter`: Maximum number of iterations.
+    - Type: `Number`
 
 #### Returns:
 - Final cluster centroids after convergence or reaching the iteration limit.
+    - Type: `(NPArray ($k $d))`
 
 ---
 
@@ -57,11 +65,15 @@ Main function to perform K-Means clustering. It initializes centroids randomly a
 
 #### Parameters:
 - `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $k))`
 - `$k`: Number of clusters.
+    - Type: `Number`
 - `$max-iter` (optional, default: 100): Maximum number of iterations.
+    - Type: `Number`
 
 #### Returns:
 - Final cluster centroids after completion of the algorithm.
+    - Type: `(NPArray ($k $d))`
 
 ## Usage
 To cluster a dataset `S` of type `(NPArray (n, d))` into 3 clusters with default settings:
