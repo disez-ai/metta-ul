@@ -14,9 +14,9 @@
     (np.sum
         (np.power $X 2)
         1
-        pyNone
-        pyNone
-        pyTrue
+        py.none
+        py.none
+        py.true
     )
 )
 
@@ -162,9 +162,9 @@
         $X
         (np.linalg.norm
             $X
-            pyNone
+            py.none
             1
-            pyTrue
+            py.true
         )
     )
 )
@@ -232,7 +232,6 @@
             (kmeans.assign
                 $embeddings
                 $centroids
-                $num-clusters
             )
         )
         1
