@@ -69,7 +69,11 @@ def test_agglomerative_closest_clusters(metta: MeTTa):
 
         (=
             (clusters)
-            (:: (py-list (0)) (:: (py-list (1)) (:: (py-list (2)) ())))
+            (List.fromExpression (
+                (py-list (0))
+                (py-list (1))
+                (py-list (2))
+            ))
         )
 
         (=
@@ -90,7 +94,7 @@ def test_agglomerative_closest_clusters(metta: MeTTa):
             (clusters)
             (np.array (distance-matrix))
             "single"
-            pyPINF
+            py.pinf
             ()
         )
         ''')[0][0]
@@ -111,7 +115,11 @@ def test_agglomerative_merge_clusters(metta: MeTTa):
 
         (=
             (clusters)
-            (:: (py-list (0)) (:: (py-list (1)) (:: (py-list (2)) ())))
+            (List.fromExpression (
+                (py-list (0))
+                (py-list (1))
+                (py-list (2))
+            ))
         )
 
         (=
@@ -136,7 +144,7 @@ def test_agglomerative_merge_clusters(metta: MeTTa):
         ''')[0][0]
 
     clusters = str(result)
-    clusters_true = '(:: [2] (:: [0, 1] ()))'
+    clusters_true = '(Cons [2] (Cons [0, 1] Nil))'
 
     assert clusters == clusters_true
 
@@ -151,7 +159,7 @@ def test_agglomerative_init_clusters(metta: MeTTa):
     result: Atom = metta.run('! (agglomerative.init-clusters 2)')[0][0]
 
     clusters = str(result)
-    clusters_true = '(:: [1] (:: [0] ()))'
+    clusters_true = '(Cons [1] (Cons [0] Nil))'
 
     assert clusters == clusters_true
 
@@ -163,12 +171,12 @@ def test_agglomerative_recursion(metta: MeTTa):
 
         (=
             (clusters)
-            (:: (py-list (2)) (:: (py-list (0 1)) ()))
+            (List.fromExpression ((py-list (2)) (py-list (0 1))))
         )
 
         (=
             (flat-clusters)
-            (:: (py-list (0 1 2)) ())
+            (List.fromExpression ((py-list (0 1 2))))
         )
 
         (=
@@ -185,12 +193,12 @@ def test_agglomerative_recursion(metta: MeTTa):
 
     result: Atom = metta.run('! (agglomerative.recursion 1 "single" (flat-clusters) (np.array (distance-matrix)) 1)')[0][0]
     history = str(result)
-    history_true = '(:: [0, 1, 2] ())'
+    history_true = '(Cons [0, 1, 2] Nil)'
     assert history == history_true
 
     result: Atom = metta.run('! (agglomerative.recursion 1 "single" (clusters) (np.array (distance-matrix)) 2)')[0][0]
     history = str(result)
-    history_true = '(:: [2, 0, 1] ())'
+    history_true = '(Cons [2, 0, 1] Nil)'
     assert history == history_true
 
 
@@ -209,7 +217,7 @@ def test_agglomerative(metta: MeTTa):
     result: Atom = metta.run('! (agglomerative (np.array (X)) 1 "single")')[0][0]
 
     clusters = str(result)
-    clusters_true = '(:: [1, 0] ())'
+    clusters_true = '(Cons [1, 0] Nil)'
 
     assert clusters == clusters_true
 
