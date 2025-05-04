@@ -153,8 +153,8 @@ def parse_hierarchy(atom):
 def test_compute_sse(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:bisecting_kmeans)
-                
+        ! (import! &self metta_ul:cluster:bisecting_kmeans)
+
         """
     )
     result: Atom = metta.run(
@@ -311,7 +311,7 @@ def test_find_max_cluster(metta: MeTTa):
         (=
             (clusters1)
             (::
-                (pyNone pyNone 10.0 pyNone)
+                (py.none py.none 10.0 py.none)
                 ()
             )
         )
@@ -334,11 +334,11 @@ def test_find_max_cluster(metta: MeTTa):
         (=
             (clusters2)
             (::
-                (pyNone pyNone 10.0 pyNone)
+                (py.none py.none 10.0 py.none)
                 (::
-                    (pyNone pyNone 20.0 pyNone)
+                    (py.none py.none 20.0 py.none)
                     (::
-                        (pyNone pyNone 5.0 pyNone)
+                        (py.none py.none 5.0 py.none)
                         ()
                     )
                 )
@@ -371,18 +371,18 @@ def test_remove_cluster(metta: MeTTa):
         (=
             (clusters0)
             (::
-                ((np.array (0)) pyNone 1.0 pyNone)
+                ((np.array (0)) py.none 1.0 py.none)
                 (::
-                    ((np.array (1)) pyNone 2.0 pyNone)
+                    ((np.array (1)) py.none 2.0 py.none)
                     (::
-                        ((np.array (2)) pyNone 3.0 pyNone)
+                        ((np.array (2)) py.none 3.0 py.none)
                         ()
                     )
                 )
             )
         )
         
-        ! (bisecting-kmeans.remove-cluster (clusters0) ((np.array (1)) pyNone 2.0 pyNone))
+        ! (bisecting-kmeans.remove-cluster (clusters0) ((np.array (1)) py.none 2.0 py.none))
         """
     )[0][0]
     py_clusters = metta_clusters_to_py_clusters(result)
@@ -398,18 +398,18 @@ def test_remove_cluster(metta: MeTTa):
         (=
             (clusters1)
             (::
-                ((np.array (0)) pyNone 1.0 pyNone)
+                ((np.array (0)) py.none 1.0 py.none)
                 (::
-                    ((np.array (1)) pyNone 2.0 pyNone)
+                    ((np.array (1)) py.none 2.0 py.none)
                     (::
-                        ((np.array (2)) pyNone 3.0 pyNone)
+                        ((np.array (2)) py.none 3.0 py.none)
                         ()
                     )
                 )
             )
         )
 
-        ! (bisecting-kmeans.remove-cluster (clusters1) ((np.array (99)) pyNone 2.0 pyNone))
+        ! (bisecting-kmeans.remove-cluster (clusters1) ((np.array (99)) py.none 2.0 py.none))
         """
     )[0][0]
     py_clusters = metta_clusters_to_py_clusters(result)
@@ -422,7 +422,7 @@ def test_remove_cluster(metta: MeTTa):
             ()
         )
 
-        ! (bisecting-kmeans.remove-cluster (clusters2) ((np.array (99)) pyNone 2.0 pyNone))
+        ! (bisecting-kmeans.remove-cluster (clusters2) ((np.array (99)) py.none 2.0 py.none))
         """
     )[0][0]
     py_clusters = metta_clusters_to_py_clusters(result)
@@ -451,15 +451,13 @@ def test_bisect_cluster(metta: MeTTa):
                     (np.array (0 1 2 3)) 
                     (np.array (5.0 5.5)) 
                     201.0 
-                    pyNone
+                    py.none
                 )
                 ()
             )
         )
                         
-        ! (bisecting-kmeans.bisect-cluster (X) (bisecting-kmeans.find-max-cluster (clusters)) 100)
-        
-        
+        ! (bisecting-kmeans.bisect-cluster (X) (bisecting-kmeans.find-max-cluster (clusters)) 10)                
         """
     )[0][0]
     cluster_0, cluster_1 = metta_clusters_to_py_clusters(result)
@@ -486,19 +484,19 @@ def test_append_to_clusters(metta: MeTTa):
         """
         (=
             (cluster0)
-            ((np.array (0)) pyNone 10.0 pyNone)
+            ((np.array (0)) py.none 10.0 py.none)
         )
         (=
             (cluster1)
-            ((np.array (1)) pyNone 20.0 pyNone)
+            ((np.array (1)) py.none 20.0 py.none)
         )
         (=
             (cluster2)
-            ((np.array (2)) pyNone 30.0 pyNone)
+            ((np.array (2)) py.none 30.0 py.none)
         )
         (=
             (cluster3)
-            ((np.array (3)) pyNone 40.0 pyNone)
+            ((np.array (3)) py.none 40.0 py.none)
         )
         
         (=
@@ -581,7 +579,7 @@ def test_append_to_hierarchy(metta: MeTTa):
         """
         (=
             (cluster0)
-            ((np.array (0)) pyNone 10.0 pyNone)
+            ((np.array (0)) py.none 10.0 py.none)
         )
                       
         (=
@@ -594,7 +592,7 @@ def test_append_to_hierarchy(metta: MeTTa):
         
         (=
             (hierarchy0)
-            pyNone
+            py.none
         )
         
         ! (append (hierarchy0) (clusters0))
@@ -611,15 +609,15 @@ def test_append_to_hierarchy(metta: MeTTa):
         """
         (=
             (cluster0)
-            ((np.array (0)) pyNone 10.0 pyNone)
+            ((np.array (0)) py.none 10.0 py.none)
         )
         (=
             (cluster1)
-            ((np.array (1)) pyNone 20.0 pyNone)
+            ((np.array (1)) py.none 20.0 py.none)
         )
         (=
             (cluster2)
-            ((np.array (2)) pyNone 30.0 pyNone)
+            ((np.array (2)) py.none 30.0 py.none)
         )                
         (=
             (clusters0)
@@ -698,7 +696,7 @@ def test_bisecting_kmeans(metta: MeTTa):
         (: init-hierarchy (-> Hierarchy))
         (=
             (init-hierarchy)
-            (append pyNone (init-cluster))
+            (append py.none (init-cluster))
         )
                 
         ! (bisecting-kmeans.recursive-bisecting-kmeans (X) (init-cluster) 1 10 (init-hierarchy))
@@ -751,200 +749,184 @@ def test_bisecting_kmeans_fit(metta: MeTTa):
     assert len(hierarchy) == 3, f"Expected 3 clusters, got {len(hierarchy)}"
 
 
-def test_assign_point_to_cluster(metta: MeTTa):
+def test_bisecting_kmeans_extract_centers(metta: MeTTa):
     metta.run(
         """
         !(import! &self metta_ul:cluster:bisecting_kmeans)
-
         """
     )
 
     result: Atom = metta.run(
         """
-        (: clusters0 (-> ClusterList))
+        (: cluster-list (-> ClusterList))
         (=
-            (clusters0)
+            (cluster-list)
             (::
-                (pyNone (np.array (0.0 0.0)) pyNone pyNone)
+                (
+                    (np.array (0 1 2))  ; indices
+                    (np.array (1.0 1.0))  ; center
+                    10.5  ; sse
+                    py.none  ; hierarchy
+                )
                 (::
-                    (pyNone (np.array (5.0 0.0)) pyNone pyNone)
+                    (
+                        (np.array (3 4))  ; indices
+                        (np.array (2.0 2.0))  ; center
+                        5.2  ; sse
+                        py.none  ; hierarchy
+                    )
+                    ()
+                )
+            )
+        )
+
+        ! (bisecting-kmeans.extract-centers (cluster-list))
+        """
+    )[0][0]
+
+    # Convert result to Python list of numpy arrays
+    centers = extract_cluster_values(result)
+
+    assert len(centers) == 2, f"Expected 2 centers, got {len(centers)}"
+    assert np.allclose(centers[0], np.array([1.0, 1.0])), f"Expected center [1.0, 1.0], got {centers[0]}"
+    assert np.allclose(centers[1], np.array([2.0, 2.0])), f"Expected center [2.0, 2.0], got {centers[1]}"
+
+    # Test with empty list
+    result: Atom = metta.run("! (bisecting-kmeans.extract-centers ())")[0][0]
+    empty_centers = extract_cluster_values(result)
+    assert len(empty_centers) == 0, f"Expected empty list, got {empty_centers}"
+
+
+def test_bisecting_kmeans_concat_arrays(metta: MeTTa):
+    metta.run(
+        """
+        !(import! &self metta_ul:cluster:bisecting_kmeans)
+        """
+    )
+
+    # Test with multiple arrays
+    result: Atom = metta.run(
+        """
+        (: arrays (-> (List (NPArray ($D)))))
+        (=
+            (arrays)
+            (::
+                (np.array (1.0 1.0))
+                (::
+                    (np.array (2.0 2.0))
                     (::
-                        (pyNone (np.array (0.0 5.0)) pyNone pyNone)
+                        (np.array (3.0 3.0))
                         ()
                     )
                 )
             )
         )
-        
-        (: p0 (-> (NPArray (2))))
-        (=
-            (p0)
-            (np.array (1.0 1.0))
-        )
-        
-        ! (bisecting-kmeans.assign-point-to-cluster (p0) (clusters0) 0 pyINF 0)        
+
+        ! (bisecting-kmeans.concat-arrays (arrays))
         """
     )[0][0]
-    cluster_p0 = result.get_object().content
-    expected_cluster_p0 = 0  # distance ~1.414 from [0,0]; far from others.
-    assert cluster_p0 == expected_cluster_p0, f"Expected {expected_cluster_p0}, got {cluster_p0}"
 
+    concatenated = result.get_object().value
+    expected = np.array([[1.0, 1.0], [2.0, 2.0], [3.0, 3.0]])
+    assert np.allclose(concatenated, expected), f"Expected {expected}, got {concatenated}"
+
+    # Test with a single array
     result: Atom = metta.run(
-        """      
-        (: p1 (-> (NPArray (2))))  
-        (=
-            (p1)
-            (np.array (4.5 0.1))
-        )
-
-        ! (bisecting-kmeans.assign-point-to-cluster (p1) (clusters0) 0 pyINF 0)        
         """
-    )[0][0]
-    cluster_p1 = result.get_object().content
-    expected_cluster_p1 = 1  # distance ~0.5 from [5,0]
-    assert cluster_p1 == expected_cluster_p1, f"Expected {expected_cluster_p1}, got {cluster_p1}"
-
-    result: Atom = metta.run(
-        """   
-        (: p2 (-> (NPArray (2))))      
+        (: single-array (-> (List (NPArray ($D)))))
         (=
-            (p2)
-            (np.array (2.5 0.0))
-        )
-
-        ! (bisecting-kmeans.assign-point-to-cluster (p2) (clusters0) 0 pyINF 0)        
-        """
-    )[0][0]
-    cluster_p2 = result.get_object().content
-    expected_cluster_p2 = 0
-    assert cluster_p2 == expected_cluster_p2, f"Expected {expected_cluster_p2}, got {cluster_p2}"
-
-    result: Atom = metta.run(
-        """    
-        (: p3 (-> (NPArray (2))))     
-        (=
-            (p3)
-            (np.array (0.0 4.9))
-        )
-
-        ! (bisecting-kmeans.assign-point-to-cluster (p3) (clusters0) 0 pyINF 0)        
-        """
-    )[0][0]
-    cluster_p3 = result.get_object().content
-    expected_cluster_p3 = 2
-    assert cluster_p3 == expected_cluster_p3, f"Expected {expected_cluster_p3}, got {cluster_p3}"
-
-    result: Atom = metta.run(
-        """  
-        (: clusters1 (-> ClusterList))      
-        (=
-            (clusters1)
-            ()
-        )
-
-        ! (bisecting-kmeans.assign-point-to-cluster (p0) (clusters1) 0 pyINF 0)        
-        """
-    )[0][0]
-    cluster_p0 = result.get_object().content
-    expected_cluster_p0 = 0
-    assert cluster_p0 == expected_cluster_p0, f"Expected {expected_cluster_p0}, got {cluster_p0}"
-
-    result: Atom = metta.run(
-        """     
-        (: clusters2 (-> ClusterList))   
-        (=
-            (clusters2)
+            (single-array)
             (::
-                (pyNone (np.array (0.0 5.0)) pyNone pyNone)
+                (np.array (4.0 4.0))
                 ()
             )
         )
 
-        ! (bisecting-kmeans.assign-point-to-cluster (p0) (clusters2) 0 pyINF 0)        
+        ! (bisecting-kmeans.concat-arrays (single-array))
         """
     )[0][0]
-    cluster_p0 = result.get_object().content
-    expected_cluster_p0 = 0
-    assert cluster_p0 == expected_cluster_p0, f"Expected {expected_cluster_p0}, got {cluster_p0}"
+
+    single_result = result.get_object().value
+    expected_single = np.array([[4.0, 4.0]])
+    assert np.allclose(single_result, expected_single), f"Expected {expected_single}, got {single_result}"
+
+    # Test with empty list
+    result: Atom = metta.run("! (bisecting-kmeans.concat-arrays ())")[0][0]
+    empty_result = result.get_object().value
+    assert len(empty_result) == 0, f"Expected empty array, got {empty_result}"
 
 
-def test_assign_all_points(metta: MeTTa):
+def test_bisecting_kmeans_assign(metta: MeTTa):
     metta.run(
         """
         !(import! &self metta_ul:cluster:bisecting_kmeans)
-
         """
     )
+
     result: Atom = metta.run(
         """
+        (: X (-> (NPArray (4 2))))
         (=
             (X)
-            (np.array ((0.1 0.2) (5.0 5.1) (0.0 -0.1) (5.1 4.9)))
+            (np.array (
+                (0.5 0.5)
+                (1.5 1.5)
+                (4.5 4.5)
+                (5.5 5.5)
+            ))
         )
+
+        (: clusters (-> ClusterList))
         (=
-            (clusters0)
+            (clusters)
             (::
-                (pyNone (np.array (0.0 0.0)) pyNone pyNone)
+                (
+                    (np.array (0 1))  ; indices
+                    (np.array (1.0 1.0))  ; center
+                    10.5  ; sse
+                    py.none  ; hierarchy
+                )
                 (::
-                    (pyNone (np.array (5.0 5.0)) pyNone pyNone)
+                    (
+                        (np.array (2 3))  ; indices
+                        (np.array (5.0 5.0))  ; center
+                        5.2  ; sse
+                        py.none  ; hierarchy
+                    )
                     ()
                 )
             )
         )
-        
-        ! (bisecting-kmeans.assign-all-points (X) (clusters0) 0 ())                
+
+        ! (bisecting-kmeans.assign (X) (clusters))
         """
     )[0][0]
-    cluster_indices = metta_clusters_to_py_clusters(result)
-    cluster_indices = [item for sublist in cluster_indices for item in sublist]
 
-    expected = [0, 1, 0, 1]
-    assert cluster_indices == expected, f"Expected {expected}, got {cluster_indices}"
+    assignments = result.get_object().value
+    expected = np.array([0, 0, 1, 1])
+    assert np.array_equal(assignments, expected), f"Expected {expected}, got {assignments}"
 
-    # Edge case: no points in X.
+    # Test with different data that's closer to the second cluster
     result: Atom = metta.run(
         """
-        (: X1 (-> (NPArray (0))))
+        (: X2 (-> (NPArray (4 2))))
         (=
-            (X1)
-            (np.array ())
+            (X2)
+            (np.array (
+                (4.0 4.0)
+                (6.0 6.0)
+                (0.9 0.9)
+                (3.0 3.0)
+            ))
         )
-        (=
-            (clusters1)
-            (::
-                (pyNone (np.array (0.0 0.0)) pyNone pyNone)
-                (::
-                    (pyNone (np.array (1.0 1.0)) pyNone pyNone)
-                    ()
-                )
-            )
-        )
-        ;! (X1)
-        ! (bisecting-kmeans.assign-all-points (X1) (clusters1) 0 ())                
-        """
-    )#[0][0]
-    cluster_indices = metta_clusters_to_py_clusters(result)
-    cluster_indices = [item for sublist in cluster_indices for item in sublist]
-    assert len(cluster_indices) == 0, f"Expected empty labels, got {result}"
 
-    result: Atom = metta.run(
-        """        
-        (=
-            (clusters2)                            
-            (::
-                (pyNone (np.array (3.0 3.0)) pyNone pyNone)
-                ()
-            )
-            
-        )
-        ;! (X1)
-        ! (bisecting-kmeans.assign-all-points (X) (clusters2) 0 ())                
+        ! (bisecting-kmeans.assign (X2) (clusters))
         """
     )[0][0]
-    cluster_indices = metta_clusters_to_py_clusters(result)
-    cluster_indices = [item for sublist in cluster_indices for item in sublist]
-    expected = [0, 0, 0, 0]
-    assert cluster_indices == expected, f"Expected {expected}, got {cluster_indices}"
+
+    assignments2 = result.get_object().value
+    expected2 = np.array([1, 1, 0, 0])
+    assert np.array_equal(assignments2, expected2), f"Expected {expected2}, got {assignments2}"
 
 
 def test_bisecting_kmeans_predict(metta: MeTTa):
@@ -955,25 +937,24 @@ def test_bisecting_kmeans_predict(metta: MeTTa):
         """
     )
     # Start with one initial cluster containing all points.
+
     result: Atom = metta.run(
         """
         (=
             (X)
             (np.array ((0.0 0.0) (0.0 1.0) (1.0 0.0) (1.0 1.0) (5.0 5.0) (5.0 6.0)))            
         )
-        
+
         (=
             (hierarchy)
             (bisecting-kmeans.fit (X) 2 10)
         )
-        
-        ;! (get-last (hierarchy))
+
         ! (bisecting-kmeans.predict (X) (hierarchy))                
         """
     )[0][0]
-    cluster_indices = metta_clusters_to_py_clusters(result)
-    cluster_indices = [item for sublist in cluster_indices for item in sublist]
 
+    cluster_indices = result.get_object().content
     assert len(cluster_indices) == 6, "cluster_indices must have exactly six elements."
 
     assert all(x == cluster_indices[0] for x in cluster_indices[:4]), "First four elements of cluster_indices " \
@@ -988,106 +969,60 @@ def test_bisecting_kmeans_predict(metta: MeTTa):
     assert set(cluster_indices) == {0, 1}, "Cluster labels must be either 0 or 1."
 
 
-def test_typing(metta: MeTTa):
-    metta.run(
-        """
-        ! (import! &self metta_ul:cluster:spectral_clustering)
-        """
-    )
-    result: Atom = metta.run(
-        """                
-        (: foo (-> (NPArray ($N)) Number))
-        ;(: foo (-> (NPArray ()) Number))        
-        (=  (foo $x) 5.0)        
-        ! (get-type foo)
-        
-        (: idx1 (-> (NPArray (3))))
-        (=
-            (idx1)
-            (np.array (1 2 3))
-        )
-        ! (get-type idx1)
-        ! (get-type (idx1))
-        
-        (: idx2 (-> (NPArray (0))))
-        (=
-            (idx2)
-            (np.array ())
-        )   
-        ! (get-type idx2)
-        ! (get-type (idx2))     
-        
-        ! (get-type (foo idx1))
-        ! (get-type (foo (idx1)))                
-        ! (get-type (foo (idx2)))
-        
-        ! (foo (idx1))  
-        ! (foo (idx2))     
-        """
-    )  # [0][0]
-    pass
-    result: Atom = metta.run(
-        """        
-                        
-        (: foo (-> Bool Number))
-        (: foo (-> Number Number))
-        (=  (foo $x) (5.0))
-        
-        ! (get-type foo)
-        
-        ! (foo ُTrue)  
-        ! (foo 0.0)           
-        """
-    )  # [0][0]
-    pass
-    result: Atom = metta.run(
-        """
-        (: Data (NPArray (4 2)))
-        (: soo (-> (NPArray ($N $D)) Number))
-        ;(: soo (-> Data Number))
-        (=  (soo $x) (np.sum $x))
-        ! (get-type soo)
-        
-        
-        ;(: Z (-> Data))
-        (: Z (-> (NPArray ($N $D))))
-        (= 
-            (Z)
-            (np.array ((0.0 0.0) (0.1 0) (1.0 1.0) (1.1 1.0)))
-        )
-        ! (get-type (Z))
-        
-        ! (get-type (soo Z))
-        ! (get-type (soo (Z)))        
-        ! (soo (Z))                
-        """
-    )  # [0][0]
-    pass
-    result: Atom = metta.run(
-        """
-        (: f (-> (NPArray ($N)) Number))
-        (= (f $x) 5.0)
-        
-        (: p (-> (NPArray (3))))
-        (= (p) (np.array (1 2 3)))
-        ! (f (p)) 
-        
-        (: q (-> (NPArray (0))))
-        (= (q) (np.array ()))
-        ! (f (q))            
-        """
-    )  # [0][0]
-    pass
-
-    result: Atom = metta.run(
-        """
-        
-        (::
-            (list)
-            (:: A (:: B (:: C ())))
-        )
-        ! (get-type (list))
-        ! (get-type (:: A (:: B (:: C ()))))       
-        """
-    )  # [0][0]
-    pass
+# def test_real_data(metta: MeTTa):
+#     from sklearn.metrics import adjusted_rand_score
+#     metta.run(
+#         """
+#         ! (import! &self metta_ul:cluster:bisecting_kmeans)
+#         ! (ul-import sklearn.datasets as dts)
+#         """
+#     )
+#     result: Atom = metta.run(
+#         """
+#         (= (get-cons $n) (match &self (Cons $n $y) $y))
+#         (Cons seed 30)
+#         (Cons random_state 170)
+#         (Cons n_samples 1000)
+#         (Param default (Cons n_clusters 3))
+#         (=
+#             (data)
+#             (dts.make_circles (n_samples (get-cons n_samples)) (factor 0.5) (noise 0.05) (random_state (get-cons seed)))
+#         )
+#         (=
+#             (get-X ($X $y))
+#             $X
+#         )
+#         (=
+#             (get-y ($X $y))
+#             $y
+#         )
+#         ! (data)
+#         """
+#     )[0][0]
+#     X = result.get_children()[0].get_object().content
+#     y_true = result.get_children()[1].get_object().content
+#     result: Atom = metta.run(
+#         """
+#         (=
+#             (hierarchy)
+#             (bisecting-kmeans.fit (get-X (data)) 2 100)
+#         )
+#
+#
+#         ! (bisecting-kmeans.predict (get-X (data)) (hierarchy))
+#         """
+#     )[0][0]
+#     y_pred = result.get_object().content
+#     ari = adjusted_rand_score(y_true, y_pred)
+#     import seaborn as sns
+#     import matplotlib.pyplot as plt
+#
+#     # Create a scatter plot using X (2D data) and color points by cluster labels (y_pred)
+#     plt.figure(figsize=(10, 8))
+#     sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=y_pred, palette='viridis', s=50, alpha=0.8)
+#     plt.title('Bisecting Kmeans Results')
+#     plt.xlabel('Feature 1')
+#     plt.ylabel('Feature 2')
+#     plt.legend(title='Cluster')
+#     plt.tight_layout()
+#     plt.show()
