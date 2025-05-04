@@ -22,4 +22,5 @@ def test_scripts():
     process_exceptions(run_script(f"{pwd}/kmeans_test.metta"))
     process_exceptions(run_script(f"{pwd}/plot_test.metta"))
     process_exceptions(run_script(f"{pwd}/linkedlist_test.metta"))
+    process_exceptions(run_script(f"{pwd}/import_test.metta"))
     return
