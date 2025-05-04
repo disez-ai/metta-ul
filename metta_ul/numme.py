@@ -212,6 +212,7 @@ def numme_atoms():
     nmConcat = G(PatternOperation("np.concat", wrapnpop(np.concat), unwrap=False))
 
     pyNone = ValueAtom(None)
+    pyTrue = ValueAtom(True)
     pyPINF = ValueAtom(float('inf'))
 
     atomPi = ValueAtom(np.pi)
@@ -263,6 +264,7 @@ def numme_atoms():
         "np.put": nmPut,
         "np.concat": nmConcat,
         "py.none": pyNone,
+        "py.true": pyTrue,
         "py.pinf": pyPINF,
         "math.pi": atomPi,
     }
