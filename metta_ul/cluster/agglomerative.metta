@@ -1,4 +1,4 @@
-!(import! &self metta_ul:numme)
+!(import! &self metta_ul)
 !(import! &self metta_ul:linkedlist)
 
 (: PyList Type)
