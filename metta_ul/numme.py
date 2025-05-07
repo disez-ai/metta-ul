@@ -210,6 +210,7 @@ def numme_atoms():
     nmAppend = G(PatternOperation("np.append", wrapnpop(np.append)))
     nmPut = G(PatternOperation("np.put", wrapnpop(np.put), unwrap=False))
     nmConcat = G(PatternOperation("np.concat", wrapnpop(np.concat), unwrap=False))
+    nmAllClose = G(PatternOperation("np.allclose", wrapnpop(np.allclose), unwrap=False))
 
     pyNone = ValueAtom(None)
     pyPINF = ValueAtom(float('inf'))
@@ -262,6 +263,7 @@ def numme_atoms():
         "np.append": nmAppend,
         "np.put": nmPut,
         "np.concat": nmConcat,
+        "np.allclose": nmAllClose,
         "py.none": pyNone,
         "py.pinf": pyPINF,
         "math.pi": atomPi,
