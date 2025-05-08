@@ -19,7 +19,6 @@ import pandas as pd
 from .array_like_tools import parse_to_slice
 
 from .numme import _np_atom_type, _np_atom_value
-from .pdm import _dataframe_atom_type, _dataframe_atom_value
 
 
 def unwrap_args(atoms):
@@ -72,8 +71,6 @@ def escape_dots(s: str) -> str:
 def atom_value(value):
     if isinstance(value, np.ndarray):
         return _np_atom_value(value, _np_atom_type(value))
-    elif isinstance(value, pd.DataFrame):
-        return _dataframe_atom_value(value, _dataframe_atom_type(value))
     elif isinstance(value, list):
         return ValueAtom(value)
     elif isinstance(value, tuple):
