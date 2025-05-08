@@ -43,7 +43,7 @@ class MeTTaTest(pytest.Item):
         passed, result = run_metta_test(self.metta, self.test_function)
 
         if not passed:
-            raise MeTTaTestFailure(f"Test '{self.name}' failed: {result}")
+            raise MeTTaTestFailure(result)
 
     def repr_failure(self, excinfo):
         if isinstance(excinfo.value, MeTTaTestFailure):
