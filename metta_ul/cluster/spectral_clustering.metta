@@ -1,88 +1,8 @@
 !(import! &self metta_ul)
+!(import! &self kmeans)
 
-! (bind! np (py-atom numpy))
-! (bind! pyNone (py-atom "None"))
-! (bind! pyTrue (py-atom "True"))
-! (bind! pyFalse (py-atom "False"))
-
-; TODO: Fix the import problem to include kmeans from kmeans.metta
-; ============== KMEANS ==============
-(=
-    (kmeans.update $X $assignments)
-    (np.div
-        (np.matmul $assignments $X)
-        (np.sum
-            $assignments
-            1
-            pyNone
-            pyNone
-            pyTrue
-        )
-    )
-)
-
-(=
-    (kmeans.assign $X $centroids $k)
-    (np.transpose
-        (np.one_hot
-            (np.argmin
-                (np.linalg.norm
-                    (np.sub
-                        (np.expand_dims $X 0)
-                        (np.expand_dims $centroids 1)
-                    )
-                    pyNone
-                    2
-                )
-                0
-            )
-            $k
-        )
-    )
-)
-
-(=
-    (kmeans.recursion $X $centroids $k $max-iter)
-    (if (> $max-iter 0)
-        (kmeans.recursion
-            $X
-            (kmeans.update
-                $X
-                (kmeans.assign $X $centroids $k)
-            )
-            $k
-            (- $max-iter 1)
-        )
-        $centroids
-    )
-)
-
-(=
-    (kmeans $X $k)
-    (kmeans $X $k 100)
-)
-
-(=
-    (kmeans $X $k $max-iter)
-    (kmeans.recursion $X (np.choose $X $k) $k $max-iter)
-)
-
-; ===============================================
-
-; ===================== UTILS ===================
-(=
-    (to-np $x)
-    ((py-dot np array) $x)
-)
-
-(=
-    (py-getitem $iterable $index)
-    (
-        (py-dot $iterable __getitem__)
-        $index
-    )
-)
-; ===============================================
+; import name is set to sc-np (spectral-clustering np) to avoid conflicts due to importing redundant modules
+! (bind! sc-np (py-atom numpy))
 
 (: X (-> (NPArray ($N $D))))
 
@@ -94,9 +14,9 @@
     (np.sum
         (np.power $X 2)
         1
-        pyNone
-        pyNone
-        pyTrue
+        py.none
+        py.none
+        py.true
     )
 )
 
@@ -176,7 +96,7 @@
 (=
     (spectral-clustering.normalized-laplacian $W $inverse-degree-matrix-W)
     (np.sub
-        (np.eye (py-getitem (py-dot $W shape) 0))
+        (np.eye (np.shape $W 0))
         (np.matmul
             $inverse-degree-matrix-W
             (np.matmul
@@ -189,10 +109,12 @@
 
 ; Python code: np.linalg.eigh(L_sym)
 ; Compute eigenvalues and eigenvectors of the symmetric Laplacian matrix for spectral embedding.
+; TODO: py-dot had to be used because np.linalg.eigh in numme.py,
+; resulted into fatal errors when combined with slice
 (: spectral-clustering.eigh (-> (NPArray ($N $N)) EighResult))
 (=
     (spectral-clustering.eigh $X)
-    ((py-dot np linalg.eigh) (to-np $X))
+    ((py-dot sc-np linalg.eigh) $X)
 )
 
 ; Python code: np.linalg.eigh(L_sym)[0]
@@ -240,9 +162,9 @@
         $X
         (np.linalg.norm
             $X
-            pyNone
+            py.none
             1
-            pyTrue
+            py.true
         )
     )
 )
@@ -253,33 +175,7 @@
 (=
     (spectral-clustering.cluster $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter)
     (kmeans
-        (spectral-clustering.row-normalize
-            (spectral-clustering.spectral-embeddings
-                (spectral-clustering.eigh
-                    (spectral-clustering.normalized-laplacian
-                        (spectral-clustering.rbf-affinity-matrix
-                            (spectral-clustering.square-distance-matrix
-                                (spectral-clustering.square-norm $X)
-                                $X
-                            )
-                            $rbf-kernel-sigma
-                        )
-                        (spectral-clustering.inverse-degree-matrix
-                            (spectral-clustering.degree
-                                (spectral-clustering.rbf-affinity-matrix
-                                    (spectral-clustering.square-distance-matrix
-                                        (spectral-clustering.square-norm $X)
-                                        $X
-                                    )
-                                    $rbf-kernel-sigma
-                                )
-                            )
-                        )
-                    )
-                )
-                $num-clusters
-            )
-        )
+        $X
         $num-clusters
         $max-kmeans-iter
     )
@@ -290,42 +186,41 @@
 (=
     (spectral-clustering.fit $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter)
     (let
-        $embeddings
-        (spectral-clustering.spectral-embeddings
-            (spectral-clustering.eigh
-                (spectral-clustering.normalized-laplacian
-                    (spectral-clustering.rbf-affinity-matrix
-                        (spectral-clustering.square-distance-matrix
-                            (spectral-clustering.square-norm $X)
-                            $X
-                        )
-                        $rbf-kernel-sigma
-                    )
-                    (spectral-clustering.inverse-degree-matrix
-                        (spectral-clustering.degree
-                            (spectral-clustering.rbf-affinity-matrix
-                                (spectral-clustering.square-distance-matrix
-                                    (spectral-clustering.square-norm $X)
-                                    $X
+        $affinity-matrix
+        (spectral-clustering.rbf-affinity-matrix
+            (spectral-clustering.square-distance-matrix
+                (spectral-clustering.square-norm $X)
+                $X
+            )
+            $rbf-kernel-sigma
+        )
+        (let
+            $embeddings
+            (spectral-clustering.row-normalize
+                (spectral-clustering.spectral-embeddings
+                    (spectral-clustering.eigh
+                        (spectral-clustering.normalized-laplacian
+                            $affinity-matrix
+                            (spectral-clustering.inverse-degree-matrix
+                                (spectral-clustering.degree
+                                    $affinity-matrix
                                 )
-                                $rbf-kernel-sigma
                             )
                         )
                     )
+                    $num-clusters
                 )
             )
-            $num-clusters
+            ($embeddings (spectral-clustering.cluster $embeddings $num-clusters $rbf-kernel-sigma $max-kmeans-iter))
         )
-        ($embeddings (spectral-clustering.cluster $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter))
     )
-
 )
 
 ; Fit spectral clustering algorithm and return spectral embedding and cluster centroids.
 (: spectral-clustering.fit (-> (NPArray ($N $D)) Number ((NPArray ($N $C)) (NPArray ($K $C)))))
 (=
     (spectral-clustering.fit $X $num-clusters)
-    (spectral-clustering.fit $X $num-clusters 0.1 100)
+    (spectral-clustering.fit $X $num-clusters 0.1 10)
 )
 
 ; Predict the cluster assignments of data given spectral embeddings, centroids and number of clusters.
@@ -337,7 +232,6 @@
             (kmeans.assign
                 $embeddings
                 $centroids
-                $num-clusters
             )
         )
         1
