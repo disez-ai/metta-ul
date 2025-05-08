@@ -107,6 +107,14 @@ def _slice(*args):
     return arr[slice_str]
 
 
+def _assert_allclose(actual: GroundedAtom, expected: GroundedAtom, rtol=ValueAtom(1e-05), atol=ValueAtom(1e-08), equal_nan=ValueAtom(False)):
+    try:
+        if np.allclose(actual.get_object().value, expected.get_object().value, rtol.get_object().value, atol.get_object().value, equal_nan.get_object().value):
+            return [E()]
+        return [E(S("Error"), E(S("np.assertAllEqual"), actual, expected), S(f"\nExpected [{expected}]\nGot: [{actual}]\nMissed results: {expected}\nExcessive results: {actual}"))]
+    except Exception as e:
+        return [E(S("Error"), E(S("np.assertAllEqual"), actual, expected), S(str(e)))]
+
 @ register_atoms
 def numme_atoms():
 
@@ -210,6 +218,8 @@ def numme_atoms():
     nmAppend = G(PatternOperation("np.append", wrapnpop(np.append)))
     nmPut = G(PatternOperation("np.put", wrapnpop(np.put), unwrap=False))
     nmConcat = G(PatternOperation("np.concat", wrapnpop(np.concat), unwrap=False))
+    nmAllClose = G(PatternOperation("np.allclose", wrapnpop(np.allclose), unwrap=False))
+    nmAssertAllClose = G(PatternOperation("np.assertAllClose", _assert_allclose, unwrap=False))
 
     pyNone = ValueAtom(None)
     pyPINF = ValueAtom(float('inf'))
@@ -262,6 +272,8 @@ def numme_atoms():
         "np.append": nmAppend,
         "np.put": nmPut,
         "np.concat": nmConcat,
+        "np.allclose": nmAllClose,
+        "np.assertAllClose": nmAssertAllClose,
         "py.none": pyNone,
         "py.pinf": pyPINF,
         "math.pi": atomPi,
