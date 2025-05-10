@@ -8,7 +8,7 @@ from sklearn.metrics import adjusted_rand_score
 def test_compute_affinity(metta: MeTTa):
     metta.run(
         """
-        !(import! &self metta_ul:cluster:spectral_clustering)
+        ! (import! &self metta_ul:cluster:spectral_clustering)
         
         (: X-1D-Single (-> (NPArray (1 1))))
         (=
@@ -275,9 +275,9 @@ def test_spectral_embedding(metta: MeTTa):
         """
         (=
             (eigh-I)
-            (spectral-clustering.eigh ((py-dot (I) tolist)))
+            (spectral-clustering.eigh (I))
         )
-
+        
         ! (spectral-clustering.spectral-embeddings (eigh-I) 2)
         """
     )[0][0]
@@ -297,11 +297,11 @@ def test_spectral_embedding(metta: MeTTa):
         """
         (=
             (L1)
-            ((0 0 0) (0 1 0) (0 0 2))
+            (np.array ((0 0 0) (0 1 0) (0 0 2)))
         )
         (=
             (eigh-L1)
-            (spectral-clustering.eigh ((py-dot (np.array (L1)) tolist)))
+            (spectral-clustering.eigh (L1))
         )
 
         ! (spectral-clustering.spectral-embeddings (eigh-L1) 2)
@@ -329,11 +329,11 @@ def test_spectral_embedding(metta: MeTTa):
         """        
         (=            
             (L2)         
-            ((0.5 -0.5) (-0.5 0.5))
+            (np.array ((0.5 -0.5) (-0.5 0.5)))
         )
         (=            
             (eigh-L2)         
-            (spectral-clustering.eigh ((py-dot (np.array (L2)) tolist)))
+            (spectral-clustering.eigh (L2))
         )
         
         ! (spectral-clustering.spectral-embeddings (eigh-L2) 2)                       
@@ -360,11 +360,11 @@ def test_spectral_embedding(metta: MeTTa):
         """        
         (=            
             (L3)         
-            ((0 0) (0 0))
+            (np.array ((0 0) (0 0)))
         )
         (=            
             (eigh-L3)         
-            (spectral-clustering.eigh ((py-dot (np.array (L3)) tolist)))
+            (spectral-clustering.eigh (L3))
         )
 
         ! (spectral-clustering.spectral-embeddings (eigh-L2) 0)                       
@@ -444,7 +444,7 @@ def test_row_normalize(metta: MeTTa):
     norm_value = np.sqrt(3)
     expected = np.ones((3, 3)) / norm_value
     assert (
-        D_norm.shape == expected.shape
+            D_norm.shape == expected.shape
     ), "Output shape must match input shape for ones matrix."
     assert np.allclose(D_norm, expected), "Row normalization failed for ones matrix."
 
@@ -466,7 +466,7 @@ def test_spectral_clustering_cluster(metta: MeTTa):
             3
         )      
         (=
-            (embeddings)
+            (embeddings1)
             (spectral-clustering.spectral-embeddings
                 (spectral-clustering.eigh
                     (spectral-clustering.normalized-laplacian
@@ -495,17 +495,17 @@ def test_spectral_clustering_cluster(metta: MeTTa):
         )        
         
         ! (np.argmax
-                (np.transpose
-                    (kmeans.assign 
-                        (embeddings) 
-                        (spectral-clustering.cluster (X1) (K1) 0.1 100) 
-                        (K1)
-                    )
+            (np.transpose
+                (kmeans.assign
+                    (embeddings1)
+                    (spectral-clustering.cluster (embeddings1) (K1) 0.1 100)
                 )
-                1            
-        )                
+            )
+            1
+        )
         """
     )[0][0]
+
     labels = result.get_object().value
     ground_truth = np.array([0, 1, 2])
     ari = adjusted_rand_score(ground_truth, labels)
@@ -523,7 +523,7 @@ def test_spectral_clustering_cluster(metta: MeTTa):
         )    
                 
         (=
-            (embeddings)
+            (embeddings2)
             (spectral-clustering.spectral-embeddings
                 (spectral-clustering.eigh
                     (spectral-clustering.normalized-laplacian
@@ -554,9 +554,8 @@ def test_spectral_clustering_cluster(metta: MeTTa):
         ! (np.argmax
                 (np.transpose
                     (kmeans.assign 
-                        (embeddings) 
-                        (spectral-clustering.cluster (X2) (K2) 0.1 100) 
-                        (K2)
+                        (embeddings2) 
+                        (spectral-clustering.cluster (embeddings2) (K2) 0.1 100) 
                     )
                 )
                 1            
@@ -603,3 +602,61 @@ def test_spectral_clustering_fit_and_predict(metta: MeTTa):
     expected_values = np.array([0, 1])
     # Ensure unique_values match the expected values
     assert np.array_equal(unique_values, expected_values), "The unique values in the array are not [0, 1]!"
+
+
+# def test_real_data(metta: MeTTa):
+#     metta.run(
+#         """
+#         ! (import! &self metta_ul:cluster:spectral_clustering)
+#         ! (ul-import sklearn.datasets as dts)
+#         """
+#     )
+#     result: Atom = metta.run(
+#         """
+#         (= (get-cons $n) (match &self (Cons $n $y) $y))
+#         (Cons seed 30)
+#         (Cons random_state 170)
+#         (Cons n_samples 1000)
+#         (Param default (Cons n_clusters 3))
+#         (=
+#             (data)
+#             (dts.make_circles (n_samples (get-cons n_samples)) (factor 0.5) (noise 0.05) (random_state (get-cons seed)))
+#         )
+#         (=
+#             (get-X ($X $y))
+#             $X
+#         )
+#         (=
+#             (get-y ($X $y))
+#             $y
+#         )
+#         ! (data)
+#         """
+#     )[0][0]
+#     X = result.get_children()[0].get_object().content
+#     y_true = result.get_children()[1].get_object().content
+#     result: Atom = metta.run(
+#         """
+#         (=
+#             (fit-outputs)
+#             (spectral-clustering.fit (get-X (data)) 2)
+#         )
+#
+#         ! (spectral-clustering.predict (fit-outputs) 2)
+#         """
+#     )[0][0]
+#     y_pred = result.get_object().content
+#     ari = adjusted_rand_score(y_true, y_pred)
+#     import seaborn as sns
+#     import matplotlib.pyplot as plt
+#
+#     # Create a scatter plot using X (2D data) and color points by cluster labels (y_pred)
+#     plt.figure(figsize=(10, 8))
+#     sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=y_pred, palette='viridis', s=50, alpha=0.8)
+#     plt.title('Spectral Clustering Results')
+#     plt.xlabel('Feature 1')
+#     plt.ylabel('Feature 2')
+#     plt.legend(title='Cluster')
+#     plt.tight_layout()
+#     plt.show()
+

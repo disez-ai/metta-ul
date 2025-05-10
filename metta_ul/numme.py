@@ -222,6 +222,7 @@ def numme_atoms():
     nmAssertAllClose = G(PatternOperation("np.assertAllClose", _assert_allclose, unwrap=False))
 
     pyNone = ValueAtom(None)
+    pyTrue = ValueAtom(True)
     pyPINF = ValueAtom(float('inf'))
 
     atomPi = ValueAtom(np.pi)
@@ -275,6 +276,7 @@ def numme_atoms():
         "np.allclose": nmAllClose,
         "np.assertAllClose": nmAssertAllClose,
         "py.none": pyNone,
+        "py.true": pyTrue,
         "py.pinf": pyPINF,
         "math.pi": atomPi,
     }
