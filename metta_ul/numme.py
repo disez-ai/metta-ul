@@ -220,6 +220,9 @@ def numme_atoms():
     nmConcat = G(PatternOperation("np.concat", wrapnpop(np.concat), unwrap=False))
     nmAllClose = G(PatternOperation("np.allclose", wrapnpop(np.allclose), unwrap=False))
     nmAssertAllClose = G(PatternOperation("np.assertAllClose", _assert_allclose, unwrap=False))
+    nmAbs = G(PatternOperation("np.abs", wrapnpop(np.abs), unwrap=False))
+    nmIsnan = G(PatternOperation("np.isnan", wrapnpop(np.isnan), unwrap=False))
+    nmUnique = G(PatternOperation("np.unique", wrapnpop(np.unique), unwrap=False))
 
     pyNone = ValueAtom(None)
     pyTrue = ValueAtom(True)
@@ -279,4 +282,7 @@ def numme_atoms():
         "py.true": pyTrue,
         "py.pinf": pyPINF,
         "math.pi": atomPi,
+        "np.abs": nmAbs,
+        "np.isnan": nmIsnan,
+        "np.unique": nmUnique
     }
