@@ -8,6 +8,7 @@
 ! (ul-from sklearn.preprocessing import StandardScaler)
 ! (ul-import matplotlib.pyplot as plt)
 ! (ul-import sklearn.metrics as metrics)
+! (ul-from numpy.random import RandomState)
 
 
 ;time functions
@@ -80,7 +81,14 @@
     ) $c2)
 )
 
-
+(= (make-aniso) 
+  (let* (
+    (($X $Y) (dts.make_blobs (n_samples (get-cons n_samples)) (random_state (get-cons random_state))))
+    ($transformation (np.array ((0.6 -0.6) (-0.4 0.8))))
+    ($X-aniso (np.dot $X $transformation))
+  )
+  ($X-aniso $Y))
+)
 
 (Cons seed 30)
 (Cons random_state 170)
@@ -88,7 +96,7 @@
 (Param default (Cons n_clusters 3))
 
 (ToyData noisy_circles
- (dts.make_circles (n_samples (get-cons n_samples)) (factor 0.5) (noise 0.05) (random_state (get-cons seed))))
+  (dts.make_circles (n_samples (get-cons n_samples)) (factor 0.5) (noise 0.05) (random_state (get-cons seed))))
 (Param noisy_circles (Cons n_clusters 2)) 
 
 (ToyData noisy_moon (dts.make_moons (n_samples (get-cons n_samples)) (noise 0.05) (random_state (get-cons seed))))
@@ -98,6 +106,9 @@
 
 (ToyData varied (dts.make_blobs (n_samples (get-cons n_samples)) (cluster_std (py-list (1.0 2.5 0.5))) (random_state (get-cons random_state))))
 
+(ToyData aniso (make-aniso))
+
+(ToyData no-structure ((RandomState.rand (RandomState (get-cons random_state)) (get-cons n_samples) 2) ()))
 (= (normalize $x) (StandardScaler.fit_transform (StandardScaler) $x))
 
 (= (cal-intrinsic-metrics $data $labels)
@@ -111,13 +122,15 @@
 )
 
 (= (cal-extrinsic-metrics $ty $labels)
-  (let* 
-  (
-    ($ari (metrics.adjusted_rand_score $ty $labels))
-    ($nmi (metrics.normalized_mutual_info_score $ty $labels))
-    ($ami (metrics.adjusted_mutual_info_score $ty $labels))
-  )
-  ($ari $nmi $ami)
+  (if (== $ty ()) (0 0 0)
+    (let* 
+    (
+      ($ari (metrics.adjusted_rand_score $ty $labels))
+      ($nmi (metrics.normalized_mutual_info_score $ty $labels))
+      ($ami (metrics.adjusted_mutual_info_score $ty $labels))
+    )
+    ($ari $nmi $ami)
+    )
   )
 )
 
