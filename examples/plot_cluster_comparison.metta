@@ -1,13 +1,12 @@
 ! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:kmeans)
 ! (import! &self metta_ul:cluster:gmm)
-;! (import! &self metta_ul:cluster:agglomerative)
-; ! (import! &self metta_ul:cluster:spectral_clustering)
-; ! (import! &self metta_ul:cluster:bisecting_kmeans)
+! (import! &self metta_ul:cluster:agglomerative)
+! (import! &self metta_ul:cluster:spectral_clustering)
+! (import! &self metta_ul:cluster:bisecting_kmeans)
 ! (ul-import sklearn.datasets as dts)
 ! (ul-from sklearn.preprocessing import StandardScaler)
 ! (ul-import matplotlib.pyplot as plt)
-! (ul-from numpy import ndarray)
 ! (ul-import sklearn.metrics as metrics)
 
 
@@ -126,48 +125,46 @@
   (let* (
     (() (println! ("start kmeans on " $dn "data type" (get-type $ds))))
     (($model $t1) (timeit (quote (kmeans $ds (get-param $dn n_clusters) 100))))
-    (() (println! ("model created" $t1)))
     (($labels $t2) (timeit (quote (kmeans.predict $ds $model))))
-    (() (println! ("kmeans done on " $dn $t2 )))
+    (() (println! ("kmeans done on " $dn take (+ $t1 $t2))))
   ) ($labels "Kmeans" (+ $t1 $t2)))
 )
 
 
-; (= (fit-predict $dn $ds) 
-;   (let* (
-;     (() (println! ("start GMM on " $dn "data type" (get-type $ds))))
-;     ($model (gmm $ds (get-param $dn n_clusters)))
-;     ($labels (gmm.predict $ds $model))
-;     (() (println! ("GMM done on " $dn)))
-;   ) ($labels "GMM"))
-; )
+(= (fit-predict $dn $ds) 
+  (let* (
+    (() (println! ("start GMM on " $dn "data type" (get-type $ds))))
+    (($model $t1) (timeit (quote (gmm $ds (get-param $dn n_clusters)))))
+    (($labels $t2) (timeit (quote (gmm.predict $ds $model))))
+    (() (println! ("GMM done on " $dn take (+ $t1 $t2))))
+  ) ($labels "GMM" (+ $t1 $t2)))
+)
 
-; (= (fit-predict $dn $ds) 
-;   (let* (
-;     (() (println! ("start bisecting on " $dn "data type" (get-type $ds) (get-param $dn n_clusters))))
-;     ($model (bisecting-kmeans.fit $ds (get-param $dn n_clusters) 10))
-;     (() (println! ("bisecting fit on " $model)))
-;     ($labels (bisecting-kmeans.predict $ds $model))
-;     (() (println! ("bisecting done on " $labels)))
-;   ) ($labels "bisecting"))
-; )
+(= (fit-predict $dn $ds) 
+  (let* (
+    (() (println! ("start bisecting on " $dn "data type" (get-type $ds) (get-param $dn n_clusters))))
+    (($model $t1) (timeit (quote (bisecting-kmeans.fit $ds (get-param $dn n_clusters) 10))))
+    (($labels $t2) (timeit (quote (bisecting-kmeans.predict $ds $model))))
+    (() (println! ("bisecting done on " $dn take (+ $t1 $t2))))
+  ) ($labels "bisecting" (+ $t1 $t2)))
+)
 
-; (= (fit-predict $dn $ds) 
-;   (let* (
-;     (() (println! ("start spectral-clustering on " $dn "data type" (get-type $ds))))
-;     ($model (spectral-clustering.fit $ds (get-param $dn n_clusters)))
-;     (() (println! ("fitted" $dn)))
-;     ($labels (spectral-clustering.predict $model (get-param $dn n_clusters)))
-;     (() (println! ("spectral-clustering done on " $dn)))
-;   ) ($labels "SpectralClustering"))
-; )
+(= (fit-predict $dn $ds) 
+  (let* (
+    (() (println! ("start spectral-clustering on " $dn "data type" (get-type $ds))))
+    (($model $t1) (timeit (quote (spectral-clustering.fit $ds (get-param $dn n_clusters)))))
+    (() (println! ("fitted" $dn)))
+    (($labels $t2) (timeit (quote (spectral-clustering.predict $model (get-param $dn n_clusters)))))
+    (() (println! ("spectral-clustering done on " $dn take (+ $t1 $t2))))
+  ) ($labels "SpectralClustering" (+ $t1 $t2)))
+)
 
 ; (= (fit-predict $dn $ds) 
 ;   (let* (
 ;     (() (println! ("start Agglomerative on " $dn "data type" (get-type $ds) "n_cluster" (get-param $dn n_clusters))))
-;     ($labels (ndarray.astype (agglomerative.fit-predict $ds (get-param $dn n_clusters) "single") int))
+;     (($labels $t) (timeit (quote (agglomerative.fit-predict $ds (get-param $dn n_clusters) "single"))))
 ;     (() (println! ("Agglomerative done on " $dn $labels)))
-;   ) ($labels "NEW"))
+;   ) ($labels "Agglomerative" $t))
 ; )
 
 
