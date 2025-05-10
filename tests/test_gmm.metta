@@ -1,5 +1,4 @@
 ! (import! &self metta_ul:cluster:gmm)
-! (np.random.seed 1)
 
 (=
     (X)
@@ -83,6 +82,7 @@
 ;; Test gmm.init
 (=
     (gmm.init.test)
+    (let $_ (np.random.seed 1)
     (let ($weights $means $covariances) (gmm.init (np.array (X)) 2)
         (assertEqual
             (
@@ -95,7 +95,7 @@
             )
             (() () ())
         )
-    )
+    ))
 )
 (Test gmm.init.test)
 
@@ -165,6 +165,7 @@
 ;; Test gmm
 (=
     (gmm.test)
+    (let $_ (np.random.seed 1)
     (let ($weights $means $covariances) (gmm (np.array (X)) 2 1)
         (assertEqual
             (
@@ -177,6 +178,6 @@
             )
             (() () ())
         )
-    )
+    ))
 )
 (Test gmm.test)
