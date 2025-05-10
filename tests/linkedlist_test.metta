@@ -1,5 +1,5 @@
 ! (import! &self metta_ul:linkedlist)
-! (import! &self metta_ul:numme)
+! (import! &self metta_ul)
 
 (=
     (list)
