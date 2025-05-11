@@ -1,5 +1,4 @@
 ! (import! &self metta_ul:cluster:kmeans)
-! (np.random.seed 1)
 
 (=
     (X)
@@ -58,9 +57,10 @@
 ;; Test kmeans
 (=
     (kmeans.test)
+    (let $_ (np.random.seed 1)
     (np.assertAllClose
         (kmeans (np.array (X)) 2)
         (np.array (centroids))
-    )
+    ))
 )
 (Test kmeans.test)

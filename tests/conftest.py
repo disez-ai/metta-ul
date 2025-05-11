@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import pytest
 from hyperon import MeTTa, E
 
@@ -7,9 +9,10 @@ def metta():
     return MeTTa()
 
 
-def pytest_collect_file(parent, path):
-    if path.ext == ".metta" and path.basename.startswith("test_"):
-        return MeTTaFile.from_parent(parent, fspath=path)
+def pytest_collect_file(parent, file_path: Path):
+    file_name, file_ext = os.path.splitext(file_path.name)
+    if file_ext == ".metta" and file_name.startswith("test_"):
+        return MeTTaFile.from_parent(parent, path=file_path)
 
 
 def run_metta_test(metta, test_expr):
@@ -21,7 +24,7 @@ class MeTTaFile(pytest.File):
     def collect(self):
         metta = MeTTa()
 
-        metta.run(self.fspath.read_text(encoding="utf-8"))
+        metta.run(self.path.read_text())
 
         # Read file and find (Test "name" function) forms
         tests = metta.run('! (match &self (Test $test-function) $test-function)')[0]
@@ -51,7 +54,7 @@ class MeTTaTest(pytest.Item):
         return super().repr_failure(excinfo)
 
     def reportinfo(self):
-        return self.fspath, 0, f"metta test: {self.name}"
+        return self.path, None, self.name
 
 class MeTTaTestFailure(Exception):
     pass
