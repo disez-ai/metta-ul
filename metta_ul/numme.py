@@ -107,6 +107,15 @@ def _slice(*args):
     return arr[slice_str]
 
 
+def _assert_isNone(actual: GroundedAtom):
+    try:
+        if actual.get_object().value is None:
+            return [E()]
+        return [E(S("Error"), E(S("py.assertIsNone"), actual, None), S(f"\nExpected None\nGot: {actual}\nMissed results: None\nExcessive results: {actual}"))]
+    except Exception as e:
+        return [E(S("Error"), E(S("py.assertIsNone"), actual, None), S(str(e)))]
+
+
 def _assert_allclose(actual: GroundedAtom, expected: GroundedAtom, rtol=ValueAtom(1e-05), atol=ValueAtom(1e-08), equal_nan=ValueAtom(False)):
     try:
         if np.allclose(actual.get_object().value, expected.get_object().value, rtol.get_object().value, atol.get_object().value, equal_nan.get_object().value):
@@ -223,10 +232,13 @@ def numme_atoms():
     nmAbs = G(PatternOperation("np.abs", wrapnpop(np.abs), unwrap=False))
     nmIsnan = G(PatternOperation("np.isnan", wrapnpop(np.isnan), unwrap=False))
     nmUnique = G(PatternOperation("np.unique", wrapnpop(np.unique), unwrap=False))
+    nmAssertIsNone = G(PatternOperation("py.assertIsNone", _assert_isNone, unwrap=False))
+    nmSort = G(PatternOperation("np.sort", wrapnpop(np.sort), unwrap=False))
 
     pyNone = ValueAtom(None)
     pyTrue = ValueAtom(True)
     pyPINF = ValueAtom(float('inf'))
+    nmTrue = G(PatternOperation("np.True_", wrapnpop(np.True_), unwrap=False))
 
     atomPi = ValueAtom(np.pi)
 
@@ -284,5 +296,8 @@ def numme_atoms():
         "math.pi": atomPi,
         "np.abs": nmAbs,
         "np.isnan": nmIsnan,
-        "np.unique": nmUnique
+        "np.unique": nmUnique,
+        "np.True_": nmTrue,
+        "py.assertIsNone": nmAssertIsNone,
+        "np.sort": nmSort
     }
