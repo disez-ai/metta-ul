@@ -1,13 +1,13 @@
 ! (import! &self metta_ul)
 ! (ul-import pandas as pd)
-! (ul-from pandas import DataFrame)
+;! (ul-from pandas import DataFrame)
 ! (ul-from sklearn.preprocessing import normalize)
 
 ! (bind! &df (pd.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
 
-! (assertEqual (get-type &df) PDDataFrame)
+! (assertEqual (get-type &df) PyDataFrame)
 
-! (bind! &norm (pdm.values &df))
+! (bind! &norm (pd.DataFrame.values &df))
 
 ! (assertEqual (get-type &norm) (NPArray (20640 2)))
 

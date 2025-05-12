@@ -7,16 +7,15 @@
 
 ! (import.df &df House)
 
-! (bind! &asd (match &self (House $id $expr) $id))
-! (assertEqual (get-type &asd) Number)
+! (match &self (House 1 ((longitude $x) (latitude $y))) (assertEqual (get-type $x) Number))
 
-!(bind! &data (np.array (collapse (match &self (House $id ((longitude $x) (latitude $y))) ($id $x $y)))))
+! (bind! &data (np.array (collapse (match &self (House $id ((longitude $x) (latitude $y))) ($id $x $y)))))
 ! (bind! &model (gmm (np.slice &data [:,1:]) 3))
 ! (bind! &labels (gmm.predict (np.slice &data [:,1:]) &model))
 ! (cons-labels &data &labels ClusterLabel)
-
-
-
-! (bind! &res (match &self (ClusterLabel $id $label) $id))
+;
+;
+;
+! (bind! &res (match &self (ClusterLabel 0 $label) $label))
 ! (assertEqual (get-type &res) Number)
 
