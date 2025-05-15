@@ -20,6 +20,15 @@
     (+ 1 (length $xs))
 )
 
+(=
+    (len ())
+    0
+)
+(=
+    (len (:: $x $xs))
+    (+ 1 (len $xs))
+)
+
 (: get-first (-> ClusterList Cluster))
 (=
     (get-first (:: $x $y))

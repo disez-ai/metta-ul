@@ -13,9 +13,9 @@ authors = [
 ]
 description = "Basic implementation of clustering algorithms in MeTTa language, including k-means, GMM, spectral clustering, and hierarchical"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
-    "hyperon>=0.2.2",
+    "hyperon",
     "scikit-learn",
     "pandas",
     "seaborn",

@@ -34,6 +34,7 @@ def import_as_atom(metta):
 
 def makeLabels(metta):
     def wrapper(data, labels, name):
+
         r = []
         for i, val in enumerate(data.get_object().value):
             a = E(S(name.get_name()), ValueAtom(int(val)), ValueAtom(int(labels.get_object().value[i])))

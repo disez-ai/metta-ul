@@ -12,21 +12,17 @@
 
 ! (import.df &df House)
 
-;! (match &self (House 0 $expr) (assertEqual (get-type $expr) ((longitude Number) (latitude Number))))
 
-;! (assertEqualToResult () ())
-! (bind! &data (make-df (collapse (match &self (House $id $expr) ($id $expr)))))
+! (match &self (House 1 ((longitude $x) (latitude $y))) (assertEqual (get-type $x) Number))
 
-! (bind! &model (kmeans (DataFrame.values &data) 3))
-! (bind! &labels (kmeans.predict (DataFrame.values &data) &model))
-
-! (cons-labels (DataFrame.values (DataFrame.index &data)) &labels ClusterLabelHouse)
-
-
-
-; ! (bind! &res (match &self (ClusterLabelHouse $id $label) $id))
-; ! (assertEqual (get-type &res) Number)
-
-; !(match &self (,(House $id $expr) (ClusterLabelHouse $id 0)) (assertEqual (get-type (kv-values $expr)) ((Number Number))))
+! (bind! &data (np.array (collapse (match &self (House $id ((longitude $x) (latitude $y))) ($id $x $y)))))
+! (bind! &model (gmm (np.slice &data [:,1:]) 3))
+! (bind! &labels (gmm.predict (np.slice &data [:,1:]) &model))
+! (cons-labels &data &labels ClusterLabel)
+;
+;
+;
+! (bind! &res (match &self (ClusterLabel 0 $label) $label))
+! (assertEqual (get-type &res) Number)
 
 ; !(println!  "Done")
