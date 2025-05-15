@@ -1,11 +1,17 @@
-! (import! &self metta_ul)
-! (import! &self metta_ul:cluster:gmm)
+ ! (import! &self metta_ul)
+! (import! &self metta_ul:cluster:kmeans)
+! (import! &self metta_ul:helper)
+! (ul-from pandas import DataFrame)
+
+
+! (assertEqual (kv-values ((k1 1) (k2 2))) (1 2))
 
 ! (ul-import pandas as pd)
 
 ! (bind! &df (pd.read_csv "tests/housing.csv" (nrows 100) (usecols (py-list ("longitude" "latitude")))))
 
 ! (import.df &df House)
+
 
 ! (match &self (House 1 ((longitude $x) (latitude $y))) (assertEqual (get-type $x) Number))
 
@@ -19,3 +25,4 @@
 ! (bind! &res (match &self (ClusterLabel 0 $label) $label))
 ! (assertEqual (get-type &res) Number)
 
+; !(println!  "Done")
