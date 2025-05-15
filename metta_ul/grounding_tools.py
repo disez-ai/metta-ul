@@ -62,7 +62,7 @@ def _is_user_defined_object(obj):
 def class_atom_type(cls):
     if not _is_user_defined_object(cls): 
         return None
-    return cls.__class__.__name__
+    return "Py" + cls.__class__.__name__
 
 def escape_dots(s: str) -> str:
     return s.replace('.', r'\.')
@@ -139,12 +139,13 @@ def ground_module_atoms(module, gname = None):
         if name.startswith('_'):
             continue
 
-        if callable(mem):
-            for item in ground_function_atom(mem, f"{gname}.{name}"):
-                yield item
-        else:
+        if isinstance(mem,type):
             for item in ground_object_atoms(mem, f"{gname}.{name}"):
                 yield item
+        elif callable(mem):
+            for item in ground_function_atom(mem, f"{gname}.{name}"):
+                yield item
+
 
 
 

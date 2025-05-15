@@ -33,7 +33,7 @@ def makeLabels(metta):
     def wrapper(data, labels, name):
         i = 0
         for val in data.get_object().value:
-            a = E(S(name.get_name()), ValueAtom(val[0]), ValueAtom(labels.get_object().value[i]))
+            a = E(S(name.get_name()), ValueAtom(val[0]), ValueAtom(int(labels.get_object().value[i])))
             metta.space().add_atom(a)
         return [Atoms.UNIT]
     return wrapper
