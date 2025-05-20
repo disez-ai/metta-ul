@@ -51,7 +51,7 @@ The MeTTa KMeans implementation uses a purely declarative, recursive style to ex
    The functions `assign` and `update` are composed in a recursion. Each recursive call passes the newly updated centroids to the next iteration.  
    - **Time Complexity (worst-case):** O(max_iter · n · k · d).  
    - **Time Complexity (average-case):** O(m · n · k · d), where m is the iteration count until tolerance is reached (m ≤ max_iter).  
-   - **Memory Overhead:** O(n·k + k·d + n·d); recursion uses tail‑call optimization, so stack does not grow.
+   - **Memory Overhead:** O(n·k + k·d + n·d); recursion can use tail‑call optimization, so stack does not grow.
 
 5. **Model Fit & Predict**  
    - `kmeans.fit(X, k, max_iter, tol)` performs recursion and returns centroids.  
@@ -102,10 +102,7 @@ This snippet:
 3. Prints cluster labels.
 
 ## Limitations & Future Work
-- **Recursion overhead:** fixed‑depth recursion incurs function-call costs.  
-- **Initialization:** add k‑means++ seeding to improve convergence.  
-- **Parallel recursion:** leverage MeTTa’s future runtime features for parallelism.  
-- **Adaptive stopping:** monitor centroid movement for early exit.
+- **Initialization:** add k‑means++ seeding to improve convergence.
 
 ## Conclusion
 This implementation verifies that MeTTa can express core ML algorithms declaratively. While performance lags optimized C libraries, the clarity and extensibility in MeTTa pave the way for further ML primitives in the language.
