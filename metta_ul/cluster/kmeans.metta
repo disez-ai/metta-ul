@@ -37,41 +37,37 @@
 )
 
 
-(: kmeans.recursion (-> (NPArray ($n $d)) (NPArray ($k $d)) Number (NPArray ($k $d))))
+(: kmeans.recursion (-> (NPArray ($n $d)) (NPArray ($k $d)) Number Number (NPArray ($k $d))))
 (= 
-    (kmeans.recursion $X $centroids $max-iter)
-    (if (> $max-iter 0)
-        (kmeans.recursion
-            $X
-            (kmeans.update
+    (kmeans.recursion $X $centroids $max-iter $tol)
+    (let $new-centroids (kmeans.update $X (kmeans.assign $X $centroids))
+        (if (and (> $max-iter 0) (< $tol (np.max (np.abs (np.sub $new-centroids $centroids)))))
+            (kmeans.recursion
                 $X
-                (kmeans.assign $X $centroids)
+                $new-centroids
+                (- $max-iter 1)
+                $tol
             )
-            (- $max-iter 1)
+            $centroids
         )
-        $centroids
     )
 )
-(: kmeans (-> (NPArray ($n $d)) Number (NPArray ($k $d))))
+
+(: kmeans.fit (-> (NPArray ($n $d)) Number (NPArray ($k $d))))
 (=
-    (kmeans $X $k)
-    (kmeans $X $k 100)
+    (kmeans.fit $X $k)
+    (kmeans.fit $X $k 100 0.0001)
 )
 
-
-(: kmeans (-> (NPArray ($n $d)) Number Number (NPArray ($k $d))))
+(: kmeans.fit (-> (NPArray ($n $d)) Number Number Number (NPArray ($k $d))))
 (=
-    (kmeans $X $k $max-iter)
-    (kmeans.recursion $X (np.choose $X $k) $max-iter)
+    (kmeans.fit $X $k $max-iter $tol) 
+    (kmeans.recursion $X (np.choose $X $k) $max-iter $tol)
 )
 
+(: kmeans.predict (-> (NPArray ($n $d)) (NPArray ($k $d)) (NPArray ($n))))
 (=
-    (kmeans.fit $X $k $max-iter) 
-    (kmeans $X $k $max-iter)
-)
-
-(=
-  (kmeans.predict $X $centers)
+    (kmeans.predict $X $centers)
     (np.argmax (kmeans.assign $X $centers) 0)
 )
 

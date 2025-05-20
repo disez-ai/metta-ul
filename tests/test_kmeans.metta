@@ -2,17 +2,17 @@
 
 (=
     (X)
-    ((1 0) (0 1))
+    ((1.0 0.0) (0.0 1.0))
 )
 
 (=
     (assignments)
-    ((1 0) (0 1))
+    ((1.0 0.0) (0.0 1.0))
 )
 
 (=
     (centroids)
-    ((1 0) (0 1))
+    ((1.0 0.0) (0.0 1.0))
 )
 
 ;; Test kmeans.update
@@ -39,7 +39,7 @@
 (=
     (kmeans.recursion.testNoRecursion)
     (np.assertAllClose
-        (kmeans.recursion (np.array (X)) (np.array (centroids)) 0)
+        (kmeans.recursion (np.array (X)) (np.array (centroids)) 0 0.0001)
         (np.array (centroids))
     )
 )
@@ -48,19 +48,29 @@
 (=
     (kmeans.recursion.testOneRecursion)
     (np.assertAllClose
-        (kmeans.recursion (np.array (X)) (np.array (centroids)) 1)
+        (kmeans.recursion (np.array (X)) (np.array (centroids)) 1 0.0001)
         (np.array (centroids))
     )
 )
 (Test kmeans.recursion.testOneRecursion)
 
-;; Test kmeans
+;; Test kmeans.fit
 (=
-    (kmeans.test)
+    (kmeans.fit.test)
     (let $_ (np.random.seed 1)
     (np.assertAllClose
-        (kmeans (np.array (X)) 2)
+        (kmeans.fit (np.array (X)) 2)
         (np.array (centroids))
     ))
 )
-(Test kmeans.test)
+(Test kmeans.fit.test)
+
+;; Test kmeans.predict
+(=
+    (kmeans.predict.test)
+    (np.assertAllClose
+        (kmeans.predict (np.array (X)) (np.array (centroids)))
+        (np.array (0 1))
+    )
+)
+(Test kmeans.predict.test)
