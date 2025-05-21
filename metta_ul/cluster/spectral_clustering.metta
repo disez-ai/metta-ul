@@ -174,10 +174,11 @@
 (: spectral-clustering.cluster (-> (NPArray ($N $D)) Number Number Number (NPArray ($K $D))))
 (=
     (spectral-clustering.cluster $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter)
-    (kmeans
+    (kmeans.fit
         $X
         $num-clusters
         $max-kmeans-iter
+        0.0001
     )
 )
 
