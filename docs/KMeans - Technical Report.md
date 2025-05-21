@@ -3,7 +3,6 @@
 **Author:** Ramin Barati, Amirhossein Nouranizadeh, Farhoud Mojahedzadeh  
 **Date:** May 19, 2025  
 **Version:** 1.0  
-**Repository:** [github.com/username/metta-kmeans](https://github.com/SNetGrant/metta-ul)
 
 ---
 

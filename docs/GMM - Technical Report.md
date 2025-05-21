@@ -1,9 +1,8 @@
 # Gaussian Mixture Model (GMM) Clustering in MeTTa
 
-**Author:** Ramin Barati  
+**Author:** Ramin Barati, Amirhossein Nouranizadeh, Farhoud Mojahedzedeh  
 **Date:** May 21, 2025  
-**Version:** 1.0  
-**Repository:** [github.com/username/metta-gmm](https://github.com/username/metta-gmm)
+**Version:** 1.0
 
 ---
 
