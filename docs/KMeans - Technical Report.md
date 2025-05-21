@@ -25,7 +25,7 @@ KMeans seeks to minimize
 J = \sum_{i=1}^{k} \sum_{x\in C_i} \|x - \mu_i\|^2
 ```
 
-where $\mu_i$ are centroids. We use Euclidean distance and a fixed maximum of 100 recursive iterations in MeTTa. Recursion replaces loops due to MeTTa’s execution model.
+where $\mu_i$ are centroids. We use Euclidean distance and continue untill either a fixed maximum of recursive iterations is reached or the change in cluster centers is less than some value in MeTTa. Recursion replaces loops due to MeTTa’s execution model.
 
 
 ## MeTTa Implementation Details
