@@ -160,9 +160,9 @@
     )
 )
 
-(: gmm (-> (NPArray ($n $d)) Number Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
+(: gmm.fit (-> (NPArray ($n $d)) Number Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
-    (gmm $X $k $max-iter)
+    (gmm.fit $X $k $max-iter)
     (gmm.recursion
         $X
         (gmm.init $X $k)
@@ -170,11 +170,11 @@
     )
 )
 
-(: gmm (-> (NPArray ($n $d)) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
+(: gmm.fit (-> (NPArray ($n $d)) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
-    (gmm $X $k)
-    (gmm $X $k 100)
+    (gmm.fit $X $k)
+    (gmm.fit $X $k 100)
 )
 
-
-(= (gmm.predict $x ($w  $m $S)) (np.argmax (gmm.e-step $x $w $m $S) 1) )
+(: gmm.predict (-> (NPArray ($n $d)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d))) (NPArray ($n))))
+(= (gmm.predict $x ($w $m $S)) (np.argmax (gmm.e-step $x $w $m $S) 1))

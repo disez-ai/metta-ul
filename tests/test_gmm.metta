@@ -162,11 +162,11 @@
 )
 (Test gmm.recursion.testOneRecursion)
 
-;; Test gmm
+;; Test gmm.fit
 (=
-    (gmm.test)
+    (gmm.fit.test)
     (let $_ (np.random.seed 1)
-    (let ($weights $means $covariances) (gmm (np.array (X)) 2 1)
+    (let ($weights $means $covariances) (gmm.fit (np.array (X)) 2 1)
         (assertEqual
             (
                 (np.assertAllClose $weights (np.array (weights)))
@@ -180,4 +180,4 @@
         )
     ))
 )
-(Test gmm.test)
+(Test gmm.fit.test)
