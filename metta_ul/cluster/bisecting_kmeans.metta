@@ -231,7 +231,7 @@
     (let
         ; compute the clusters
         $centers
-        (kmeans (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0) 2)
+        (kmeans.fit (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0) 2)
 
         ; output tuple
         (::
