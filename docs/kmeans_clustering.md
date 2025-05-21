@@ -58,7 +58,7 @@ Recursively updates the centroids until the maximum number of iterations is reac
 
 ---
 
-### `kmeans`
+### `kmeans.fit`
 
 #### Description:
 Main function to perform K-Means clustering. It initializes centroids randomly and iteratively updates them.
@@ -70,28 +70,47 @@ Main function to perform K-Means clustering. It initializes centroids randomly a
     - Type: `Number`
 - `$max-iter` (optional, default: 100): Maximum number of iterations.
     - Type: `Number`
+- `$tol` (optional, default: 0.0001): Tolerance on the shift of the centroids.
+    - Type: `Number`
 
 #### Returns:
 - Final cluster centroids after completion of the algorithm.
     - Type: `(NPArray ($k $d))`
+
+---
+
+### `kmeans.predict`
+
+#### Description:
+Main function for predicting the labels of some test data after learning the centroids from the training data. It computes the assignments and then return the positions of the maximum assignments as the labels.
+
+#### Parameters:
+- `$X`: Data points as a matrix.
+    - Type: `(NPArray ($n $k))`
+- `$centroids`: The position of centroids of the clusters.
+    - Type: `(NPArray ($k $d))`
+
+#### Returns:
+- predicted labels.
+    - Type: `(NPArray ($n))`
 
 ## Usage
 To cluster a dataset `S` of type `(NPArray (n, d))` into 3 clusters with default settings:
 ```metta
 (=
     (centroids)
-    (kmeans (S) 3)
+    (kmeans.fit (S) 3)
 )
 ```
-To specify a maximum number of 50 iterations:
+To specify a maximum number of 50 iterations and a tolerance of 0.001:
 ```metta
-(kmeans (S) 3 50)
+(kmeans (S) 3 50 0.001)
 ```
-To assign a dataset `X` of type `(NPArray (m, d))` using `centroids`:
+To predict the labels of a dataset `X` of type `(NPArray (m, d))` using `centroids`:
 ```
 (=
     (assignments)
-    (kmeans.assign (X) (centroids) 3)
+    (kmeans.predict (X) (centroids))
 )
 ```
 
