@@ -70,6 +70,3 @@
     (kmeans.predict $X $centers)
     (np.argmax (kmeans.assign $X $centers) 0)
 )
-
-
-
