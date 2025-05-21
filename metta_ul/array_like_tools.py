@@ -1,4 +1,3 @@
-
 def parse_to_slice(input_str):
     """
     Parses a string representing numpy indexing and returns the corresponding NumPy array slice.

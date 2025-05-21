@@ -1,5 +1,5 @@
 import inspect
-from hyperon.atoms import E,S,G, OperationAtom, ValueAtom,NoReduceError
+from hyperon.atoms import E, S, G, OperationAtom, ValueAtom, NoReduceError
 from hyperon.ext import register_atoms
 
 from sklearn.preprocessing import normalize, StandardScaler
@@ -20,6 +20,7 @@ def va_wrapnpop(func, dtype="PCA"):
         a, k = unwrap_args(args)
         res = func(*a, **k)
         return [ValueAtom(res, dtype)]
+
     return wrapper
 
 
@@ -30,6 +31,7 @@ def method_wrapnpop(func_name, npop):
         func = npop(method)
         res = func(*args[1:])
         return res
+
     return wrapper
 
 
@@ -41,18 +43,18 @@ def dataset_wrapnpop(func):
             return [_tuple_to_Expr(res)]
         else:
             return [_atom_value(res)]
+
     return wrapper
+
 
 def map_dataset_atoms():
     dataset_functions = inspect.getmembers(sklearn.datasets, inspect.isfunction)
     mapping = {}
-    for name,  func in dataset_functions:
+    for name, func in dataset_functions:
         if name.startswith("load_") or name.startswith("make_"):
             func_name = f"skl.datasets.{name}"
             func = dataset_wrapnpop(func)
-            skl_dataset = OperationAtom(
-                    func_name, func, unwrap=False
-            )
+            skl_dataset = OperationAtom(func_name, func, unwrap=False)
             mapping[rf"skl\.datasets\.{name}"] = skl_dataset
     return mapping
 
@@ -60,18 +62,25 @@ def map_dataset_atoms():
 @register_atoms
 def skl_atoms():
 
-    skl_pca = OperationAtom("skl.decomposition.PCA",
-                            va_wrapnpop(PCA, "PCA"), unwrap=False)
+    skl_pca = OperationAtom(
+        "skl.decomposition.PCA", va_wrapnpop(PCA, "PCA"), unwrap=False
+    )
     skl_pca_fit = OperationAtom(
-        "skl.decomposition.PCA.fit", lambda *args: ValueAtom(args[0].fit(args[1]), "PCA"))
+        "skl.decomposition.PCA.fit",
+        lambda *args: ValueAtom(args[0].fit(args[1]), "PCA"),
+    )
 
     slk_pca_fit_transform = OperationAtom(
-        "skl.decomposition.PCA.fit_transform", method_wrapnpop("fit_transform", wrapnpop), unwrap=False
-    ) 
+        "skl.decomposition.PCA.fit_transform",
+        method_wrapnpop("fit_transform", wrapnpop),
+        unwrap=False,
+    )
 
     slk_scaler_fit_transform = G(
         PatternOperation(
-            "skl.preprocessing.Scaler.fit_transform", wrapnpop(_slk_scaler_fit_transform), unwrap=False
+            "skl.preprocessing.Scaler.fit_transform",
+            wrapnpop(_slk_scaler_fit_transform),
+            unwrap=False,
         )
     )
 
@@ -83,12 +92,11 @@ def skl_atoms():
 
     skl_datasets = map_dataset_atoms()
 
-
     return {
         r"skl\.preprocessing\.normalize": skl_normalize,
         r"skl\.preprocessing\.Scaler\.fit_transform": slk_scaler_fit_transform,
         r"skl\.decomposition\.PCA": skl_pca,
         r"skl\.decomposition\.PCA\.fit": skl_pca_fit,
         r"skl\.decomposition\.PCA\.fit_transform": slk_pca_fit_transform,
-        **skl_datasets
+        **skl_datasets,
     }

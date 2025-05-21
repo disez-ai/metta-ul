@@ -52,7 +52,11 @@ def metta_clusters_to_py_clusters(metta_clusters):
             return
 
         # Remove any SymbolAtom tokens (assumed to be the "::" markers).
-        children = [child for child in cons_node.get_children() if not isinstance(child, SymbolAtom)]
+        children = [
+            child
+            for child in cons_node.get_children()
+            if not isinstance(child, SymbolAtom)
+        ]
         if not children:
             return
 
@@ -279,18 +283,22 @@ def test_compute_initial_cluster(metta: MeTTa):
         """
     )[0][0]
     init_cluster = metta_clusters_to_py_clusters(result)
-    assert len(init_cluster) == 1, f"Expected 1 initial cluster, got {len(init_cluster)}"
+    assert (
+        len(init_cluster) == 1
+    ), f"Expected 1 initial cluster, got {len(init_cluster)}"
 
     init_indices, init_centers, init_sse, init_hierarchy = init_cluster[0]
 
-    data = np.array([[1.0, 2.0],
-                     [3.0, 4.0],
-                     [5.0, 6.0]])
+    data = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
     expected_indices = np.arange(data.shape[0])
-    assert np.array_equal(init_indices, expected_indices), "Initial cluster indices are not correct."
+    assert np.array_equal(
+        init_indices, expected_indices
+    ), "Initial cluster indices are not correct."
 
     expected_center = np.mean(data, axis=0)
-    assert np.allclose(init_centers, expected_center), "Initial cluster center is incorrect."
+    assert np.allclose(
+        init_centers, expected_center
+    ), "Initial cluster center is incorrect."
 
     expected_sse = np.sum((data[expected_indices] - expected_center) ** 2)
     assert np.allclose(init_sse, expected_sse), "Initial SSE is incorrect."
@@ -326,7 +334,9 @@ def test_find_max_cluster(metta: MeTTa):
     max_cluster = [indices, center, sse, hierarchy]
 
     expected_max_cluster = [None, None, 10.0, None]
-    assert max_cluster == expected_max_cluster, f"expected_max_cluster is not the same as max_cluster."
+    assert (
+        max_cluster == expected_max_cluster
+    ), f"expected_max_cluster is not the same as max_cluster."
 
     result: Atom = metta.run(
         """        
@@ -355,7 +365,9 @@ def test_find_max_cluster(metta: MeTTa):
     max_cluster = [indices, center, sse, hierarchy]
 
     expected_max_cluster = [None, None, 20.0, None]
-    assert max_cluster == expected_max_cluster, f"expected_max_cluster is not the same as max_cluster."
+    assert (
+        max_cluster == expected_max_cluster
+    ), f"expected_max_cluster is not the same as max_cluster."
 
 
 def test_remove_cluster(metta: MeTTa):
@@ -465,10 +477,14 @@ def test_bisect_cluster(metta: MeTTa):
     # Check that the union of indices of the children equals the parent's indices.
     union = np.sort(np.concatenate((cluster_0[0], cluster_1[0])))
     expected = np.array([0, 1, 2, 3])
-    assert np.array_equal(union, expected), "Children indices do not partition the parent's indices correctly."
+    assert np.array_equal(
+        union, expected
+    ), "Children indices do not partition the parent's indices correctly."
 
     # Check that the clusters are disjoint.
-    assert np.intersect1d(cluster_0[0], cluster_1[0]).size == 0, "Child clusters are not disjoint."
+    assert (
+        np.intersect1d(cluster_0[0], cluster_1[0]).size == 0
+    ), "Child clusters are not disjoint."
 
 
 def test_append_to_clusters(metta: MeTTa):
@@ -524,7 +540,9 @@ def test_append_to_clusters(metta: MeTTa):
 
     # # Test that the extended list has the original clusters plus the children in order.
     expected = [dummy_cluster_0, dummy_cluster_1, dummy_cluster_2, dummy_cluster_3]
-    assert extended_clusters == expected, f"Expected {expected}, got {extended_clusters}"
+    assert (
+        extended_clusters == expected
+    ), f"Expected {expected}, got {extended_clusters}"
     result: Atom = metta.run(
         """        
         (=
@@ -539,7 +557,9 @@ def test_append_to_clusters(metta: MeTTa):
     cluster_0, cluster_1 = metta_clusters_to_py_clusters(result)
     extended_clusters = [cluster_0, cluster_1]
     expected_empty = [dummy_cluster_0, dummy_cluster_1]
-    assert extended_clusters == expected_empty, f"Expected {expected_empty}, got {extended_clusters}"
+    assert (
+        extended_clusters == expected_empty
+    ), f"Expected {expected_empty}, got {extended_clusters}"
 
     result: Atom = metta.run(
         """                
@@ -551,7 +571,9 @@ def test_append_to_clusters(metta: MeTTa):
     # Edge Case 2: Empty children tuple
     extended_clusters = [cluster_0, cluster_1]
     expected_clusters = [dummy_cluster_0, dummy_cluster_1]
-    assert extended_clusters == expected_clusters, f"Expected {expected_clusters}, got {extended_clusters}"
+    assert (
+        extended_clusters == expected_clusters
+    ), f"Expected {expected_clusters}, got {extended_clusters}"
 
     # Edge Case 3: Both clusters and children are empty
     result: Atom = metta.run(
@@ -602,7 +624,9 @@ def test_append_to_hierarchy(metta: MeTTa):
     hierarchy = parse_hierarchy(result)
     expected_cluster = [[np.array([0]), None, 10.0, None]]
     assert len(hierarchy) == 1, f"Expected hierarchy length 1, got {len(hierarchy)}"
-    assert hierarchy[0] == expected_cluster, "New clusters not appended correctly for empty hierarchy."
+    assert (
+        hierarchy[0] == expected_cluster
+    ), "New clusters not appended correctly for empty hierarchy."
 
     # Test 2: Append to a non-empty hierarchy.
     result: Atom = metta.run(
@@ -664,11 +688,15 @@ def test_append_to_hierarchy(metta: MeTTa):
         """
     )[0][0]
     hierarchy = parse_hierarchy(result)
-    expected_last_cluster = [[np.array([0]), None, 10.0, None],
-                             [np.array([1]), None, 20.0, None],
-                             [np.array([2]), None, 30.0, None]]
+    expected_last_cluster = [
+        [np.array([0]), None, 10.0, None],
+        [np.array([1]), None, 20.0, None],
+        [np.array([2]), None, 30.0, None],
+    ]
     assert len(hierarchy) == 3, f"Expected hierarchy length 3, got {len(hierarchy)}"
-    assert hierarchy[-1] == expected_last_cluster, "New clusters not appended correctly to non-empty hierarchy."
+    assert (
+        hierarchy[-1] == expected_last_cluster
+    ), "New clusters not appended correctly to non-empty hierarchy."
 
 
 def test_bisecting_kmeans(metta: MeTTa):
@@ -788,8 +816,12 @@ def test_bisecting_kmeans_extract_centers(metta: MeTTa):
     centers = extract_cluster_values(result)
 
     assert len(centers) == 2, f"Expected 2 centers, got {len(centers)}"
-    assert np.allclose(centers[0], np.array([1.0, 1.0])), f"Expected center [1.0, 1.0], got {centers[0]}"
-    assert np.allclose(centers[1], np.array([2.0, 2.0])), f"Expected center [2.0, 2.0], got {centers[1]}"
+    assert np.allclose(
+        centers[0], np.array([1.0, 1.0])
+    ), f"Expected center [1.0, 1.0], got {centers[0]}"
+    assert np.allclose(
+        centers[1], np.array([2.0, 2.0])
+    ), f"Expected center [2.0, 2.0], got {centers[1]}"
 
     # Test with empty list
     result: Atom = metta.run("! (bisecting-kmeans.extract-centers ())")[0][0]
@@ -828,7 +860,9 @@ def test_bisecting_kmeans_concat_arrays(metta: MeTTa):
 
     concatenated = result.get_object().value
     expected = np.array([[1.0, 1.0], [2.0, 2.0], [3.0, 3.0]])
-    assert np.allclose(concatenated, expected), f"Expected {expected}, got {concatenated}"
+    assert np.allclose(
+        concatenated, expected
+    ), f"Expected {expected}, got {concatenated}"
 
     # Test with a single array
     result: Atom = metta.run(
@@ -848,7 +882,9 @@ def test_bisecting_kmeans_concat_arrays(metta: MeTTa):
 
     single_result = result.get_object().value
     expected_single = np.array([[4.0, 4.0]])
-    assert np.allclose(single_result, expected_single), f"Expected {expected_single}, got {single_result}"
+    assert np.allclose(
+        single_result, expected_single
+    ), f"Expected {expected_single}, got {single_result}"
 
     # Test with empty list
     result: Atom = metta.run("! (bisecting-kmeans.concat-arrays ())")[0][0]
@@ -904,7 +940,9 @@ def test_bisecting_kmeans_assign(metta: MeTTa):
 
     assignments = result.get_object().value
     expected = np.array([0, 0, 1, 1])
-    assert np.array_equal(assignments, expected), f"Expected {expected}, got {assignments}"
+    assert np.array_equal(
+        assignments, expected
+    ), f"Expected {expected}, got {assignments}"
 
     # Test with different data that's closer to the second cluster
     result: Atom = metta.run(
@@ -926,7 +964,9 @@ def test_bisecting_kmeans_assign(metta: MeTTa):
 
     assignments2 = result.get_object().value
     expected2 = np.array([1, 1, 0, 0])
-    assert np.array_equal(assignments2, expected2), f"Expected {expected2}, got {assignments2}"
+    assert np.array_equal(
+        assignments2, expected2
+    ), f"Expected {expected2}, got {assignments2}"
 
 
 def test_bisecting_kmeans_predict(metta: MeTTa):
@@ -957,14 +997,17 @@ def test_bisecting_kmeans_predict(metta: MeTTa):
     cluster_indices = result.get_object().content
     assert len(cluster_indices) == 6, "cluster_indices must have exactly six elements."
 
-    assert all(x == cluster_indices[0] for x in cluster_indices[:4]), "First four elements of cluster_indices " \
-                                                                      "must be the same"
+    assert all(x == cluster_indices[0] for x in cluster_indices[:4]), (
+        "First four elements of cluster_indices " "must be the same"
+    )
 
-    assert all(x == cluster_indices[4] for x in cluster_indices[4:]), "Last two elements of cluster_indices " \
-                                                                      "must be the same"
+    assert all(x == cluster_indices[4] for x in cluster_indices[4:]), (
+        "Last two elements of cluster_indices " "must be the same"
+    )
 
-    assert cluster_indices[0] != cluster_indices[4], "First four elements of cluster_indices must be " \
-                                                     "different from the last two."
+    assert cluster_indices[0] != cluster_indices[4], (
+        "First four elements of cluster_indices must be " "different from the last two."
+    )
 
     assert set(cluster_indices) == {0, 1}, "Cluster labels must be either 0 or 1."
 

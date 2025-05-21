@@ -64,8 +64,7 @@ class PatternOperation(OperationObject):
         if self.rec:
             args = args[0].get_children()
             args = [
-                self.execute(arg)[0] if isinstance(
-                    arg, ExpressionAtom) else arg
+                self.execute(arg)[0] if isinstance(arg, ExpressionAtom) else arg
                 for arg in args
             ]
         # If there is a variable or PatternValue in arguments, create PatternValue
@@ -85,13 +84,17 @@ def _np_atom_type(npobj):
         return AtomType.UNDEFINED
     return E(S("NPArray"), E(*[ValueAtom(s, "Number") for s in npobj.shape]))
 
+
 def _np_atom_value(npobj, typ):
     return G(NumpyValue(npobj), typ)
 
+
 def wrapnpop(func):
     def wrapper(*args):
-        a = [arg.get_object().value if isinstance(arg, GroundedAtom)
-             else arg.get_name() for arg in args]
+        a = [
+            arg.get_object().value if isinstance(arg, GroundedAtom) else arg.get_name()
+            for arg in args
+        ]
         res = func(*a)
         typ = _np_atom_type(res)
         return [_np_atom_value(res, typ)]
@@ -111,20 +114,49 @@ def _assert_isNone(actual: GroundedAtom):
     try:
         if actual.get_object().value is None:
             return [E()]
-        return [E(S("Error"), E(S("py.assertIsNone"), actual, None), S(f"\nExpected None\nGot: {actual}\nMissed results: None\nExcessive results: {actual}"))]
+        return [
+            E(
+                S("Error"),
+                E(S("py.assertIsNone"), actual, None),
+                S(
+                    f"\nExpected None\nGot: {actual}\nMissed results: None\nExcessive results: {actual}"
+                ),
+            )
+        ]
     except Exception as e:
         return [E(S("Error"), E(S("py.assertIsNone"), actual, None), S(str(e)))]
 
 
-def _assert_allclose(actual: GroundedAtom, expected: GroundedAtom, rtol=ValueAtom(1e-05), atol=ValueAtom(1e-08), equal_nan=ValueAtom(False)):
+def _assert_allclose(
+    actual: GroundedAtom,
+    expected: GroundedAtom,
+    rtol=ValueAtom(1e-05),
+    atol=ValueAtom(1e-08),
+    equal_nan=ValueAtom(False),
+):
     try:
-        if np.allclose(actual.get_object().value, expected.get_object().value, rtol.get_object().value, atol.get_object().value, equal_nan.get_object().value):
+        if np.allclose(
+            actual.get_object().value,
+            expected.get_object().value,
+            rtol.get_object().value,
+            atol.get_object().value,
+            equal_nan.get_object().value,
+        ):
             return [E()]
-        return [E(S("Error"), E(S("np.assertAllEqual"), actual, expected), S(f"\nExpected [{expected}]\nGot: [{actual}]\nMissed results: {expected}\nExcessive results: {actual}"))]
+        return [
+            E(
+                S("Error"),
+                E(S("np.assertAllEqual"), actual, expected),
+                S(
+                    f"\nExpected [{expected}]\nGot: [{actual}]\nMissed results: {expected}\nExcessive results: {actual}"
+                ),
+            )
+        ]
     except Exception as e:
         return [E(S("Error"), E(S("np.assertAllEqual"), actual, expected), S(str(e)))]
 
-@ register_atoms
+
+@register_atoms
 def numme_atoms():
 
     # FIXME: we don't add types for operations, because numpy operations types
@@ -140,22 +172,16 @@ def numme_atoms():
         )
     )
     nmAddAtom = G(PatternOperation("np.add", wrapnpop(np.add), unwrap=False))
-    nmSubAtom = G(PatternOperation(
-        "np.sub", wrapnpop(np.subtract), unwrap=False))
-    nmMulAtom = G(PatternOperation(
-        "np.mul", wrapnpop(np.multiply), unwrap=False))
-    nmDivAtom = G(PatternOperation(
-        "np.div", wrapnpop(np.divide), unwrap=False))
-    nmMMulAtom = G(PatternOperation(
-        "np.matmul", wrapnpop(np.matmul), unwrap=False))
-    nmArgmin = G(PatternOperation(
-        "np.argmin", wrapnpop(np.argmin), unwrap=False))
+    nmSubAtom = G(PatternOperation("np.sub", wrapnpop(np.subtract), unwrap=False))
+    nmMulAtom = G(PatternOperation("np.mul", wrapnpop(np.multiply), unwrap=False))
+    nmDivAtom = G(PatternOperation("np.div", wrapnpop(np.divide), unwrap=False))
+    nmMMulAtom = G(PatternOperation("np.matmul", wrapnpop(np.matmul), unwrap=False))
+    nmArgmin = G(PatternOperation("np.argmin", wrapnpop(np.argmin), unwrap=False))
     nmTranspose = G(
         PatternOperation("np.transpose", wrapnpop(np.transpose), unwrap=False)
     )
     nmNorm = G(
-        PatternOperation("np.linalg.norm", wrapnpop(
-            np.linalg.norm), unwrap=False)
+        PatternOperation("np.linalg.norm", wrapnpop(np.linalg.norm), unwrap=False)
     )
     nmSum = G(PatternOperation("np.sum", wrapnpop(np.sum), unwrap=False))
     nmOneHot = G(
@@ -164,14 +190,12 @@ def numme_atoms():
         )
     )
     nmExpandDims = G(
-        PatternOperation("np.expand_dims", wrapnpop(
-            np.expand_dims), unwrap=False)
+        PatternOperation("np.expand_dims", wrapnpop(np.expand_dims), unwrap=False)
     )
     nmChoose = G(
         PatternOperation(
             "np.choose",
-            wrapnpop(lambda x, k: x[np.random.choice(
-                x.shape[0], k, replace=False)]),
+            wrapnpop(lambda x, k: x[np.random.choice(x.shape[0], k, replace=False)]),
             unwrap=False,
         )
     )
@@ -182,62 +206,63 @@ def numme_atoms():
             unwrap=False,
         )
     )
-    nmEigh = G(PatternOperation("np.linalg.eigh",wrapnpop(np.linalg.eigh), unwrap=False))
+    nmEigh = G(
+        PatternOperation("np.linalg.eigh", wrapnpop(np.linalg.eigh), unwrap=False)
+    )
 
-    nmInv = G(PatternOperation("np.linalg.inv",
-                               wrapnpop(np.linalg.inv), unwrap=False))
-    nmEinsum = G(PatternOperation(
-        "np.einsum", wrapnpop(np.einsum), unwrap=False))
+    nmInv = G(PatternOperation("np.linalg.inv", wrapnpop(np.linalg.inv), unwrap=False))
+    nmEinsum = G(PatternOperation("np.einsum", wrapnpop(np.einsum), unwrap=False))
     nmExp = G(PatternOperation("np.exp", wrapnpop(np.exp), unwrap=False))
     nmLog = G(PatternOperation("np.log", wrapnpop(np.log), unwrap=False))
     nmCov = G(PatternOperation("np.cov", wrapnpop(np.cov), unwrap=False))
-    nmRepeat = G(PatternOperation(
-        "np.repeat", wrapnpop(np.repeat), unwrap=False))
+    nmRepeat = G(PatternOperation("np.repeat", wrapnpop(np.repeat), unwrap=False))
     nmEye = G(PatternOperation("np.eye", wrapnpop(np.eye), unwrap=False))
     nmOnes = G(PatternOperation("np.ones", wrapnpop(np.ones), unwrap=False))
     nmPower = G(PatternOperation("np.power", wrapnpop(np.power), unwrap=False))
     nmRandomRand = G(
-        PatternOperation("np.random.rand", wrapnpop(
-            np.random.rand), unwrap=False)
+        PatternOperation("np.random.rand", wrapnpop(np.random.rand), unwrap=False)
     )
     nmDiag = G(PatternOperation("np.diag", wrapnpop(np.diag), unwrap=False))
     nmSqrt = G(PatternOperation("np.sqrt", wrapnpop(np.sqrt), unwrap=False))
-    nmArgsort = G(PatternOperation(
-        "np.argsort", wrapnpop(np.argsort), unwrap=False))
-    nmArange = G(PatternOperation(
-        "np.arange", wrapnpop(np.arange), unwrap=False))
+    nmArgsort = G(PatternOperation("np.argsort", wrapnpop(np.argsort), unwrap=False))
+    nmArange = G(PatternOperation("np.arange", wrapnpop(np.arange), unwrap=False))
     nmTake = G(PatternOperation("np.take", wrapnpop(np.take), unwrap=False))
 
     nmSlice = G(PatternOperation("np.slice", wrapnpop(_slice), unwrap=False))
-    nmArgmax = G(PatternOperation(
-        "np.argmax", wrapnpop(np.argmax), unwrap=False))
-    nmIx_ = G(PatternOperation("np.ix_", wrapnpop(
-        np.ix_), unwrap=False, rec=False))
+    nmArgmax = G(PatternOperation("np.argmax", wrapnpop(np.argmax), unwrap=False))
+    nmIx_ = G(PatternOperation("np.ix_", wrapnpop(np.ix_), unwrap=False, rec=False))
     nmMin = G(PatternOperation("np.min", wrapnpop(np.min), unwrap=False))
     nmMax = G(PatternOperation("np.max", wrapnpop(np.max), unwrap=False))
     nmMean = G(PatternOperation("np.mean", wrapnpop(np.mean), unwrap=False))
-    nmSqueeze = G(PatternOperation(
-        "np.squeeze", wrapnpop(np.squeeze), unwrap=False))
-    nmRandomSeed = G(PatternOperation("np.random.seed",
-                     wrapnpop(np.random.seed), unwrap=False))
-    nmShape = G(PatternOperation("np.shape", wrapnpop(
-        lambda _x, _i: _x.shape[_i]), unwrap=False))
+    nmSqueeze = G(PatternOperation("np.squeeze", wrapnpop(np.squeeze), unwrap=False))
+    nmRandomSeed = G(
+        PatternOperation("np.random.seed", wrapnpop(np.random.seed), unwrap=False)
+    )
+    nmShape = G(
+        PatternOperation(
+            "np.shape", wrapnpop(lambda _x, _i: _x.shape[_i]), unwrap=False
+        )
+    )
     nmWhere = G(PatternOperation("np.where", wrapnpop(np.where), unwrap=False))
     nmEqual = G(PatternOperation("np.equal", wrapnpop(np.equal), unwrap=False))
     nmAppend = G(PatternOperation("np.append", wrapnpop(np.append)))
     nmPut = G(PatternOperation("np.put", wrapnpop(np.put), unwrap=False))
     nmConcat = G(PatternOperation("np.concat", wrapnpop(np.concat), unwrap=False))
     nmAllClose = G(PatternOperation("np.allclose", wrapnpop(np.allclose), unwrap=False))
-    nmAssertAllClose = G(PatternOperation("np.assertAllClose", _assert_allclose, unwrap=False))
+    nmAssertAllClose = G(
+        PatternOperation("np.assertAllClose", _assert_allclose, unwrap=False)
+    )
     nmAbs = G(PatternOperation("np.abs", wrapnpop(np.abs), unwrap=False))
     nmIsnan = G(PatternOperation("np.isnan", wrapnpop(np.isnan), unwrap=False))
     nmUnique = G(PatternOperation("np.unique", wrapnpop(np.unique), unwrap=False))
-    nmAssertIsNone = G(PatternOperation("py.assertIsNone", _assert_isNone, unwrap=False))
+    nmAssertIsNone = G(
+        PatternOperation("py.assertIsNone", _assert_isNone, unwrap=False)
+    )
     nmSort = G(PatternOperation("np.sort", wrapnpop(np.sort), unwrap=False))
 
     pyNone = ValueAtom(None)
     pyTrue = ValueAtom(True)
-    pyPINF = ValueAtom(float('inf'))
+    pyPINF = ValueAtom(float("inf"))
     nmTrue = G(PatternOperation("np.True_", wrapnpop(np.True_), unwrap=False))
 
     atomPi = ValueAtom(np.pi)
@@ -299,5 +324,5 @@ def numme_atoms():
         "np.unique": nmUnique,
         "np.True_": nmTrue,
         "py.assertIsNone": nmAssertIsNone,
-        "np.sort": nmSort
+        "np.sort": nmSort,
     }

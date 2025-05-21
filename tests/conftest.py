@@ -16,7 +16,7 @@ def pytest_collect_file(parent, file_path: Path):
 
 
 def run_metta_test(metta, test_expr):
-    result = metta.run(f'! ({test_expr})')[0][0]
+    result = metta.run(f"! ({test_expr})")[0][0]
     return result and result == E(), result
 
 
@@ -27,11 +27,13 @@ class MeTTaFile(pytest.File):
         metta.run(self.path.read_text())
 
         # Read file and find (Test "name" function) forms
-        tests = metta.run('! (match &self (Test $test-function) $test-function)')[0]
+        tests = metta.run("! (match &self (Test $test-function) $test-function)")[0]
 
         for test in tests:
             test_name = test.get_name()
-            yield MeTTaTest.from_parent(self, name=test_name, test_function=test_name, metta=metta)
+            yield MeTTaTest.from_parent(
+                self, name=test_name, test_function=test_name, metta=metta
+            )
 
 
 class MeTTaTest(pytest.Item):
@@ -56,6 +58,6 @@ class MeTTaTest(pytest.Item):
     def reportinfo(self):
         return self.path, None, self.name
 
+
 class MeTTaTestFailure(Exception):
     pass
-

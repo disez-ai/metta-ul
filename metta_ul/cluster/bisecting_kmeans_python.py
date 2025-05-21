@@ -44,7 +44,9 @@ def find_max_cluster(clusters):
     return head if head[2] >= rest_max[2] else rest_max
 
 
-def recursive_bisecting_hierarchy(data, clusters, max_clusters, n_init=10, hierarchy=None):
+def recursive_bisecting_hierarchy(
+    data, clusters, max_clusters, n_init=10, hierarchy=None
+):
     """
     Recursively bisects the cluster with maximum SSE until reaching max_clusters.
     Returns a list where each element is a list of clusters at that level.
@@ -65,7 +67,9 @@ def recursive_bisecting_hierarchy(data, clusters, max_clusters, n_init=10, hiera
     new_clusters = clusters + [child0, child1]
     hierarchy.append(new_clusters)
     # Recurse until reaching the desired number of clusters.
-    return recursive_bisecting_hierarchy(data, new_clusters, max_clusters, n_init, hierarchy)
+    return recursive_bisecting_hierarchy(
+        data, new_clusters, max_clusters, n_init, hierarchy
+    )
 
 
 def assign_labels_recursive(clusters, labels, current=0):
@@ -87,7 +91,7 @@ def plot_centers(clusters, idx=0):
         return
     # cluster[1] is the center.
     center = clusters[idx][1]
-    plt.scatter(center[0], center[1], c='red', s=100, marker='x')
+    plt.scatter(center[0], center[1], c="red", s=100, marker="x")
     plot_centers(clusters, idx + 1)
 
 
@@ -156,7 +160,7 @@ def main():
 
     # Plot
     plt.figure(figsize=(8, 6))
-    plt.scatter(X[:, 0], X[:, 1], c=labels, s=30, cmap='viridis', alpha=0.7)
+    plt.scatter(X[:, 0], X[:, 1], c=labels, s=30, cmap="viridis", alpha=0.7)
     plot_centers(final_clusters)
     plt.title("Bisecting KMeans Hierarchy (Final Clusters in Last Level)")
     plt.xlabel("Feature 1")
@@ -168,8 +172,16 @@ def main():
     print("Predicted labels for new samples:", new_labels)
 
     # Plot new points
-    plt.scatter(X[:, 0], X[:, 1], c=labels, s=30, cmap='viridis', alpha=0.5)
-    plt.scatter(X_test[:, 0], X_test[:, 1], c=new_labels, s=100, edgecolor='k', cmap='viridis', marker='D')
+    plt.scatter(X[:, 0], X[:, 1], c=labels, s=30, cmap="viridis", alpha=0.5)
+    plt.scatter(
+        X_test[:, 0],
+        X_test[:, 1],
+        c=new_labels,
+        s=100,
+        edgecolor="k",
+        cmap="viridis",
+        marker="D",
+    )
     plot_centers(final_clusters)
     plt.title("Predicted Labels for New Data Points")
     plt.show()
