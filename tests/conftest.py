@@ -45,10 +45,13 @@ class MeTTaTest(pytest.Item):
     def runtest(self):
         # Run MeTTa interpreter with self.source and evaluate self.test_function
         # This requires MeTTa interpreter bindings or a subprocess call
-        passed, result = run_metta_test(self.metta, self.test_function)
+        try:
+            passed, result = run_metta_test(self.metta, self.test_function)
 
-        if not passed:
-            raise MeTTaTestFailure(result)
+            if not passed:
+                raise MeTTaTestFailure(result)
+        except Exception as e:
+            raise MeTTaTestFailure(e)
 
     def repr_failure(self, excinfo):
         if isinstance(excinfo.value, MeTTaTestFailure):
