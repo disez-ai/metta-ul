@@ -45,9 +45,9 @@
 )
 
 
-(: gmm.log-likelihood (-> (NPArray ($n $d)) (NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)) Number))
+(: gmm.log-likelihood (-> (NPArray ($n $d)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d))) (NPArray (1))))
 (=
-    (gmm.log-likelihood $X $weights $means $covariances)
+    (gmm.log-likelihood $X ($weights $means $covariances))
     (np.sum
         (np.log
             (np.sum
@@ -144,36 +144,48 @@
 )
 
 
-(: gmm.recursion (-> (NPArray ($n $d)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d))) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
+(: gmm.recursion (-> (NPArray ($n $d)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d))) Number Number (NPArray (1)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
-    (gmm.recursion $X ($weights $means $covariances) $max-iter)
+    (gmm.recursion $X ($weights $means $covariances) $max-iter $tol $log-likelihood)
     (if (> $max-iter 0)
-        (gmm.recursion
-            $X
-            (gmm.m-step
-                $X
-                (gmm.e-step $X $weights $means $covariances)
+        (let* 
+            (
+                ($new-params (gmm.m-step $X (gmm.e-step $X $weights $means $covariances)))
+                ($new-log-likelihood (gmm.log-likelihood $X $new-params))
             )
-            (- $max-iter 1)
+            (if (< $tol (np.max (np.abs (np.sub $new-log-likelihood $log-likelihood))))
+                (gmm.recursion
+                    $X
+                    $new-params
+                    (- $max-iter 1)
+                    $tol
+                    $new-log-likelihood
+                )
+                $new-params
+            )
         )
         ($weights $means $covariances)
     )
 )
 
-(: gmm.fit (-> (NPArray ($n $d)) Number Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
+(: gmm.fit (-> (NPArray ($n $d)) Number Number Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
-    (gmm.fit $X $k $max-iter)
-    (gmm.recursion
-        $X
-        (gmm.init $X $k)
-        $max-iter
+    (gmm.fit $X $k $max-iter $tol)
+    (let $init-params (gmm.init $X $k)
+        (gmm.recursion
+            $X
+            $init-params
+            $max-iter
+            $tol
+            (gmm.log-likelihood $X $init-params)
+        )
     )
 )
 
 (: gmm.fit (-> (NPArray ($n $d)) Number ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d)))))
 (=
     (gmm.fit $X $k)
-    (gmm.fit $X $k 100)
+    (gmm.fit $X $k 100 0.001)
 )
 
 (: gmm.predict (-> (NPArray ($n $d)) ((NPArray ($k)) (NPArray ($k $d)) (NPArray ($k $d $d))) (NPArray ($n))))
