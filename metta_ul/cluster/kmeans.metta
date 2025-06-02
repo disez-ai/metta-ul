@@ -40,16 +40,19 @@
 (: kmeans.recursion (-> (NPArray ($n $d)) (NPArray ($k $d)) Number Number (NPArray ($k $d))))
 (= 
     (kmeans.recursion $X $centroids $max-iter $tol)
-    (let $new-centroids (kmeans.update $X (kmeans.assign $X $centroids))
-        (if (and (> $max-iter 0) (< $tol (np.max (np.abs (np.sub $new-centroids $centroids)))))
-            (kmeans.recursion
-                $X
+    (if (> $max-iter 0)
+        (let $new-centroids (kmeans.update $X (kmeans.assign $X $centroids))
+            (if (< $tol (np.max (np.abs (np.sub $new-centroids $centroids))))
+                (kmeans.recursion
+                    $X
+                    $new-centroids
+                    (- $max-iter 1)
+                    $tol
+                )
                 $new-centroids
-                (- $max-iter 1)
-                $tol
             )
-            $centroids
         )
+        $centroids
     )
 )
 

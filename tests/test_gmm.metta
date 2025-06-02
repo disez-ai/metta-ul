@@ -73,7 +73,7 @@
 (=
     (gmm.log-likelihood.test)
     (np.assertAllClose
-        (gmm.log-likelihood (np.array (X)) (np.array (weights)) (np.array (means)) (np.array (covariances)))
+        (gmm.log-likelihood (np.array (X)) ((np.array (weights)) (np.array (means)) (np.array (covariances))))
         (np.array (-4.43552512))
     )
 )
@@ -131,7 +131,7 @@
 ;; Test gmm.recursion
 (=
     (gmm.recursion.testNoRecursion)
-    (let ($weights $means $covariances) (gmm.recursion (np.array (X)) ((np.array (weights)) (np.array (means)) (np.array (covariances))) 0)
+    (let ($weights $means $covariances) (gmm.recursion (np.array (X)) ((np.array (weights)) (np.array (means)) (np.array (covariances))) 0 0.001 (np.vector -4.43552512))
         (assertEqual
             (
                 (np.assertAllClose $weights (np.array (weights)))
@@ -146,7 +146,7 @@
 
 (=
     (gmm.recursion.testOneRecursion)
-    (let ($weights $means $covariances) (gmm.recursion (np.array (X)) ((np.array (weights)) (np.array (means)) (np.array (covariances))) 1)
+    (let ($weights $means $covariances) (gmm.recursion (np.array (X)) ((np.array (weights)) (np.array (means)) (np.array (covariances))) 1 0.001 (np.vector -4.43552512))
         (assertEqual
             (
                 (np.assertAllClose $weights (np.array (weights)))
@@ -166,7 +166,7 @@
 (=
     (gmm.fit.test)
     (let $_ (np.random.seed 1)
-    (let ($weights $means $covariances) (gmm.fit (np.array (X)) 2 1)
+    (let ($weights $means $covariances) (gmm.fit (np.array (X)) 2 1 0.001)
         (assertEqual
             (
                 (np.assertAllClose $weights (np.array (weights)))

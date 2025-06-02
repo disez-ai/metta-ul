@@ -103,7 +103,13 @@ scikit‑learn provides `GaussianMixture` with C-optimized loops and multiple co
 | Parallelization     | single‑threaded            | single‑threaded          |
 
 ## Benchmark Setup
-*(To be populated with GMM-specific benchmarks.)*
+| Dataset          | Time (s)             | Silhouette  | Calinski-Harabasz | Davies-Bouldin | Adjusted Rand Index | Normalized Mutual Info | Adjusted Mutual Info |
+| ---------------- | -------------------- | ----------- | ----------------- | -------------- | ------------------- | ---------------------- | -------------------- |
+| noisy\_moon      | 11.45                | 0.3140      | 224.19            | 0.9050         | 0.1654              | 0.2800                 | 0.2787               |
+| varied           | 11.58                | 0.5881      | 1198.59           | 0.6846         | 0.9468              | 0.9160                 | 0.9157               |
+| no-structure     | 11.30                | 0.3548      | 337.10            | 0.9267         | 0.0000              | 0.0000                 | 0.0000               |
+| blobs            | 11.68                | 0.6538      | 1422.54           | 0.4799         | 0.9644              | 0.9479                 | 0.9477               |
+| noisy_circles    | 11.74                | 0.3102      | 232.51            | 1.198          | 0.0127              | 0.0124                 | 0.0109               |
 
 ## Usage Example
 ```metta

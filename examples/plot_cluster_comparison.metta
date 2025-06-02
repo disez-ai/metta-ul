@@ -137,7 +137,7 @@
 (= (fit-predict $dn $ds)  
   (let* (
     (() (println! ("start kmeans on " $dn "data type" (get-type $ds))))
-    (($model $t1) (timeit (quote (kmeans $ds (get-param $dn n_clusters) 100))))
+    (($model $t1) (timeit (quote (kmeans.fit $ds (get-param $dn n_clusters)))))
     (($labels $t2) (timeit (quote (kmeans.predict $ds $model))))
     (() (println! ("kmeans done on " $dn take (+ $t1 $t2))))
   ) ($labels "Kmeans" (+ $t1 $t2)))
@@ -147,7 +147,7 @@
 (= (fit-predict $dn $ds) 
   (let* (
     (() (println! ("start GMM on " $dn "data type" (get-type $ds))))
-    (($model $t1) (timeit (quote (gmm $ds (get-param $dn n_clusters)))))
+    (($model $t1) (timeit (quote (gmm.fit $ds (get-param $dn n_clusters)))))
     (($labels $t2) (timeit (quote (gmm.predict $ds $model))))
     (() (println! ("GMM done on " $dn take (+ $t1 $t2))))
   ) ($labels "GMM" (+ $t1 $t2)))
