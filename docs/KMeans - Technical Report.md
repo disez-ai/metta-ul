@@ -78,13 +78,13 @@ Both implementations are single‑threaded. scikit‑learn’s KMeans uses optim
 ## Results
 **Performance comparison:**
 
-| Dataset        | MeTTa Time (s) | scikit‑learn Time (s) | Silhouette | Calinski‑Harabasz | Davies‑Bouldin | ARI     | NMI    | AMI     |
-| -------------- | -------------- | --------------------- | ---------- | ----------------- | -------------- | ------- | ------ | ------- |
-| blobs          | 3.8121         | < 0.01                | 0.6542     | 1424.91           | 0.4793         | 0.9703  | 0.9544 | 0.9543  |
-| noisy_moons    | 3.8136         | < 0.01                | 0.4956     | 690.81            | 0.8120         | 0.4834  | 0.3856 | 0.3848  |
-| no_structure   | 3.7417         | < 0.01                | 0.3813     | 388.93            | 0.8689         | 0.0000  | 0.0000 | 0.0000  |
-| varied         | 3.8929         | < 0.01                | 0.6395     | 1549.99           | 0.6104         | 0.7310  | 0.7345 | 0.7335  |
-| noisy_circles  | 3.8889         | < 0.01                | 0.3471     | 281.73            | 1.1958         | −0.0017 | 0.0002 | −0.0013 |
+| Dataset        | MeTTa Time (s) | scikit-learn Time (s) | Silhouette | Calinski-Harabasz | Davies-Bouldin | Adjusted Rand Index | Normalized Mutual Info | Adjusted Mutual Info |
+| -------------- | --------------- | ---------------------- | ---------- | ------------------ | --------------- | ------------------- | ---------------------- | -------------------- |
+| varied         | 0.464           | <0.01                  | 0.63991    | 1549.90            | 0.61256         | 0.74010             | 0.74164                | 0.74068              |
+| blobs          | 0.239           | <0.01                  | 0.65424    | 1424.91            | 0.47929         | 0.97027             | 0.95445                | 0.95428              |
+| noisy_circles  | 0.797           | <0.01                  | 0.35274    | 287.33             | 1.18125         | -0.00186            | 0.00010                | -0.00135             |
+| noisy_moon     | 0.426           | <0.01                  | 0.49557    | 690.81             | 0.81197         | 0.48338             | 0.38565                | 0.38476              |
+| no-structure   | 0.986           | <0.01                  | 0.38135    | 388.93             | 0.86894         | 0                   | 0                      | 0                    |
 
 MeTTa’s recursive overhead yields ~3.8 s runtimes, whereas scikit‑learn completes in under 0.01 s. Despite this gap, MeTTa’s implementation showcases the language’s ability to express complex numerical algorithms.
 
