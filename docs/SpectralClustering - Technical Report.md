@@ -128,25 +128,16 @@ The MeTTa implementation provides core functionality while scikit‑learn offers
 
 ## Results
 
-Performance comparison on noisy_moons dataset:
+Performance comparison:
 
-| Algorithm            | Runtime (s)  | Silhouette | Calinski‑Harabasz | Davies‑Bouldin | ARI    | NMI   | AMI   |
-|----------------------|--------------|------------|-------------------|----------------|--------|-------|-------|
-| Spectral Clustering  | 1.099        | 0.385      | 429.54            | 1.028          | 1.000  | 1.000 | 1.000 |
-| KMeans               | 3.636        | 0.496      | 690.81            | 0.812          | 0.483  | 0.386 | 0.385 |
-| GMM                  | 11.453       | 0.314      | 224.19            | 0.905          | 0.165  | 0.280 | 0.279 |
-| scikit‑learn Spectral| 0.050        | ‑          | ‑                 | ‑              | ‑      | ‑     | ‑     |
+| Dataset        | Time (s) | Silhouette | Calinski-Harabasz | Davies-Bouldin | ARI   | NMI   | AMI   |
+| -------------- | -------- | ---------- | ----------------- | -------------- | ----- | ----- | ----- |
+| no-structure   | 0.69     | 0.370      | 359.72            | 0.863          | 0     | 0     | 0     |
+| blobs          | 1.57     | 0.457      | 268.15            | 0.594          | 0.568 | 0.729 | 0.728 |
+| noisy_circles  | 1.18     | 0.114      | 0.0077            | 240.59         | 1.000 | 1.000 | 1.000 |
+| noisy_moon     | 0.73     | 0.385      | 429.54            | 1.028          | 1.000 | 1.000 | 1.000 |
+| varied         | 0.76     | 0.627      | 1474.97           | 0.642          | 0.843 | 0.828 | 0.827 |
 
-Performance comparison on varied dataset:
-
-| Algorithm            | Runtime (s)  | Silhouette | Calinski‑Harabasz | Davies‑Bouldin | ARI    | NMI   | AMI   |
-|----------------------|--------------|------------|-------------------|----------------|--------|-------|-------|
-| Spectral Clustering  | 1.107        | 0.627      | 1474.97           | 0.642          | 0.843  | 0.828 | 0.827 |
-| KMeans               | 3.713        | 0.640      | 1549.90           | 0.613          | 0.740  | 0.742 | 0.741 |
-| GMM                  | 11.577       | 0.588      | 1198.59           | 0.685          | 0.947  | 0.916 | 0.916 |
-| scikit‑learn Spectral| 0.090        | ‑          | ‑                 | ‑              | ‑      | ‑     | ‑     |
-
-The MeTTa spectral clustering implementation significantly outperforms other MeTTa clustering algorithms on the noisy_moons dataset, achieving perfect external validation scores (ARI, NMI, AMI = 1.0). This confirms spectral clustering's strength on non‑convex clusters. While scikit‑learn's implementation is ~20x faster due to optimized C/Cython code and specialized solvers, the MeTTa version delivers comparable clustering quality with reasonable performance for moderate‑sized datasets.
 
 ## Usage Example
 
@@ -173,11 +164,6 @@ This snippet:
 - **Eigensolver efficiency**: Could integrate specialized solvers like ARPACK for large sparse matrices.
 - **Hyperparameter selection**: Automatic sigma estimation for the RBF kernel would improve usability.
 - **Alternative Laplacians**: Add unnormalized and random walk variants.
-
-Potential improvements:
-- Implement Nyström approximation for large‑scale spectral clustering
-- Add sparse affinity matrix support using k‑nearest neighbors
-- Explore MeTTa's parallelization capabilities for distance computations
 
 ## Conclusion
 The MeTTa implementation of spectral clustering demonstrates the language's capability to express complex numerical algorithms declaratively. Despite performance differences compared to optimized C/Cython code, the implementation achieves excellent clustering quality on non‑convex datasets. The clear functional decomposition allows for future extensions and optimizations while serving as a reference for spectral methods in MeTTa.
