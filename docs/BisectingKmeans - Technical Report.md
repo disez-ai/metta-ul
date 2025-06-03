@@ -111,7 +111,7 @@ scikit‑learn's `BisectingKMeans` (introduced in version 1.1) offers some optim
 |-------------------------|---------------------------------------|--------------------------------------|
 | Cluster selection       | Largest SSE only                      | Largest SSE or random                |
 | Bisection method        | Standard K-means                      | K-means or K-means++                 |
-| Parallel execution      | None                                  | Optional parallel processing         |
+| Parallel execution      | None                                  | None (no n_jobs parameter)           |
 | Hierarchy tracking      | Full hierarchy maintained             | Final clusters only                  |
 | Memory efficiency       | Stores all intermediate clusters      | More memory-efficient implementation |
 | Implementation          | Recursive with functional approach    | Iterative with optimized C/Cython    |
@@ -127,23 +127,17 @@ The MeTTa implementation provides explicit hierarchy tracking that scikit‑lear
 
 ## Results
 
-Performance comparison on noisy_circles dataset:
+Performance comparison:
 
-| Algorithm            | Runtime (s)  | Silhouette | Calinski‑Harabasz | Davies‑Bouldin | ARI    | NMI   | AMI   |
-|----------------------|--------------|------------|-------------------|----------------|--------|-------|-------|
-| Bisecting K-means    | 4.945        | 0.350      | 283.23            | 1.192          | -0.002 | 0.000 | -0.001|
-| K-means              | 3.822        | 0.351      | 285.69            | 1.187          | -0.002 | 0.000 | -0.001|
-| Spectral Clustering  | 1.124        | 0.114      | 0.008             | 240.59         | 1.000  | 1.000 | 1.000 |
+| Dataset        | MeTTa Time (s) | scikit‑learn Time (s) | Silhouette | Calinski‑Harabasz | Davies‑Bouldin | ARI     | NMI    | AMI     |
+| -------------- | -------------- | --------------------- | ---------- | ----------------- | -------------- | ------- | ------ | ------- |
+| blobs          | 3.036          | < 0.01                | 0.6541     | 1423.97           | 0.4787         | 0.9821  | 0.9691 | 0.9690  |
+| noisy_moon     | 1.541          | < 0.01                | 0.4956     | 690.81            | 0.8120         | 0.4834  | 0.3857 | 0.3848  |
+| no_structure   | 3.244          | < 0.01                | 0.3629     | 356.97            | 0.8715         | 0.0000  | 0.0000 | 0.0000  |
+| varied         | 2.996          | < 0.01                | 0.6396     | 1548.48           | 0.6096         | 0.7266  | 0.7313 | 0.7303  |
+| noisy_circles  | 1.129          | < 0.01                | 0.3496     | 282.17            | 1.1915         | −0.0019 | 0.0001 | −0.0014 |
 
-The benchmark results reveal several insights:
 
-1. **Runtime Performance**: Bisecting K-means shows approximately 30% longer runtime compared to standard K-means, which is expected due to the additional overhead of hierarchical operations and multiple K-means applications.
-
-2. **Clustering Quality**: On datasets with complex non-convex shapes like `noisy_circles`, both Bisecting K-means and standard K-means struggle (with near-zero ARI, NMI, and AMI), while Spectral Clustering excels. This confirms the known limitation of K-means variants on non-convex cluster geometries.
-
-3. **Intrinsic Metrics**: The Silhouette, Calinski-Harabasz, and Davies-Bouldin scores for Bisecting K-means are nearly identical to standard K-means, suggesting that the hierarchical approach doesn't overcome the fundamental geometric limitations of centroid-based clustering.
-
-These results highlight that while Bisecting K-means provides hierarchical information not available in standard K-means, it doesn't necessarily improve clustering quality for datasets with complex geometries where boundary-based approaches like Spectral Clustering are more appropriate.
 
 ## Usage Example
 ```metta
@@ -170,11 +164,6 @@ This snippet:
 - **Memory Efficiency**: Stores the complete hierarchy which could be memory-intensive for large datasets with many clusters.
 - **Termination Criteria**: Currently only terminates based on number of clusters; could add additional criteria based on minimum SSE improvement.
 
-Potential improvements:
-- Implement parallel processing for the bisection step
-- Add alternative cluster selection strategies
-- Integrate with other clustering methods for the bisection step
-- Develop memory-optimized representations of the hierarchy
 
 ## Conclusion
 The MeTTa implementation of Bisecting K-means demonstrates the language's capability to express recursive algorithms and hierarchical data structures. While the algorithm doesn't outperform Spectral Clustering on complex geometries, it provides valuable hierarchical information not available in flat clustering methods. The functional and declarative approach in MeTTa makes the algorithm structure clear and maintainable, though with some performance trade-offs compared to optimized implementations.
