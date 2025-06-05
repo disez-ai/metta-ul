@@ -264,6 +264,7 @@ def numme_atoms():
     pyTrue = ValueAtom(True)
     pyPINF = ValueAtom(float("inf"))
     nmTrue = G(PatternOperation("np.True_", wrapnpop(np.True_), unwrap=False))
+    nmItem = G(PatternOperation("np.item", wrapnpop(lambda arr, idx: arr.item(idx)), unwrap=False))
 
     atomPi = ValueAtom(np.pi)
 
@@ -325,4 +326,5 @@ def numme_atoms():
         "np.True_": nmTrue,
         "py.assertIsNone": nmAssertIsNone,
         "np.sort": nmSort,
+        "np.item": nmItem,
     }
