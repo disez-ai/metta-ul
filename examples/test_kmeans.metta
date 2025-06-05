@@ -13,7 +13,7 @@
 
 (= (fit-predict $ds)  
   (let* (
-    ($model (kmeans.fit $ds (get-param $dn n_clusters)))
+    ($model (kmeans.fit $ds 3))
     ($labels (kmeans.predict $ds $model))
   ) $labels )
 )

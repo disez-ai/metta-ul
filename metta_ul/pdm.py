@@ -27,12 +27,7 @@ def import_as_atom(metta):
             a = E(
                 S(aname),
                 ValueAtom(i),
-                E(
-                    *[
-                        E(S(str(k)), ValueAtom(float(v)))
-                        for k, v in row._asdict().items()
-                    ]
-                ),
+                E(*[E(S(str(k)), ValueAtom(float(v))) for k, v in row._asdict().items()]),
             )
             metta.space().add_atom(a)
             r.append(a)
@@ -46,9 +41,10 @@ def makeLabels(metta):
 
         r = []
         for i, val in enumerate(data.get_object().value):
+            print(val)
             a = E(
                 S(name.get_name()),
-                ValueAtom(int(val)),
+                ValueAtom(int(val[0])),
                 ValueAtom(int(labels.get_object().value[i])),
             )
             metta.space().add_atom(a)
