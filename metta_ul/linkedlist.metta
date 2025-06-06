@@ -14,7 +14,7 @@
          (Cons $head (List.fromExpression $tail)))))
 
 (: List.twoCombinations (-> (List $a) (List ($a $a))))
-(: List.twoCombinations (-> (List $a) (List $a) (List ($a $a))))
+(: List.twoCombinations (-> (List $a) (List $b) (List ($a $b))))
 (= 
     (List.twoCombinations Nil)
     Nil
@@ -33,7 +33,6 @@
         )
     )
 )
-; ! (two-combinations (:: A (:: B (:: C ()))))
 
 (: List.in (-> $a (List $a) Bool))
 (= (List.in $x Nil) False)
