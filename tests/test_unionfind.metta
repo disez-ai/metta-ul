@@ -17,7 +17,7 @@
 (=
     (UnionFind.find.test)
     (assertEqual
-        (UnionFind.find (UnionFind.init 2) 0)
+        (UnionFind.find ((np.arange 2) 2) 0)
         0
     )
 )
@@ -25,7 +25,7 @@
 
 (=
     (UnionFind.union.test)
-    (let ($parent $count) (UnionFind.union (UnionFind.init 2) 0 1)
+    (let ($parent $count) (UnionFind.union ((np.arange 2) 2) 0 1)
         (assertEqual 
             (
                 (np.assertAllClose $parent (np.vector 1 1))
@@ -36,3 +36,11 @@
     )
 )
 (Test UnionFind.union.test)
+
+(=
+    (UnionFind.get.test)
+    (let $set (UnionFind.get ((np.vector 1 1) 1) 0)
+        (np.assertAllClose $set (np.arange 2))
+    )
+)
+(Test UnionFind.get.test)

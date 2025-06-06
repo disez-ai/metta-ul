@@ -39,3 +39,11 @@
         )
     )
 )
+
+(: UnionFind.get (-> UnionFind Number (NPArray ($k))))
+(=
+    (UnionFind.get ($parent $count) $u)
+    (let $ru (UnionFind.find ($parent $count) $u)
+        ((py-dot (np.nonzero (np.equal $parent $ru)) __getitem__) 0)
+    )
+)
