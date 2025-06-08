@@ -1,0 +1,41 @@
+# .github/workflows/docs.yml
+name: Deploy Docs to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Or master, depending on your default branch
+    paths:
+      - 'docs/**' # Trigger only if changes are in the docs folder
+      - 'mkdocs.yml' # Or if the config changes
+
+permissions:
+  contents: write # Needed to push to gh-pages branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for git-based plugins/versioning
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x" # Use a compatible Python version
+
+      - name: Install dependencies
+        run: |
+          pip install mkdocs mkdocs-material
+
+      - name: Build MkDocs site
+        run: mkdocs build --clean --strict
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4 # Action to deploy to gh-pages
+        if: github.ref == 'refs/heads/main' # Only deploy from your main branch
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site # The directory where MkDocs builds the site
