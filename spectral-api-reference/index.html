@@ -1,0 +1,2488 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://SNetGrant.github.io/metta-ul/spectral-api-reference/">
+      
+      
+        <link rel="prev" href="../gmm-technical/">
+      
+      
+        <link rel="next" href="../spectral-technical/">
+      
+      
+      <link rel="icon" href="../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>API - Clustering Algorithms in MeTTa</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#metta_ulclusterspectral-clustering" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Clustering Algorithms in MeTTa" class="md-header__button md-logo" aria-label="Clustering Algorithms in MeTTa" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Clustering Algorithms in MeTTa
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../kmeans-api-reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Clustering
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../visualization/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Clustering Algorithms in MeTTa" class="md-nav__button md-logo" aria-label="Clustering Algorithms in MeTTa" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    Clustering Algorithms in MeTTa
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Clustering
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Clustering
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    KMeans
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            KMeans
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kmeans-api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kmeans-technical/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Technical
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    GMM
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            GMM
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gmm-api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gmm-technical/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Technical
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Spectral
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Spectral
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    API
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    API
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#function-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Function Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Function Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringsquare-norm" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.square-norm
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.square-norm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringsquare-distance-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.square-distance-matrix
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.square-distance-matrix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringrbf-affinity-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.rbf-affinity-matrix
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.rbf-affinity-matrix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringdegree" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.degree
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.degree">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringinverse-degree-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.inverse-degree-matrix
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.inverse-degree-matrix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringnormalized-laplacian" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.normalized-laplacian
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.normalized-laplacian">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringeigh" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.eigh
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.eigh">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringeigenvalues" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.eigenvalues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.eigenvalues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringeigenvectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.eigenvectors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.eigenvectors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringeigval-top-k-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.eigval-top-k-index
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.eigval-top-k-index">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringspectral-embeddings" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.spectral-embeddings
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.spectral-embeddings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringrow-normalize" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.row-normalize
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.row-normalize">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringcluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.cluster
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringfit" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.fit
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.fit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringpredict" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.predict
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.predict">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spectral-technical/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Technical
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spectral-method/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Method
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Bisecting
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Bisecting
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bisecting-kmeans-api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bisecting-kmeans-technical/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Technical
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Agglomerative
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            Agglomerative
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agglomerative-api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agglomerative-technical/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Technical
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../visualization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Virtualization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#function-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Function Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Function Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringsquare-norm" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.square-norm
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.square-norm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringsquare-distance-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.square-distance-matrix
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.square-distance-matrix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringrbf-affinity-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.rbf-affinity-matrix
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.rbf-affinity-matrix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringdegree" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.degree
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.degree">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringinverse-degree-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.inverse-degree-matrix
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.inverse-degree-matrix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringnormalized-laplacian" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.normalized-laplacian
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.normalized-laplacian">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringeigh" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.eigh
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.eigh">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringeigenvalues" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.eigenvalues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.eigenvalues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringeigenvectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.eigenvectors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.eigenvectors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringeigval-top-k-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.eigval-top-k-index
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.eigval-top-k-index">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringspectral-embeddings" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.spectral-embeddings
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.spectral-embeddings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringrow-normalize" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.row-normalize
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.row-normalize">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringcluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.cluster
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringfit" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.fit
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.fit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spectral-clusteringpredict" class="md-nav__link">
+    <span class="md-ellipsis">
+      spectral-clustering.predict
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="spectral-clustering.predict">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="metta_ulclusterspectral-clustering">metta_ul:cluster:spectral-clustering</h1>
+<h2 id="overview">Overview</h2>
+<p>This module implements the Spectral Clustering algorithm. It uses the RBF (Radial Basis Function) kernel to construct an affinity matrix, computes the normalized graph Laplacian, and performs eigen-decomposition to extract spectral embeddings. These embeddings are then normalized and clustered using k-means. The algorithm is designed to cluster data that may not be linearly separable, leveraging the eigenstructure of the Laplacian.</p>
+<h2 id="function-definitions">Function Definitions</h2>
+<h3 id="spectral-clusteringsquare-norm"><code>spectral-clustering.square-norm</code></h3>
+<p>Computes the square norm for each row (data point) in the dataset.</p>
+<h4 id="parameters">Parameters:</h4>
+<ul>
+<li><code>$X</code>: The dataset, represented as an array of data points.</li>
+<li>Type: <code>(NPArray ($N $D))</code></li>
+</ul>
+<h4 id="returns">Returns:</h4>
+<ul>
+<li>A vector where each element is the sum of squares of the components of the corresponding data point.</li>
+<li>Type: <code>(NPArray ($N 1)</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringsquare-distance-matrix"><code>spectral-clustering.square-distance-matrix</code></h3>
+<p>Computes the matrix of squared Euclidean distances between each pair of data points in the dataset.</p>
+<h4 id="parameters_1">Parameters:</h4>
+<ul>
+<li><code>$square-norm-X</code>: The vector of square norms computed from <code>$X</code>.</li>
+<li>Type: <code>(NPArray ($N 1))</code></li>
+<li><code>$X</code>: The dataset.</li>
+<li>Type: <code>(NPArray ($N $D))</code></li>
+</ul>
+<h4 id="returns_1">Returns:</h4>
+<ul>
+<li>A square matrix where the entry at (i, j) is the squared Euclidean distance between data point <em>i</em> and <em>j</em>.</li>
+<li>Type: <code>(NPArray ($N $N))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringrbf-affinity-matrix"><code>spectral-clustering.rbf-affinity-matrix</code></h3>
+<p>Generates the RBF (Radial Basis Function) affinity matrix from a squared distance matrix.</p>
+<h4 id="parameters_2">Parameters:</h4>
+<ul>
+<li><code>$sqr-distance-matrix-X</code>: The matrix of squared distances between data points.</li>
+<li>Type: <code>(NPArray ($N $N))</code></li>
+<li><code>$rbf-kernel-sigma</code>: The sigma parameter for the RBF kernel.</li>
+<li>Type: <code>Number</code></li>
+</ul>
+<h4 id="returns_2">Returns:</h4>
+<ul>
+<li>A symmetric affinity matrix where each entry represents the similarity between a pair of data points based on the RBF kernel.</li>
+<li>Type: <code>(NPArray ($N $N))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringdegree"><code>spectral-clustering.degree</code></h3>
+<p>Computes the degree of each node (data point) based on the affinity matrix.</p>
+<h4 id="parameters_3">Parameters:</h4>
+<ul>
+<li><code>$W</code>: The affinity matrix.</li>
+<li>Type: <code>(NPArray ($N $N))</code></li>
+</ul>
+<h4 id="returns_3">Returns:</h4>
+<ul>
+<li>A vector where each element is the sum of the corresponding row in <code>$W</code>.</li>
+<li>Type: <code>(NPArray ($N 1))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringinverse-degree-matrix"><code>spectral-clustering.inverse-degree-matrix</code></h3>
+<p>Constructs the inverse degree matrix used for normalization.</p>
+<h4 id="parameters_4">Parameters:</h4>
+<ul>
+<li><code>$degree-W</code>: The vector of node degrees computed from <code>$W</code>.</li>
+<li>Type: <code>(NPArray ($N 1))</code></li>
+</ul>
+<h4 id="returns_4">Returns:</h4>
+<ul>
+<li>A diagonal matrix where each diagonal element is the inverse square root of the corresponding degree.</li>
+<li>Type: <code>(NPArray ($N $N))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringnormalized-laplacian"><code>spectral-clustering.normalized-laplacian</code></h3>
+<p>Computes the normalized graph Laplacian from the affinity matrix and its inverse degree matrix.</p>
+<h4 id="parameters_5">Parameters:</h4>
+<ul>
+<li><code>$W</code>: The RBF affinity matrix.</li>
+<li>Type: <code>(NPArray ($N $N))</code></li>
+<li><code>$inverse-degree-matrix-W</code>: The inverse degree matrix computed from <code>$W</code>.</li>
+<li>Type: <code>(NPArray ($N $N))</code></li>
+</ul>
+<h4 id="returns_5">Returns:</h4>
+<ul>
+<li>The normalized Laplacian matrix defined as <em>I - D^{-1/2} W D^{-1/2}</em>, where <em>I</em> is the identity matrix.</li>
+<li>Type: (NPArray ($N $N))</li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringeigh"><code>spectral-clustering.eigh</code></h3>
+<p>Performs eigen-decomposition on a given matrix.</p>
+<h4 id="parameters_6">Parameters:</h4>
+<ul>
+<li><code>$X</code>: The matrix to decompose (typically the normalized Laplacian).</li>
+<li>Type: <code>(NPArray ($N $N))</code></li>
+</ul>
+<h4 id="returns_6">Returns:</h4>
+<ul>
+<li>A tuple containing the eigenvalues and eigenvectors of <code>$X</code>.</li>
+<li>Type: <code>EighResult</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringeigenvalues"><code>spectral-clustering.eigenvalues</code></h3>
+<p>Extracts the eigenvalues from the result of the eigen-decomposition.</p>
+<h4 id="parameters_7">Parameters:</h4>
+<ul>
+<li><code>$eigh-X</code>: The tuple returned from <code>spectral-clustering.eigh</code>.</li>
+<li>Type: <code>EighResult</code></li>
+</ul>
+<h4 id="returns_7">Returns:</h4>
+<ul>
+<li>A vector containing the eigenvalues.</li>
+<li>Type: <code>(NPArray ($N))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringeigenvectors"><code>spectral-clustering.eigenvectors</code></h3>
+<p>Extracts the eigenvectors from the result of the eigen-decomposition.</p>
+<h4 id="parameters_8">Parameters:</h4>
+<ul>
+<li><code>$eigh-X</code>: The tuple returned from <code>spectral-clustering.eigh</code>.</li>
+<li>Type: <code>EighResult</code></li>
+</ul>
+<h4 id="returns_8">Returns:</h4>
+<ul>
+<li>A matrix whose columns correspond to the eigenvectors of <code>$X</code>.</li>
+<li>Type: <code>(NPArray ($N $N))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringeigval-top-k-index"><code>spectral-clustering.eigval-top-k-index</code></h3>
+<p>Finds the indices corresponding to the smallest <em>k</em> eigenvalues (after sorting).</p>
+<h4 id="parameters_9">Parameters:</h4>
+<ul>
+<li><code>$eigval-L</code>: The vector of eigenvalues.</li>
+<li>Type: <code>(NPArray ($N))</code></li>
+<li><code>$k</code>: The number of top eigenvalue indices to select.</li>
+<li>Type: <code>Number</code></li>
+</ul>
+<h4 id="returns_9">Returns:</h4>
+<ul>
+<li>A vector of indices for the top <em>k</em> eigenvalues.</li>
+<li>Type: <code>(NPArray ($N))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringspectral-embeddings"><code>spectral-clustering.spectral-embeddings</code></h3>
+<p>Computes the spectral embeddings by selecting the top <em>k</em> eigenvectors based on their eigenvalues.</p>
+<h4 id="parameters_10">Parameters:</h4>
+<ul>
+<li><code>$eigh-I</code>: The eigen-decomposition result of the normalized Laplacian.</li>
+<li>Type: <code>EighResult</code></li>
+<li><code>$k</code>: The number of clusters (and hence dimensions for the embeddings).</li>
+<li>Type: <code>Number</code></li>
+</ul>
+<h4 id="returns_10">Returns:</h4>
+<ul>
+<li>A matrix of spectral embeddings extracted from the selected eigenvectors.</li>
+<li>Type: <code>(NPArray ($N $D))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringrow-normalize"><code>spectral-clustering.row-normalize</code></h3>
+<p>Normalizes each row of a matrix to have unit norm.</p>
+<h4 id="parameters_11">Parameters:</h4>
+<ul>
+<li><code>$X</code>: A matrix (such as the spectral embeddings).</li>
+<li>Type: <code>(NPArray ($N $D))</code></li>
+</ul>
+<h4 id="returns_11">Returns:</h4>
+<ul>
+<li>The row-normalized version of <code>$X</code>.</li>
+<li>Type: <code>(NPArray ($N $D))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringcluster"><code>spectral-clustering.cluster</code></h3>
+<p>Clusters the spectral embeddings using the k-means algorithm.</p>
+<h4 id="parameters_12">Parameters:</h4>
+<ul>
+<li><code>$X</code>: The original dataset.</li>
+<li>Type: <code>(NPArray ($N $D))</code></li>
+<li><code>$num-clusters</code>: The desired number of clusters.</li>
+<li>Type: <code>Number</code></li>
+<li><code>$rbf-kernel-sigma</code>: The sigma parameter for constructing the RBF affinity matrix.</li>
+<li>Type: <code>Number</code></li>
+<li><code>$max-kmeans-iter</code>: The maximum number of iterations for the k-means algorithm.</li>
+<li>Type: <code>Number</code></li>
+</ul>
+<h4 id="returns_12">Returns:</h4>
+<ul>
+<li>The centroids obtained after clustering the row-normalized spectral embeddings with k-means.</li>
+<li>Type: <code>(NPArray ($K $D))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringfit"><code>spectral-clustering.fit</code></h3>
+<p>Performs the full spectral clustering process on the dataset.</p>
+<h4 id="parameters_13">Parameters:</h4>
+<ul>
+<li><code>$X</code>: The dataset, represented as an array of data points.</li>
+<li>Type: <code>(NPArray ($N $D))</code></li>
+<li><code>$num-clusters</code>: The desired number of clusters.</li>
+<li>Type: <code>Number</code></li>
+<li><code>$rbf-kernel-sigma</code>: The sigma parameter for the RBF kernel (default example: <code>0.1</code>).</li>
+<li>Type: <code>Number</code></li>
+<li><code>$max-kmeans-iter</code>: The maximum number of iterations for the k-means algorithm (default example: <code>100</code>).</li>
+<li>Type: <code>Number</code></li>
+</ul>
+<h4 id="returns_13">Returns:</h4>
+<ul>
+<li>The tuple containing spectral embeddings and the final centroids computed from clustering the spectral embeddings.</li>
+<li>Type: <code>((NPArray ($N $C)) (NPArray ($K $C)))</code></li>
+</ul>
+<hr />
+<h3 id="spectral-clusteringpredict"><code>spectral-clustering.predict</code></h3>
+<p>Predicts the cluster assignment for each data point in the dataset using the spectral embeddings and computed centroids.</p>
+<h4 id="parameters_14">Parameters:</h4>
+<ul>
+<li>A tuple <code>($embeddings $centroids)</code>, where:</li>
+<li><code>$embeddings</code>: The spectral embedding matrix.</li>
+<li><code>$centroids</code>: The centroids obtained from the clustering step.</li>
+<li>Type: <code>((NPArray ($N $C)) (NPArray ($K $C)))</code></li>
+<li><code>$num-clusters</code>: The number of clusters.</li>
+<li>Type: <code>Number</code></li>
+</ul>
+<h4 id="returns_14">Returns:</h4>
+<ul>
+<li>A vector of cluster labels, one for each data point, determined by assigning each point to the nearest centroid.</li>
+<li>Type: <code>((NPArray ($N)))</code></li>
+</ul>
+<h2 id="usage">Usage</h2>
+<p>To perform spectral clustering on a dataset <code>S</code> (an <code>NPArray</code> of shape <code>(n, d)</code>) with a specified number of clusters (e.g., 3), RBF kernel sigma (e.g., <code>0.1</code>), and a maximum of 100 iterations for k-means, you can use:
+<div class="highlight"><pre><span></span><code>(=
+    (embeddings-and-centroids)
+    (spectral-clustering.fit (S) 3 0.1 100)
+)
+</code></pre></div>
+To predict the cluster labels for the dataset <code>S</code>, use:
+<div class="highlight"><pre><span></span><code>(=
+    (cluster-labels)
+    (spectral-clustering.predict
+        (embeddings-and-centroids)        
+        3
+    )    
+)
+</code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/SNetGrant/metta-ul" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "search.suggest", "search.highlight", "search.share", "navigation.indexes", "toc.follow"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
