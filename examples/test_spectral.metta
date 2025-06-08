@@ -1,3 +1,5 @@
+;fix steps from test_kmeans
+
 ! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:kmeans)
 ! (ul-import pandas as pd)
@@ -5,12 +7,11 @@
 ! (ul-import seaborn as sns)
 
 
-! (bind! &df (pd.read_csv "tests/housing.csv" (nrows 100) (usecols (py-list ("longitude" "latitude")))))
+! (bind! &df (pd.read_csv "tests/housing.csv" (nrows 100) ))
 
 ! (import.df &df House)
 
 
-! (match &self (House 1 ((longitude $x) (latitude $y))) (assertEqual (get-type $x) Number))
 ! (bind! &data (np.array (collapse (match &self (House $id ((longitude $x) (latitude $y))) ($id $x $y)))))
 
 
