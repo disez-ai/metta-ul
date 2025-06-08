@@ -14,13 +14,13 @@ nav:                                # This defines your sidebar navigation
     - Spectral:
       - API: spectral-api-reference.md
       - Technical: spectral-technical.md
+      - Method: spectral-method.md
     - Bisecting:
-      - API: bisecting-api-reference.md
-      - Technical: bisecting-technical.md
+      - API: bisecting-kmeans-api-reference.md
+      - Technical: bisecting-kmeans-technical.md
     - Agglomerative:
       - API: agglomerative-api-reference.md
       - Technical: agglomerative-technical.md
-      - Method: agglomerative-method.md
   - Guides:
     - Virtualization: visualization.md # You can nest sections
 
