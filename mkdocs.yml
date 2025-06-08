@@ -1,0 +1,69 @@
+# mkdocs.yml
+site_name: Clustering Algorithms in MeTTa   # Title of your documentation site
+site_url: https://SNetGrant.github.io/metta-ul/ # Important for absolute links
+
+nav:                                # This defines your sidebar navigation
+  - Home: index.md
+  - Clustering:
+    - KMeans: 
+      - API: kmeans-api-reference.md
+      - Technical: kmeans-technical.md
+    - GMM: 
+      - API: gmm-api-reference.md
+      - Technical: gmm-technical.md
+    - Spectral:
+      - API: spectral-api-reference.md
+      - Technical: spectral-technical.md
+    - Bisecting:
+      - API: bisecting-api-reference.md
+      - Technical: bisecting-technical.md
+    - Agglomerative:
+      - API: agglomerative-api-reference.md
+      - Technical: agglomerative-technical.md
+      - Method: agglomerative-method.md
+  - Guides:
+    - Virtualization: visualization.md # You can nest sections
+
+theme:
+  name: material                  # Use the Material for MkDocs theme
+  features:
+    - navigation.tabs             # Adds top-level tabs for major sections
+    - navigation.sections         # Groups items in the sidebar
+    - search.suggest              # Search suggestions as you type
+    - search.highlight            # Highlights search results
+    - search.share                # Option to share search results link
+    - navigation.indexes          # Auto-generates index pages for sections
+    - toc.follow                  # Table of Contents follows scroll
+  palette:                        # Customize colors
+    - scheme: default
+      primary: teal
+      accent: deep orange
+    - scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-4 # Icon for dark mode switch
+        name: Switch to light mode
+  # You can add a logo, favicon, and other assets here
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+
+extra:
+  social:                         # Add social links if desired
+    - icon: fontawesome/brands/github
+      link: https://github.com/SNetGrant/metta-ul
+
+plugins:
+  - search:                       # Enable the search plugin
+      lang: en
+  # If you want documentation versioning:
+  # - gl_tooling.mkdocs.versioning # Example plugin for versioning (requires setup)
+
+markdown_extensions:              # Useful Markdown extensions
+  - admonition                    # For info/warning/danger blocks
+  - pymdownx.details              # For collapsible sections
+  - pymdownx.superfences          # For advanced code blocks
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list                     # For adding attributes to markdown elements
+  - md_in_html                    # Allows Markdown inside HTML blocks
