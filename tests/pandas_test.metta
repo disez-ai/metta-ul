@@ -4,13 +4,21 @@
 
 ! (bind! &df (pd.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
 
-; ! (let* (
-;     ($dfs (pd.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
-;     (() (println! ($dfs)))
-;     ) $dfs)
+! (let $nda (pd.DataFrame.values (pd.read_csv "tests/housing.csv" )) (get-type $nda))
+
+! (assertEqual (get-type &df) (PDataFrame))
 
 (= (fake-function $df) $df)
 
 ! (assertEqual (fake-function 1) 1)
 
+;;; breaking calls 
+
+; ! (let $nda (pd.DataFrame.values &df) (get-type $nda))
+
 ; ! (assertEqual (fake &df) &df)
+
+; ! (let* (
+;     ($dfs (pd.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
+;     ; (() (println! ($dfs)))
+;     ) $dfs)
