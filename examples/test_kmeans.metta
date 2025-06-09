@@ -2,18 +2,30 @@
 ! (import! &self metta_ul:cluster:kmeans)
 
 ! (ul-import pandas as pd)
-! (ul-from sklearn import preprocessing)
-! (ul-import seaborn as sns)
+! (ul-import numpy as unp)
+! (ul-from sklearn.preprocessing import StandardScaler)
+! (ul-from sklearn.preprocessing import OneHotEncoder)
+! (ul-from sklearn.impute import SimpleImputer)
+! (ul-from sklearn.manifold import TSNE)
+! (ul-import seaborn as usns)
 
-! (bind! &df (pd.read_csv "tests/housing.csv"))
+! (bind! &df (pd.DataFrame.values (pd.read_csv "tests/housing.csv")))
 
-; add data preprocessing for one-hot-encoding for ocean_proximity col 
-; look like using pandas will be the easier option. but investigate!
+(= (pre $values)
+    (let* (
+        ($imputer (SimpleImputer (strategy "median")))
+        ($numerical-numpy (ul-slice $values [:,:-1]))
+        ($categorical-numpy (ul-slice $values [:,-1:]))
+        ($imputed-numerical-numpy (SimpleImputer.fit_transform $imputer $numerical-numpy))
+        ($one-encoder (OneHotEncoder (handle_unknown "ignore") (sparse_output (py-atom False))))
+        ($encoded-numpy (OneHotEncoder.fit_transform $one-encoder $categorical-numpy))
+        ($X (unp.concatenate (py-tuple ($imputed-numerical-numpy $encoded-numpy)) (axis 1)))
+        ($scaler (StandardScaler))
+        ($X-scaled (StandardScaler.fit_transform $scaler $X))
+    ) $X-scaled)
+)
 
-! (bind! &X (pd.DataFrame.values &df))
-
-! (bind! &X-norm (preprocessing.normalize &X))
-
+! (bind! &X-scaled (pre &df))
 
 (= (fit-predict $ds)  
   (let* (
@@ -22,11 +34,17 @@
   ) $labels )
 )
 
+(= (reduce-dimension $ds)  
+  (let* (
+    ($tsne (TSNE (n_components 2) (random_state 42) (perplexity 30) (max_iter 1000)))
+    ($res (TSNE.fit_transform $tsne $ds))
+  ) $res )
+)
 
-! (bind! &labels (fit-predict &X-norm 3))
+! (bind! &labels (fit-predict &X-scaled))
 
-; use sklearn.manifold.TSNE to reduce dimension to 2.
-; and make a DataFrame out of it for visualization
+! (bind! &X-reduced (reduce-dimension &X-scaled))
 
-! (bind! &plot (sns.scatterplot (data &df) (x "longitude")  (y "latitude") (hue  &labels)))
+! (bind! &plot (usns.scatterplot (x (ul-slice &X-reduced [:,0])) (y (ul-slice &X-reduced [:,1])) (hue &labels)))
 
+! (println! ("data" (get-type &plot)))
