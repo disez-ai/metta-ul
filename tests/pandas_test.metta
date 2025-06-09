@@ -8,6 +8,10 @@
 
 ! (assertEqual (get-type &df) (PDataFrame))
 
+! (bind! &nda (pd.DataFrame.values (pd.read_csv "tests/housing.csv")))
+
+! (assertEqual (get-type &nda) (NPArray (20640 10)))
+
 (= (fake-function $df) $df)
 
 ! (assertEqual (fake-function 1) 1)
