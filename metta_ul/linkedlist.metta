@@ -1,3 +1,5 @@
+! (import! &self metta_ul:functools)
+
 ;; Declaration of typed List data type and constructors
 (: List (-> $a Type))
 (: Nil (List $a))
@@ -13,8 +15,8 @@
               ($tail (cdr-atom $expr)))
          (Cons $head (List.fromExpression $tail)))))
 
-(: List.twoCombinations.map (-> (-> $a $a $b) (List $a) (List $b)))
-(: List.twoCombinations.map (-> (-> $a $a $b) (List $a) (List $a) (List $b)))
+(: List.twoCombinations.map (-> (-> ($a $a) $b) (List $a) (List $b)))
+(: List.twoCombinations.map (-> (-> ($a $a) $b) (List $a) (List $a) (List $b)))
 (= 
     (List.twoCombinations.map $f Nil)
     Nil
@@ -28,22 +30,16 @@
     (case ($list1 $list2)
         (
             ((Nil Nil) Nil)
-            (((Cons $x $xs) (Cons $y $ys)) (Cons ($f $x $y) (List.twoCombinations.map $f $list1 $ys)))
+            (((Cons $x $xs) (Cons $y $ys)) (Cons ($f ($x $y)) (List.twoCombinations.map $f $list1 $ys)))
             (((Cons $x $xs) Nil) (List.twoCombinations.map $f $xs))
         )
     )
 )
 
-(: List.twoCombinations.identity (-> $a $a ($a $a)))
-(=
-    (List.twoCombinations.identity $x $y)
-    ($x $y)
-)
-
 (: List.twoCombinations (-> (List $a) (List ($a $a))))
 (= 
     (List.twoCombinations $list)
-    (List.twoCombinations.map List.twoCombinations.identity $list)
+    (List.twoCombinations.map (Lambda $p $p) $list)
 )
 
 (: List.in (-> $a (List $a) Bool))
