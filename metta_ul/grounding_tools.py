@@ -16,6 +16,7 @@ from hyperon.atoms import (
     IncorrectArgumentError,
 )
 from hyperon.ext import register_atoms
+from .pandas import _dataframe_atom_value, _dataframe_atom_type
 import numpy as np
 import pandas as pd
 from .array_like_tools import parse_to_slice
@@ -73,7 +74,9 @@ def escape_dots(s: str) -> str:
 
 
 def atom_value(value):
-    if isinstance(value, np.ndarray):
+    if isinstance(value, pd.DataFrame):
+        return _dataframe_atom_value(value, _dataframe_atom_type(value))
+    elif isinstance(value, np.ndarray):
         return _np_atom_value(value, _np_atom_type(value))
     elif isinstance(value, list):
         return ValueAtom(value)
