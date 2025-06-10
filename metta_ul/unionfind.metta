@@ -11,7 +11,7 @@
     )
 )
 
-(: Union.find (-> UnionFind Number Number))
+(: UnionFind.find (-> UnionFind Number Number))
 (=
     (UnionFind.find ($parent $count) $u)
     (let $parent-u (np.item $parent $u)
@@ -24,7 +24,7 @@
     )
 )
 
-(: UnionFind.union (-> UnionFind Number Number Bool))
+(: UnionFind.union (-> UnionFind Number Number UnionFind))
 (=
     (UnionFind.union ($parent $count) $u $v)
     (let* (
@@ -46,4 +46,16 @@
     (let $ru (UnionFind.find ($parent $count) $u)
         ((py-dot (np.nonzero (np.equal $parent $ru)) __getitem__) 0)
     )
+)
+
+(: UnionFind.areUnified (-> UnionFind Number Number Bool))
+(=
+    (UnionFind.areUnified $uf $u $v)
+    (== (UnionFind.find $uf $u) (UnionFind.find $uf $v))
+)
+
+(: UnionFind.roots (-> UnionFind (NPArray ($k))))
+(=
+    (UnionFind.roots ($parent $count))
+    (np.unique $parent)
 )
