@@ -94,7 +94,7 @@
     (agglomerative.heapify.test)
     (assertEqual
         (agglomerative.heapify (np.array (distance-matrix2)))
-        (Heap.Node (1.0 1 0) (Heap.Node (2.0 2 0) (Heap.Node (3.0 2 1) Nil Nil) Nil) Nil)
+        (Heap.Node 1 (1.0 0 1) (Heap.Node 1 (1.0 1 0) Nil (Heap.Node 0 (2.0 2 0) Nil Nil)) Nil)
     )
 )
 (Test agglomerative.heapify.test)
@@ -110,7 +110,7 @@
             ((np.vector 0 1) 2)
             0
         )
-        (Heap.Node (1.0 0 1) Nil Nil)
+        (Heap.Node 0 (1.0 0 1) Nil Nil)
     )
 )
 (Test agglomerative.heappush.test)
@@ -129,7 +129,7 @@
     (agglomerative.cluster.testOneCluster)
     (assertEqual
         (agglomerative.cluster (np.array (X)) 1 "single")
-        ((np.vector 0 0) 1)
+        ((np.vector 1 1) 1)
     )
 )
 (Test agglomerative.cluster.testOneCluster)

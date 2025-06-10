@@ -30,29 +30,29 @@
 )
 
 (: agglomerative.heapify (-> (NPArray ($a $a)) (Heap (Number Number Number))))
-(: agglomerative.heapify (-> (NPArray ($a $a)) Number Number (Heap (Number Number Number)) (Heap (Number Number Number))))
+(: agglomerative.heapify (-> (NPArray ($a $a)) (NPArray ($a)) Number (Heap (Number Number Number)) (Heap (Number Number Number))))
 (=
     (agglomerative.heapify $distance-matrix)
     (let $n (np.shape $distance-matrix 0)
-        (agglomerative.heapify $distance-matrix (- $n 1) (- $n 2) Nil)
+        (agglomerative.heapify $distance-matrix (np.argmin (np.add $distance-matrix (np.mul (np.max $distance-matrix) (np.eye (np.shape $distance-matrix 0)))) 0) (- $n 1) Nil)
     )
 )
 (=
-    (agglomerative.heapify $distance-matrix $i $j $heap)
-    (if (and (== $i 1) (== $j 0))
-        (Heap.push 
-            $heap 
-            (
-                (np.item $distance-matrix (py-tuple ($i $j)))
-                $i
-                $j
+    (agglomerative.heapify $distance-matrix $nn $i $heap)
+    (let $j (np.item $nn $i)
+        (if (== $i 0)
+            (Heap.push 
+                $heap 
+                (
+                    (np.item $distance-matrix (py-tuple ($i $j)))
+                    $i
+                    $j
+                )
             )
-        )
-        (let ($k $l) (if (== $j 0) ((- $i 1) (- $i 2)) ($i (- $j 1)))
             (agglomerative.heapify 
                 $distance-matrix
-                $k
-                $l
+                $nn
+                (- $i 1)
                 (Heap.push 
                     $heap 
                     (
