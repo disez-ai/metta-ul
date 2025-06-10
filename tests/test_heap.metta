@@ -53,8 +53,8 @@
 (=
     (Heap.merge.testNilRight)
     (assertEqual
-        (Heap.merge (Heap.Node 2 Nil Nil) Nil)
-        (Heap.Node 2 Nil Nil)
+        (Heap.merge (Heap.Node 0 1 Nil Nil) Nil)
+        (Heap.Node 0 1 Nil Nil)
     )
 )
 (Test Heap.merge.testNilRight)
@@ -62,8 +62,8 @@
 (=
     (Heap.merge.testNilLeft)
     (assertEqual
-        (Heap.merge Nil (Heap.Node 1 Nil Nil))
-        (Heap.Node 1 Nil Nil)
+        (Heap.merge Nil (Heap.Node 0 1 Nil Nil))
+        (Heap.Node 0 1 Nil Nil)
     )
 )
 (Test Heap.merge.testNilLeft)
@@ -71,8 +71,8 @@
 (=
     (Heap.merge.testNumberLess)
     (assertEqual
-        (Heap.merge (Heap.Node 1 Nil Nil) (Heap.Node 2 Nil Nil))
-        (Heap.Node 1 (Heap.Node 2 Nil Nil) Nil)
+        (Heap.merge (Heap.Node 0 1 Nil Nil) (Heap.Node 0 2 Nil Nil))
+        (Heap.Node 1 1 Nil (Heap.Node 0 2 Nil Nil))
     )
 )
 (Test Heap.merge.testNumberLess)
@@ -89,8 +89,8 @@
 (=
     (Heap.merge.testExpression)
     (assertEqual
-        (Heap.merge (Heap.Node (1 A) Nil Nil) (Heap.Node (2 B) Nil Nil))
-        (Heap.Node (1 A) (Heap.Node (2 B) Nil Nil) Nil)
+        (Heap.merge (Heap.Node 0 (1 A) Nil Nil) (Heap.Node 0 (2 B) Nil Nil))
+        (Heap.Node 1 (1 A) Nil (Heap.Node 0 (2 B) Nil Nil))
     )
 )
 (Test Heap.merge.testExpression)
@@ -99,7 +99,7 @@
     (Heap.push.testNilNumber)
     (assertEqual
         (Heap.push Nil 1)
-        (Heap.Node 1 Nil Nil)
+        (Heap.Node 0 1 Nil Nil)
     )
 )
 (Test Heap.push.testNilNumber)
@@ -107,7 +107,7 @@
     (Heap.push.testNilExpression)
     (assertEqual
         (Heap.push Nil (1 A))
-        (Heap.Node (1 A) Nil Nil)
+        (Heap.Node 0 (1 A) Nil Nil)
     )
 )
 (Test Heap.push.testNilExpression)
@@ -115,16 +115,16 @@
 (=
     (Heap.push.testOneNumberLess)
     (assertEqual
-        (Heap.push (Heap.Node 1 Nil Nil) 2)
-        (Heap.Node 1 (Heap.Node 2 Nil Nil) Nil)
+        (Heap.push (Heap.Node 0 1 Nil Nil) 2)
+        (Heap.Node 1 1 Nil (Heap.Node 0 2 Nil Nil))
     )
 )
 (Test Heap.push.testOneNumberLess)
 (=
     (Heap.push.testOneExpressionLess)
     (assertEqual
-        (Heap.push (Heap.Node (1 A) Nil Nil) (2 B))
-        (Heap.Node (1 A) (Heap.Node (2 B) Nil Nil) Nil)
+        (Heap.push (Heap.Node 0 (1 A) Nil Nil) (2 B))
+        (Heap.Node 1 (1 A) Nil (Heap.Node 0 (2 B) Nil Nil))
     )
 )
 (Test Heap.push.testOneExpressionLess)
@@ -132,16 +132,16 @@
 (=
     (Heap.push.testOneNumberGreater)
     (assertEqual
-        (Heap.push (Heap.Node 2 Nil Nil) 1)
-        (Heap.Node 1 (Heap.Node 2 Nil Nil) Nil)
+        (Heap.push (Heap.Node 0 2 Nil Nil) 1)
+        (Heap.Node 1 1 Nil (Heap.Node 0 2 Nil Nil))
     )
 )
 (Test Heap.push.testOneNumberGreater)
 (=
     (Heap.push.testOneExpressionGreater)
     (assertEqual
-        (Heap.push (Heap.Node (2 B) Nil Nil) (1 A))
-        (Heap.Node (1 A) (Heap.Node (2 B) Nil Nil) Nil)
+        (Heap.push (Heap.Node 0 (2 B) Nil Nil) (1 A))
+        (Heap.Node 1 (1 A) Nil (Heap.Node 0 (2 B) Nil Nil))
     )
 )
 (Test Heap.push.testOneExpressionGreater)
@@ -157,7 +157,7 @@
 (=
     (Heap.peek.testNumber)
     (assertEqual
-        (Heap.peek (Heap.Node 1 Nil Nil))
+        (Heap.peek (Heap.Node 0 1 Nil Nil))
         1
     )
 )
@@ -165,7 +165,7 @@
 (=
     (Heap.peek.testExpression)
     (assertEqual
-        (Heap.peek (Heap.Node (1 A) Nil Nil))
+        (Heap.peek (Heap.Node 0 (1 A) Nil Nil))
         (1 A)
     )
 )
@@ -182,7 +182,7 @@
 (=
     (Heap.pop.testOne)
     (assertEqual
-        (Heap.pop (Heap.Node 1 Nil Nil))
+        (Heap.pop (Heap.Node 0 1 Nil Nil))
         Nil
     )
 )
@@ -190,8 +190,8 @@
 (=
     (Heap.pop.testTwo)
     (assertEqual
-        (Heap.pop (Heap.Node 1 (Heap.Node 2 Nil Nil) Nil))
-        (Heap.Node 2 Nil Nil)
+        (Heap.pop (Heap.Node 1 1 Nil (Heap.Node 0 2 Nil Nil)))
+        (Heap.Node 0 2 Nil Nil)
     )
 )
 (Test Heap.pop.testTwo)
