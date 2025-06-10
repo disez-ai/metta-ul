@@ -51,6 +51,24 @@
 (Test Heap.lessOrEqual.testExpressionGreater)
 
 (=
+    (Heap.merge.testNilRight)
+    (assertEqual
+        (Heap.merge (Heap.Node 2 Nil Nil) Nil)
+        (Heap.Node 2 Nil Nil)
+    )
+)
+(Test Heap.merge.testNilRight)
+
+(=
+    (Heap.merge.testNilLeft)
+    (assertEqual
+        (Heap.merge Nil (Heap.Node 1 Nil Nil))
+        (Heap.Node 1 Nil Nil)
+    )
+)
+(Test Heap.merge.testNilLeft)
+
+(=
     (Heap.merge.testNumberLess)
     (assertEqual
         (Heap.merge (Heap.Node 1 Nil Nil) (Heap.Node 2 Nil Nil))
