@@ -1,100 +1,96 @@
 import numpy as np
+from heapq import heappush, heappop
 
+def euclidean_distance_matrix(X):
+    diffs = X[:, None, :] - X[None, :, :]
+    return np.linalg.norm(diffs, axis=-1)
 
-def euclidean_distance_matrix(points):
-    """Compute the pairwise Euclidean distance matrix using vectorized operations."""
-    points = np.array(points)
-    diffs = points[:, np.newaxis, :] - points[np.newaxis, :, :]
-    return np.sqrt(np.sum(diffs**2, axis=-1))
-
-
-def linkage_distance(dist_matrix, cluster1, cluster2, linkage):
-    """Compute linkage distance between two clusters based on the specified method."""
-    distances = dist_matrix[np.ix_(cluster1, cluster2)]
-    if linkage == "single":
-        return np.min(distances)
-    elif linkage == "complete":
-        return np.max(distances)
-    elif linkage == "average":
-        return np.mean(distances)
+def cluster_distance(dist_matrix, c1, c2, linkage):
+    d = dist_matrix[np.ix_(list(c1), list(c2))]
+    if linkage == 'single':
+        return np.min(d)
+    elif linkage == 'complete':
+        return np.max(d)
+    elif linkage == 'average':
+        return np.mean(d)
     else:
-        raise ValueError(
-            "Invalid linkage type. Choose 'single', 'complete', or 'average'."
-        )
+        raise ValueError("Invalid linkage type")
 
+class UnionFind:
+    def __init__(self, n):
+        self.parent = np.arange(n)
+        self.count = n
 
-def merge_clusters(clusters, dist_matrix, linkage):
-    """Find and merge the two closest clusters based on the linkage criterion."""
-    n = len(clusters)
-    min_dist = float("inf")
-    merge_pair = None
+    def find(self, u):
+        if self.parent[u] != u:
+            self.parent[u] = self.find(self.parent[u])
+        return self.parent[u]
 
-    # Find the closest pair of clusters
+    def union(self, u, v):
+        ru, rv = self.find(u), self.find(v)
+        if ru == rv:
+            return
+        self.parent[rv] = ru
+        self.count -= 1
+    
+    def __getitem__(self, index):
+        root = self.find(index)
+        return np.nonzero(np.equal(self.parent, root))[0]
+    
+    def __iter__(self):
+        roots = np.unique(self.parent)
+        for root in roots:
+            yield root, self[root]
+
+def hierarchical_clustering(X, k=2, linkage='single'):
+    n = len(X)
+    dist_matrix = euclidean_distance_matrix(X)
+
+    # Initialize disjoint clusters and priority queue
+    uf = UnionFind(n)
+    heap = [(dist_matrix[i, j], i, j) for i in range(n) for j in range(i+1, n)]
+    heap.sort()
+
+    while uf.count > k:
+        d, i, j = heappop(heap)
+        ri, rj = uf.find(i), uf.find(j)
+        if ri == rj:
+            continue
+
+        # Merge clusters
+        uf.union(ri, rj)
+        new_root = uf.find(ri)
+        new_cluster = uf[new_root]
+
+        # Update distances to all other clusters
+        for root, cluster in uf:
+            if root == new_root:
+                continue
+            d_new = cluster_distance(dist_matrix, new_cluster, cluster, linkage)
+            heappush(heap, (d_new, new_root, root))
+
+    # Build final labels
+    label_map = {}
+    labels = np.empty(n, dtype=int)
+    current_label = 0
     for i in range(n):
-        for j in range(i + 1, n):
-            dist = linkage_distance(dist_matrix, clusters[i], clusters[j], linkage)
-            if dist < min_dist:
-                min_dist = dist
-                merge_pair = (i, j)
-
-    # Merge the closest clusters
-    i_min, j_min = merge_pair
-    new_cluster = clusters[i_min] + clusters[j_min]
-
-    # Create a new list of clusters excluding merged ones
-    new_clusters = [clusters[k] for k in range(n) if k not in (i_min, j_min)]
-    new_clusters.append(new_cluster)
-
-    return new_clusters, ((clusters[i_min], clusters[j_min]), min_dist)
+        root = uf.find(i)
+        if root not in label_map:
+            label_map[root] = current_label
+            current_label += 1
+        labels[i] = label_map[root]
+    return labels
 
 
-def hierarchical_clustering(points, linkage="single"):
-    """
-    Perform bottom-up hierarchical clustering using recursion and NumPy.
-
-    Parameters:
-        points (list): A list of points (each point is a NumPy array or list of coordinates).
-        linkage (str): Linkage method: 'single', 'complete', or 'average'.
-
-    Returns:
-        A tuple (final_cluster, merge_history) where:
-          - final_cluster is the single cluster containing all points.
-          - merge_history is a list of tuples recording the merged clusters and their distances.
-    """
-    # Compute pairwise Euclidean distance matrix
-    dist_matrix = euclidean_distance_matrix(points)
-
-    # Start with each point as its own cluster (store indices)
-    clusters = [[i] for i in range(len(points))]
-    merge_history = []
-
-    def recursive_merge(clusters, merge_history):
-        if len(clusters) == 1:
-            return clusters[0], merge_history
-
-        new_clusters, merge_info = merge_clusters(clusters, dist_matrix, linkage)
-        merge_history.append(merge_info)
-
-        return recursive_merge(new_clusters, merge_history)
-
-    final_cluster, history = recursive_merge(clusters, merge_history)
-
-    # Convert indices back to original points
-    final_cluster = [points[i] for i in final_cluster]
-
-    return final_cluster, history
-
-
-# Example usage:
 if __name__ == "__main__":
-    # Define a simple dataset (each point is a NumPy array or tuple of coordinates).
-    data_points = np.array([[1, 2], [2, 3], [5, 8], [8, 8], [1, 0]])
-
-    # Perform clustering using different linkage criteria.
-    for method in ["single", "complete", "average"]:
-        final_cluster, history = hierarchical_clustering(data_points, linkage=method)
-        print(f"\nLinkage: {method}")
-        print("Merge History (merged clusters and distance at merge):")
-        for merge, dist in history:
-            print(f"Merge: {merge}, Distance: {dist:.3f}")
-        print("Final Cluster:", final_cluster)
+    X = np.array([
+        [0, 0],
+        [1, 1],
+        [1, 0],
+        [5, 5],
+        [10, 10],
+        [5.5, 5.2]
+    ])
+    for linkage in ["single", "complete", "average"]:
+        labels = hierarchical_clustering(X, k=4, linkage=linkage)
+        print(f"{linkage.title()} linkage: {labels}")
