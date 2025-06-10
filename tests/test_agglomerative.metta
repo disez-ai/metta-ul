@@ -129,7 +129,7 @@
     (agglomerative.cluster.testOneCluster)
     (assertEqual
         (agglomerative.cluster (np.array (X)) 1 "single")
-        ((np.vector 1 1) 1)
+        ((np.vector 0 0) 1)
     )
 )
 (Test agglomerative.cluster.testOneCluster)
