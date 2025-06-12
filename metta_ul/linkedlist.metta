@@ -1,13 +1,13 @@
 ! (import! &self metta_ul:functools)
 
-;; Declaration of typed List data type and List.Nodetructors
-(: List (-> $a Type))
-(: Nil (List $a))
-(: List.Node (-> $a (List $a) (List $a)))
+;; Declaration of List data type and List.Nodetructors
+(: List Type)
+(: Nil List)
+(: List.Node (-> $a List List))
 
 ;; Build a list from an expression, containing all the sub-expressions
 ;; as elements of the list.
-(: List.fromExpression (-> Expression (List $a)))
+(: List.fromExpression (-> Expression List))
 (= (List.fromExpression $expr)
    (if (== $expr ())
        Nil
@@ -15,8 +15,8 @@
               ($tail (cdr-atom $expr)))
          (List.Node $head (List.fromExpression $tail)))))
 
-(: List.twoCombinations.map (-> (-> ($a $a) $b) (List $a) (List $b)))
-(: List.twoCombinations.map (-> (-> ($a $a) $b) (List $a) (List $a) (List $b)))
+(: List.twoCombinations.map (-> (-> ($a $b) $c) List List))
+(: List.twoCombinations.map (-> (-> ($a $b) $c) List List List))
 (= 
     (List.twoCombinations.map $f Nil)
     Nil
@@ -36,20 +36,20 @@
     )
 )
 
-(: List.twoCombinations (-> (List $a) (List ($a $a))))
+(: List.twoCombinations (-> List List))
 (= 
     (List.twoCombinations $list)
     (List.twoCombinations.map (Lambda $p $p) $list)
 )
 
-(: List.in (-> $a (List $a) Bool))
+(: List.in (-> $a List Bool))
 (= (List.in $x Nil) False)
 (=
     (List.in $x (List.Node $y $ys))
     (if (== $x $y) True (List.in $x $ys))
 )
 
-(: List.remove (-> (List $a) (List $a) (List $a)))
+(: List.remove (-> List List List))
 (= (List.remove $rm Nil) Nil)
 (= (List.remove $rm (List.Node $x $xs))
     (if (List.in $x $rm)
@@ -58,21 +58,21 @@
     )
 )
 
-(: List.push (-> $a (List $a) (List $a)))
+(: List.push (-> $a List List))
 (= (List.push $y Nil) (List.Node $y Nil))
 (= (List.push $y $list) (List.Node $y $list))
 
-(: List.append (-> $a (List $a) (List $a)))
+(: List.append (-> $a List List))
 (= (List.append $y Nil) (List.Node $y Nil))
 (= (List.append $y (List.Node $x $xs))
     (List.Node $x (List.append $y $xs))
 )
 
-(: List.length (-> (List $a) Number))
+(: List.length (-> List Number))
 (= (List.length Nil) 0)
 (= (List.length (List.Node $x $xs)) (+ 1 (List.length $xs)))
 
-(: List.concat (-> (List $a) (List $a) (List $a)))
+(: List.concat (-> List List List))
 (= (List.concat Nil Nil) Nil)
 (= (List.concat (List.Node $x $xs) Nil) (List.Node $x $xs))
 (= (List.concat Nil (List.Node $y $ys)) (List.Node $y $ys))
