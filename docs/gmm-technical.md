@@ -98,18 +98,18 @@ scikit‑learn provides `GaussianMixture` with C-optimized loops and multiple co
 | Feature             | MeTTa Implementation       | scikit‑learn             |
 |---------------------|----------------------------|--------------------------|
 | Covariance types    | full only                  | full, tied, diag, spherical |
-| Initialization      | uniform + random samples   | k‑means++, random        |
-| Convergence control | fixed max_iter             | tol on log‑likelihood    |
+| Initialization      | random                     | k‑means++, random        |
+| Convergence control | tol on log‑likelihood      | tol on log‑likelihood    |
 | Parallelization     | single‑threaded            | single‑threaded          |
 
 ## Benchmark Setup
-| Dataset          | Time (s)             | Silhouette  | Calinski-Harabasz | Davies-Bouldin | Adjusted Rand Index | Normalized Mutual Info | Adjusted Mutual Info |
-| ---------------- | -------------------- | ----------- | ----------------- | -------------- | ------------------- | ---------------------- | -------------------- |
-| noisy\_moon      | 11.45                | 0.3140      | 224.19            | 0.9050         | 0.1654              | 0.2800                 | 0.2787               |
-| varied           | 11.58                | 0.5881      | 1198.59           | 0.6846         | 0.9468              | 0.9160                 | 0.9157               |
-| no-structure     | 11.30                | 0.3548      | 337.10            | 0.9267         | 0.0000              | 0.0000                 | 0.0000               |
-| blobs            | 11.68                | 0.6538      | 1422.54           | 0.4799         | 0.9644              | 0.9479                 | 0.9477               |
-| noisy_circles    | 11.74                | 0.3102      | 232.51            | 1.198          | 0.0127              | 0.0124                 | 0.0109               |
+| Dataset        | MeTTa Time (s) | scikit-learn Time (s) | Silhouette | Calinski-Harabasz | Davies-Bouldin | Adjusted Rand Index | Normalized Mutual Info | Adjusted Mutual Info |
+| -------------- | --------------- | ---------------------- | ---------- | ------------------ | --------------- | ------------------- | ---------------------- | -------------------- |
+| varied         | 15.125          | <0.01                  | 0.58807    | 1198.59            | 0.68460         | 0.94682             | 0.91605                | 0.91574              |
+| blobs          | 4.519           | <0.01                  | 0.65379    | 1422.54            | 0.47993         | 0.96444             | 0.94787                | 0.94768              |
+| noisy_circles  | 149.801         | <0.01                  | 0.34909    | 281.92             | 1.19307         | -0.00199            | 0.00001                | -0.00144             |
+| noisy_moon     | 78.848          | <0.01                  | 0.35369    | 297.61             | 0.88993         | 0.23313             | 0.33222                | 0.33114              |
+| no-structure   | 151.017         | <0.01                  | 0.22208    | 181.17             | 1.60891         | 0                   | 0                      | 0                    |
 
 ## Usage Example
 ```metta
@@ -121,9 +121,7 @@ scikit‑learn provides `GaussianMixture` with C-optimized loops and multiple co
 ```
 
 ## Limitations & Future Work
-- Support additional covariance structures.  
-- Early stopping on log‑likelihood change.  
-- Integrate MeTTa’s parallel capabilities.  
+- Support additional covariance structures.
 
 ## Conclusion
 The GMM implementation demonstrates MeTTa’s ability to express probabilistic EM algorithms declaratively. While performance depends on NumPy backends, the clear, recursive definitions simplify future extensions.
