@@ -470,13 +470,13 @@ def test_spectral_clustering_cluster(metta: MeTTa):
             (spectral-clustering.spectral-embeddings
                 (spectral-clustering.eigh
                     (spectral-clustering.normalized-laplacian
-                        (spectral-clustering.compute-rbf-affinity-matrix 
+                        (spectral-clustering.compute-affinity-matrix 
                             (X1)
                             0.1
                         )
                         (spectral-clustering.inverse-degree-matrix
                             (spectral-clustering.degree
-                                (spectral-clustering.compute-rbf-affinity-matrix 
+                                (spectral-clustering.compute-affinity-matrix 
                                     (X1)
                                     0.1
                                 )
@@ -521,13 +521,13 @@ def test_spectral_clustering_cluster(metta: MeTTa):
             (spectral-clustering.spectral-embeddings
                 (spectral-clustering.eigh
                     (spectral-clustering.normalized-laplacian
-                        (spectral-clustering.compute-rbf-affinity-matrix 
+                        (spectral-clustering.compute-affinity-matrix 
                             (X2)
                             0.1
                         )
                         (spectral-clustering.inverse-degree-matrix
                             (spectral-clustering.degree
-                                (spectral-clustering.compute-rbf-affinity-matrix 
+                                (spectral-clustering.compute-affinity-matrix 
                                     (X2)
                                     0.1
                                 )
@@ -607,7 +607,30 @@ def test_spectral_clustering_fit_and_predict_knn_graph_mode(metta: MeTTa):
         """
     )
     result: Atom = metta.run(
-        """
+        """        
+        ; Removing the RBF-based spectral-clustering.compute-affinity-matrix function
+        ! (match &self (= (spectral-clustering.compute-affinity-matrix $X $rbf-kernel-sigma) $Expression) (remove-atom &self (= (spectral-clustering.compute-affinity-matrix $X $rbf-kernel-sigma) $Expression)))
+        
+        ; =================== KNN mode ===================
+        ; Defining the KNN graph-based spectral-clustering.compute-affinity-matrix function
+        (=
+            (spectral-clustering.compute-affinity-matrix $X $n-neighbors)
+            (let*
+                (
+                    ($dist (spectral-clustering.square-distance-matrix (spectral-clustering.square-norm $X) $X))
+                    ($N (np.shape $dist 0))
+                    ($end-index (+ 1 $n-neighbors))
+                    ($knn-indices (np.take (np.argsort $dist 1) (np.arange 1 $end-index) 1))
+                    ($row-index (np.reshape (np.arange $N) (np.array ($N 1))))
+                    ($flat-index (np.reshape (np.add (np.mul $row-index $N) $knn-indices) -1))
+                    ($mask (np.isin (np.arange (* $N $N)) $flat-index))
+                    ($A-flat (np.where $mask 1.0 0.0))
+                    ($A (np.reshape $A-flat (np.array ($N $N))))
+                )
+                (np.add 0.00000001 (np.maximum $A (np.transpose $A)))
+            )
+        )                
+        
         (= 
             (X)
             (np.array ((0.0 0.0) (0.1 0) (1.0 1.0) (1.1 1.0)))
@@ -616,13 +639,11 @@ def test_spectral_clustering_fit_and_predict_knn_graph_mode(metta: MeTTa):
         (: fit-outputs (-> ((NPArray (4 2)) (NPArray (2 2)))))
         (=
             (fit-outputs)
-            (spectral-clustering.fit (X) 2 "binary-knn-graph" 1 10)
+            (spectral-clustering.fit (X) 2 1 10)
         )
-        ;! (fit-outputs)
         ! (spectral-clustering.predict (fit-outputs) 2)
-        ;! (np.add 0.0000001 (spectral-clustering.compute-knn-binary-graph-affinity-matrix (X) 1))
         """
-    )[0][0]
+    )[1][0]
 
     cluster_labels = result.get_object().value
     assert (
@@ -642,60 +663,3 @@ def test_spectral_clustering_fit_and_predict_knn_graph_mode(metta: MeTTa):
     assert np.array_equal(
         unique_values, expected_values
     ), f"The unique values in the array are not [0, 1]! {cluster_labels}"
-    pass
-
-# def test_real_data(metta: MeTTa):
-#     metta.run(
-#         """
-#         ! (import! &self metta_ul:cluster:spectral_clustering)
-#         ! (ul-import sklearn.datasets as dts)
-#         """
-#     )
-#     result: Atom = metta.run(
-#         """
-#         (= (get-cons $n) (match &self (Cons $n $y) $y))
-#         (Cons seed 30)
-#         (Cons random_state 170)
-#         (Cons n_samples 1000)
-#         (Param default (Cons n_clusters 3))
-#         (=
-#             (data)
-#             (dts.make_circles (n_samples (get-cons n_samples)) (factor 0.5) (noise 0.05) (random_state (get-cons seed)))
-#         )
-#         (=
-#             (get-X ($X $y))
-#             $X
-#         )
-#         (=
-#             (get-y ($X $y))
-#             $y
-#         )
-#         ! (data)
-#         """
-#     )[0][0]
-#     X = result.get_children()[0].get_object().content
-#     y_true = result.get_children()[1].get_object().content
-#     result: Atom = metta.run(
-#         """
-#         (=
-#             (fit-outputs)
-#             (spectral-clustering.fit (get-X (data)) 2)
-#         )
-#
-#         ! (spectral-clustering.predict (fit-outputs) 2)
-#         """
-#     )[0][0]
-#     y_pred = result.get_object().content
-#     ari = adjusted_rand_score(y_true, y_pred)
-#     import seaborn as sns
-#     import matplotlib.pyplot as plt
-#
-#     # Create a scatter plot using X (2D data) and color points by cluster labels (y_pred)
-#     plt.figure(figsize=(10, 8))
-#     sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=y_pred, palette='viridis', s=50, alpha=0.8)
-#     plt.title('Spectral Clustering Results')
-#     plt.xlabel('Feature 1')
-#     plt.ylabel('Feature 2')
-#     plt.legend(title='Cluster')
-#     plt.tight_layout()
-#     plt.show()
