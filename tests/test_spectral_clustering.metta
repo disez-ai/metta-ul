@@ -117,7 +117,7 @@
     (spectral-clustering.rbf-affinity-matrix.test1)
     (let
         $W
-        (spectral-clustering.compute-rbf-affinity-matrix
+        (spectral-clustering.compute-affinity-matrix
             (X-1D-Single)
             1.0
         )
@@ -138,7 +138,7 @@
     (spectral-clustering.rbf-affinity-matrix.test2)
     (let
         $W
-        (spectral-clustering.compute-rbf-affinity-matrix
+        (spectral-clustering.compute-affinity-matrix
             (X-1D-Multiple)
             1.0
         )
@@ -161,7 +161,7 @@
     (spectral-clustering.rbf-affinity-matrix.test3)
     (let
         $W
-        (spectral-clustering.compute-rbf-affinity-matrix
+        (spectral-clustering.compute-affinity-matrix
             (X-2D-Multiple)
             1.0
         )
@@ -184,7 +184,7 @@
     (spectral-clustering.rbf-affinity-matrix.test4)
     (let
         $W
-        (spectral-clustering.compute-rbf-affinity-matrix
+        (spectral-clustering.compute-affinity-matrix
             (X-2D-Multiple)
             1.0
         )
@@ -207,7 +207,7 @@
     (spectral-clustering.rbf-affinity-matrix.test5)
     (let
         $W
-        (spectral-clustering.compute-rbf-affinity-matrix
+        (spectral-clustering.compute-affinity-matrix
             (X-2D-Random-1)
             1.0
         )
@@ -307,7 +307,7 @@
     (spectral-clustering.normalized-laplacian.test4)
     (let
         $W-X-2D-Random
-        (spectral-clustering.compute-rbf-affinity-matrix
+        (spectral-clustering.compute-affinity-matrix
             (X-2D-Random-2)
             1.0
         )
@@ -553,7 +553,7 @@
     (spectral-clustering.cluster.test1)
     (let
         $W-X1
-        (spectral-clustering.compute-rbf-affinity-matrix
+        (spectral-clustering.compute-affinity-matrix
             (X1)
             0.1
         )
@@ -597,7 +597,7 @@
     (spectral-clustering.cluster.test2)
     (let
         $W-X2
-        (spectral-clustering.compute-rbf-affinity-matrix
+        (spectral-clustering.compute-affinity-matrix
             (X2)
             0.1
         )
@@ -661,11 +661,29 @@
 )
 (Test spectral-clustering.fit-predict.test1)
 
+! (match &self (= (spectral-clustering.compute-affinity-matrix $X $rbf-kernel-sigma) $Expression) (remove-atom &self (= (spectral-clustering.compute-affinity-matrix $X $rbf-kernel-sigma) $Expression)))
+(=
+    (spectral-clustering.compute-affinity-matrix $X $n-neighbors)
+    (let*
+        (
+            ($dist (spectral-clustering.square-distance-matrix (spectral-clustering.square-norm $X) $X))
+            ($N (np.shape $dist 0))
+            ($end-index (+ 1 $n-neighbors))
+            ($knn-indices (np.take (np.argsort $dist 1) (np.arange 1 $end-index) 1))
+            ($row-index (np.reshape (np.arange $N) (np.array ($N 1))))
+            ($flat-index (np.reshape (np.add (np.mul $row-index $N) $knn-indices) -1))
+            ($mask (np.isin (np.arange (* $N $N)) $flat-index))
+            ($A-flat (np.where $mask 1.0 0.0))
+            ($A (np.reshape $A-flat (np.array ($N $N))))
+        )
+        (np.add 0.00000001 (np.maximum $A (np.transpose $A)))
+    )
+)
 (=
     (spectral-clustering.fit-predict.test2)
     (let
         $fit-outputs
-        (spectral-clustering.fit (X-Fit) 2 "binary-knn-graph" 1 100)
+        (spectral-clustering.fit (X-Fit) 2 1 100)
         (let
             $pred
             (spectral-clustering.predict $fit-outputs 2)

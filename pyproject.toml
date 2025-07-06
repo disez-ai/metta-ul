@@ -27,5 +27,9 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/SNetGrant/metta_kmeans"
+Homepage = "https://github.com/SNetGrant/metta-ul"
+
+[tool.setuptools]
+include-package-data = true
+
 
