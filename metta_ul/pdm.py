@@ -18,6 +18,23 @@ import pandas as pd
 import numpy as np
 
 
+def parse_value(value):
+    """
+    Returns:
+        - float if the input is a numeric string or number
+        - string if the input is a non-numeric string
+    """
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        try:
+            return float(value)
+        except ValueError:
+            return value
+    return value
+
+
+
 def import_as_atom(metta):
     def wrapper(*args):
         df = args[0].get_object().value
@@ -27,7 +44,7 @@ def import_as_atom(metta):
             a = E(
                 S(aname),
                 ValueAtom(i),
-                E(*[E(S(str(k)), ValueAtom(float(v))) for k, v in row._asdict().items()]),
+                E(*[E(S(str(k)), ValueAtom(parse_value(v))) for k, v in row._asdict().items()]),
             )
             metta.space().add_atom(a)
             r.append(a)
