@@ -2,6 +2,7 @@
 
 ! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:spectral_clustering)
+! (import! &self metta_ul:helper)
 
 ! (ul-import pandas as pd)
 ! (ul-import numpy as unp)
@@ -12,31 +13,11 @@
 ! (ul-import seaborn as usns)
 
 
-! (bind! &df (pd.read_csv "tests/housing.csv" (nrows 100) ))
+! (bind! &df (pd.read_csv "tests/housing.csv" (nrows 10) ))
 
 ! (import.df &df House)
 
-(= (values ($k $v)) $v)
-
-(: df-values (-> Expression Expression))
-(= (df-values $expr)
-   (if (== $expr ()) ()
-       (let* (($head (car-atom $expr))
-              ($tail (cdr-atom $expr))
-              ($head-new (values $head))
-              ($tail-new (df-values $tail))
-             )
-         (cons-atom $head-new $tail-new)
-       )
-   )
-)
-
-(= (df-indexed-values $id $expr) (let $vals (df-values $expr) (cons-atom $id $vals)))
-
-
-! (bind! &data (np.array (collapse (match &self (House $id $props)  (df-indexed-values $id $props)))))
-
-
+! (bind! &data (np.array (collapse (match &self (House $id $props)  (df-values $id $props)))))
 
 (= (pre $values)
     (let* (
