@@ -1,13 +1,13 @@
 ! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:kmeans)
 
-! (ul-import pandas as pd)
-! (ul-import numpy as unp)
-! (ul-from sklearn.preprocessing import StandardScaler)
-! (ul-from sklearn.preprocessing import OneHotEncoder)
-! (ul-from sklearn.impute import SimpleImputer)
-! (ul-from sklearn.manifold import TSNE)
-! (ul-import seaborn as usns)
+! (py-import! pandas as pd)
+! (py-import! numpy as unp)
+! (py-from! sklearn.preprocessing import StandardScaler)
+! (py-from! sklearn.preprocessing import OneHotEncoder)
+! (py-from! sklearn.impute import SimpleImputer)
+! (py-from! sklearn.manifold import TSNE)
+! (py-import! seaborn as usns)
 
 ! (bind! &df (pd.DataFrame.values (pd.read_csv "tests/housing.csv")))
 

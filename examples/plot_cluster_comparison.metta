@@ -4,16 +4,16 @@
 ! (import! &self metta_ul:cluster:agglomerative)
 ! (import! &self metta_ul:cluster:spectral_clustering)
 ! (import! &self metta_ul:cluster:bisecting_kmeans)
-! (ul-import sklearn.datasets as dts)
-! (ul-from sklearn.preprocessing import StandardScaler)
-! (ul-import matplotlib.pyplot as plt)
-! (ul-import sklearn.metrics as metrics)
-! (ul-from numpy.random import RandomState)
+! (py-import! sklearn.datasets as dts)
+! (py-from! sklearn.preprocessing import StandardScaler)
+! (py-import! matplotlib.pyplot as plt)
+! (py-import! sklearn.metrics as metrics)
+! (py-from! numpy.random import RandomState)
 
 
 ;time functions
-! (ul-import datetime.datetime.now as now)
-! (ul-from time import perf_counter)
+! (py-import! datetime.datetime.now as now)
+! (py-from! time import perf_counter)
 
 (= (time.sub $t1 $t2) ((py-dot $t1 __sub__)$t2))
 (= (time.fmt $t) ((py-dot $t strftime) "%Y/%m/%d %H:%M:%S" ))

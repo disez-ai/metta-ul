@@ -1,6 +1,6 @@
 ! (import! &self metta_ul:cluster:spectral_clustering)
-! (ul-import math as ma)
-! (ul-import sklearn.metrics as metrics)
+! (py-import! math as ma)
+! (py-import! sklearn.metrics as metrics)
 
 ;; Setting the random seed
 ! (np.random.seed 1)

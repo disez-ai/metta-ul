@@ -8,7 +8,7 @@ The goal of `metta_ul` is to ground essential Python libraries inside MeTTa, ena
 * **Matplotlib** for plotting
 * **Scikit-learn** for machine learning, including dimensionality reduction
 
-We started by grounding core functions explicitly but later switched to a general import mechanism with `ul-import` and `ul-from` macros, allowing dynamic binding of Python modules and their functions.
+We started by grounding core functions explicitly but later switched to a general import mechanism with `py-import!` and `py-from!` macros, allowing dynamic binding of Python modules and their functions.
 
 ---
 
@@ -17,31 +17,31 @@ We started by grounding core functions explicitly but later switched to a genera
 ### Explicit Grounding vs General Import Macros
 
 * **Explicit Grounding:** Ground individual functions or classes one by one (e.g., `pd.read_csv`, `plt.plot`).
-* **General Import Macros:** Use `ul-import` and `ul-from` to import modules or functions dynamically, providing flexibility and scalability.
+* **General Import Macros:** Use `py-import!` and `py-from!` to import modules or functions dynamically, providing flexibility and scalability.
 
 ---
 
 ## Import Macros
 
-### `ul-import`
+### `py-import!`
 
 Import whole modules or assign aliases:
 
 ```lisp
-! (ul-import pandas as pd)
-! (ul-import matplotlib.pyplot as plt)
-! (ul-import sklearn.decomposition as decomposition)
-! (ul-import sklearn.manifold as manifold)
+! (py-import! pandas as pd)
+! (py-import! matplotlib.pyplot as plt)
+! (py-import! sklearn.decomposition as decomposition)
+! (py-import! sklearn.manifold as manifold)
 ```
 
-### `ul-from`
+### `py-from!`
 
 Import specific functions or classes:
 
 ```lisp
-! (ul-from sklearn.decomposition import PCA)
-! (ul-from sklearn.manifold import TSNE)
-! (ul-from pandas import DataFrame)
+! (py-from! sklearn.decomposition import PCA)
+! (py-from! sklearn.manifold import TSNE)
+! (py-from! pandas import DataFrame)
 ```
 
 ---
@@ -51,7 +51,7 @@ Import specific functions or classes:
 ### Pandas: Import and Export CSV
 
 ```lisp
-! (ul-import pandas as pd)
+! (py-import! pandas as pd)
 
 (= (load-csv $filename) (pd.read_csv $filename))
 (= (save-csv $df $filename) (pd.DataFrame.to_csv $df $filename))
@@ -60,7 +60,7 @@ Import specific functions or classes:
 ### Matplotlib: Plotting Line Chart
 
 ```lisp
-! (ul-import matplotlib.pyplot as plt)
+! (py-import! matplotlib.pyplot as plt)
 
 (= (plot-line $x $y)
   (plt.plot $x $y)
@@ -72,9 +72,9 @@ Import specific functions or classes:
 Use scikit-learn's PCA and t-SNE for reducing data dimensionality:
 
 ```lisp
-! (ul-from sklearn.decomposition import PCA)
-! (ul-from sklearn.manifold import TSNE)
-! (ul-import numpy as np)
+! (py-from! sklearn.decomposition import PCA)
+! (py-from! sklearn.manifold import TSNE)
+! (py-import! numpy as np)
 
 (= (reduce-pca $data $components)
   (let* (
@@ -97,5 +97,5 @@ Use scikit-learn's PCA and t-SNE for reducing data dimensionality:
 ## Summary
 
 * Virtualization in `metta_ul` grounds important Python libraries into MeTTa.
-* `ul-import` and `ul-from` macros dynamically bind Python modules/functions, enabling concise and extensible code.
+* `py-import!` and `py-from!` macros dynamically bind Python modules/functions, enabling concise and extensible code.
 * This allows integration of data science workflows — data loading (pandas), visualization (matplotlib), and machine learning (scikit-learn) — directly in MeTTa programs.
