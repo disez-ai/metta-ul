@@ -102,8 +102,8 @@ def pdme_atoms(run_context):
 
     return {
         r"make-df": G(DFOperation()),
-        r"import\.df": OperationAtom(
-            "import-df", import_as_atom(run_context), unwrap=False
+        r"import-pandas-dataframe": OperationAtom(
+            "import-pandas-dataframe", import_as_atom(run_context), unwrap=False
         ),
         r"cons-labels": OperationAtom(
             "cons-labels", makeLabels(run_context), unwrap=False

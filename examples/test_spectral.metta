@@ -1,5 +1,3 @@
-;fix steps from test_kmeans
-
 ! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:spectral_clustering)
 ! (import! &self metta_ul:helper)
@@ -15,7 +13,9 @@
 
 ! (bind! &df (pd.read_csv "tests/housing.csv" (nrows 10) ))
 
-! (import.df &df House)
+! (import-pandas-dataframe &df House)
+
+! (import! &self metta_ul:helper)
 
 ! (bind! &data (np.array (collapse (match &self (House $id $props)  (df-values $id $props)))))
 
@@ -34,7 +34,7 @@
     ) $X-scaled)
 )
 
-! (bind! &X-scaled (pre &data))
+! (bind! &X-processed (pre &data))
 
 
 (= (fit-predict $ds)  
@@ -52,7 +52,12 @@
 )
 
 
-! (bind! &labels (fit-predict &X-scaled))
+! (bind! &labels (fit-predict &X-processed))
+
+! (bind! &X-reduced (reduce-dimension &X-processed))
+
+! (bind! &plot (usns.scatterplot (x (ul-slice &X-reduced [:,0])) (y (ul-slice &X-reduced [:,1])) (hue &labels)))
+
 
 ! (cons-labels &data &labels ClusterLabel)
 
@@ -78,8 +83,8 @@
 )
 
 
-! (bind! &labels2 (fit-predict &X-scaled))
+! (bind! &labels2 (fit-predict &X-processed))
 
-! (cons-labels &data &labels2 ClusterLabel2)
+! (cons-labels &data &labels2 ClusterLabel)
 
-! (match &self (ClusterLabel2 $index $label) ($index $label))
+! (match &self (ClusterLabel$index $label) ($index $label))

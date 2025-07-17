@@ -10,7 +10,7 @@
 
 ! (bind! &df (pd.read_csv "tests/housing.csv" (nrows 100) (usecols (py-list ("longitude" "latitude")))))
 
-! (import.df &df House)
+! (import-pandas-dataframe &df House)
 
 
 ! (match &self (House 1 ((longitude $x) (latitude $y))) (assertEqual (get-type $x) Number))

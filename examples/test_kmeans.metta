@@ -25,7 +25,7 @@
     ) $X-scaled)
 )
 
-! (bind! &X-scaled (pre &df))
+! (bind! &X-processed (pre &df))
 
 (= (fit-predict $ds)  
   (let* (
@@ -41,9 +41,9 @@
   ) $res )
 )
 
-! (bind! &labels (fit-predict &X-scaled))
+! (bind! &labels (fit-predict &X-processed))
 
-! (bind! &X-reduced (reduce-dimension &X-scaled))
+! (bind! &X-reduced (reduce-dimension &X-processed))
 
 ! (bind! &plot (usns.scatterplot (x (ul-slice &X-reduced [:,0])) (y (ul-slice &X-reduced [:,1])) (hue &labels)))
 
