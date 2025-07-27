@@ -1017,7 +1017,7 @@ def test_bisecting_kmeans_predict(metta: MeTTa):
 #     metta.run(
 #         """
 #         ! (import! &self metta_ul:cluster:bisecting_kmeans)
-#         ! (ul-import sklearn.datasets as dts)
+#         ! (py-import! sklearn.datasets as dts)
 #         """
 #     )
 #     result: Atom = metta.run(

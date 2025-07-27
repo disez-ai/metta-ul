@@ -1,5 +1,5 @@
 ! (import! &self metta_ul:cluster:bisecting_kmeans)
-! (ul-import sklearn.metrics as metrics)
+! (py-import! sklearn.metrics as metrics)
 
 ;; ========================================================================
 ;; ======================= Defining test variables ========================

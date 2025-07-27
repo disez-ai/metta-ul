@@ -97,7 +97,10 @@
         (np.div
             1.0
             (np.sqrt
-                $degree-W
+                (np.add
+                    $degree-W
+                    1e-10
+                )
             )
         )
     )
@@ -173,11 +176,14 @@
     (spectral-clustering.row-normalize $X)
     (np.div
         $X
-        (np.linalg.norm
-            $X
-            py.none
-            1
-            py.true
+        (np.add
+            (np.linalg.norm
+                $X
+                py.none
+                1
+                py.true
+            )
+            1e-10
         )
     )
 )

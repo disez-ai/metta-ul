@@ -425,10 +425,14 @@ def test_row_normalize(metta: MeTTa):
             """
         )[0][0]
     C_norm = result.get_object().value
-    # For the zero row, dividing by zero should result in nan values.
-    assert np.isnan(
-        C_norm[0]
-    ).all(), "Row normalization should yield nan for zero vector."
+
+    # With epsilon added, zero rows should not produce NaN anymore
+    # Instead, they should be normalized by the epsilon value
+    expected_zero_row = np.array([0, 0]) / np.sqrt(1e-10)  # [0, 0] / very_small_number
+    assert np.allclose(
+        C_norm[0], expected_zero_row
+    ), "Row normalization with epsilon should not yield NaN for zero vector."
+
     # For the nonzero row:
     expected_nonzero = np.array([1, 2]) / np.linalg.norm([1, 2])
     assert np.allclose(
@@ -600,6 +604,7 @@ def test_spectral_clustering_fit_and_predict(metta: MeTTa):
         unique_values, expected_values
     ), "The unique values in the array are not [0, 1]!"
 
+
 def test_spectral_clustering_fit_and_predict_knn_graph_mode(metta: MeTTa):
     metta.run(
         """
@@ -627,7 +632,7 @@ def test_spectral_clustering_fit_and_predict_knn_graph_mode(metta: MeTTa):
                     ($A-flat (np.where $mask 1.0 0.0))
                     ($A (np.reshape $A-flat (np.array ($N $N))))
                 )
-                (np.add 0.00000001 (np.maximum $A (np.transpose $A)))
+                (np.add 0.0000001 (np.maximum $A (np.transpose $A)))
             )
         )                
         

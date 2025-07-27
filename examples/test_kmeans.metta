@@ -1,13 +1,13 @@
 ! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:kmeans)
 
-! (ul-import pandas as pd)
-! (ul-import numpy as unp)
-! (ul-from sklearn.preprocessing import StandardScaler)
-! (ul-from sklearn.preprocessing import OneHotEncoder)
-! (ul-from sklearn.impute import SimpleImputer)
-! (ul-from sklearn.manifold import TSNE)
-! (ul-import seaborn as usns)
+! (py-import! pandas as pd)
+! (py-import! numpy as unp)
+! (py-from! sklearn.preprocessing import StandardScaler)
+! (py-from! sklearn.preprocessing import OneHotEncoder)
+! (py-from! sklearn.impute import SimpleImputer)
+! (py-from! sklearn.manifold import TSNE)
+! (py-import! seaborn as usns)
 
 ! (bind! &df (pd.DataFrame.values (pd.read_csv "tests/housing.csv")))
 
@@ -25,7 +25,7 @@
     ) $X-scaled)
 )
 
-! (bind! &X-scaled (pre &df))
+! (bind! &X-processed (pre &df))
 
 (= (fit-predict $ds)  
   (let* (
@@ -41,9 +41,9 @@
   ) $res )
 )
 
-! (bind! &labels (fit-predict &X-scaled))
+! (bind! &labels (fit-predict &X-processed))
 
-! (bind! &X-reduced (reduce-dimension &X-scaled))
+! (bind! &X-reduced (reduce-dimension &X-processed))
 
 ! (bind! &plot (usns.scatterplot (x (ul-slice &X-reduced [:,0])) (y (ul-slice &X-reduced [:,1])) (hue &labels)))
 

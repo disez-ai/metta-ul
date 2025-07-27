@@ -10,6 +10,25 @@
 ! (py-from! sklearn.manifold import TSNE)
 ! (py-import! seaborn as usns)
 
+! (match &self (= (spectral-clustering.compute-affinity-matrix $X $rbf-kernel-sigma) $Expression) (remove-atom &self (= (spectral-clustering.compute-affinity-matrix $X $rbf-kernel-sigma) $Expression)))
+(: spectral-clustering.compute-affinity-matrix (-> (NPArray ($N $D)) Number (NPArray ($N $N))))
+(=
+    (spectral-clustering.compute-affinity-matrix $X $n-neighbors)
+    (let*
+        (
+            ($dist (spectral-clustering.square-distance-matrix (spectral-clustering.square-norm $X) $X))
+            ($N (np.shape $dist 0))
+            ($end-index (+ 1 $n-neighbors))
+            ($knn-indices (np.take (np.argsort $dist 1) (np.arange 1 $end-index) 1))
+            ($row-index (np.reshape (np.arange $N) (np.array ($N 1))))
+            ($flat-index (np.reshape (np.add (np.mul $row-index $N) $knn-indices) -1))
+            ($mask (np.isin (np.arange (* $N $N)) $flat-index))
+            ($A-flat (np.where $mask 1.0 0.0))
+            ($A (np.reshape $A-flat (np.array ($N $N))))
+        )
+        (np.add 0.0000001 (np.maximum $A (np.transpose $A)))
+    )
+)
 
 ! (bind! &df (pd.read_csv "tests/housing.csv" (nrows 100) ))
 
@@ -37,14 +56,14 @@
 ! (bind! &X-processed (pre &data))
 
 
-(= (fit-predict $ds)  
+(= (fit-predict $ds)
   (let* (
-    ($model (spectral-clustering.fit $ds 3))
+    ($model (spectral-clustering.fit $ds 3 5 100))
     ($labels (spectral-clustering.predict $model 3))
   ) $labels )
 )
 
-(= (reduce-dimension $ds)  
+(= (reduce-dimension $ds)
   (let* (
     ($tsne (TSNE (n_components 2) (random_state 42)))
     ($res (TSNE.fit_transform $tsne $ds))
