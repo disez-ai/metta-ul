@@ -505,7 +505,10 @@
 
         (assertEqual
             (
-                (np.assertAllClose ((py-dot (np.slice (np.isnan $C-norm) [0]) all)) True)
+                (np.assertAllClose
+                    (np.slice $C-norm [0])
+                    (np.array (0.0 0.0))
+                )
                 (np.assertAllClose
                     (np.slice $C-norm [1])
                     (np.array (0.4472135954999579 0.8944271909999159))
@@ -513,10 +516,10 @@
             )
             (() ())
         )
-
     )
 )
 (Test spectral-clustering.row-normalize.test3)
+
 
 (=
     (spectral-clustering.row-normalize.test4)
