@@ -275,11 +275,11 @@ def _slice(*args):
 @register_atoms(pass_metta=True)
 def gtools(run_context):
     return {
-        r"ul-import": OperationAtom(
-            "ul-import", register_ul_import(run_context), unwrap=False
+        r"py-import!": OperationAtom(
+            "py-import!", register_ul_import(run_context), unwrap=False
         ),
-        r"ul-from": OperationAtom(
-            "ul-from", register_ul_from(run_context), unwrap=False
+        r"py-from!": OperationAtom(
+            "py-from!", register_ul_from(run_context), unwrap=False
         ),
         r"ul-dot": OperationAtom("ul-dot", dot(), unwrap=False),
         r"ul-slice": OperationAtom("ul-slice", func_wrapnpop(_slice), unwrap=False),

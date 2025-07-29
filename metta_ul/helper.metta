@@ -1,16 +1,16 @@
-!(import! &self metta_ul)
+(= (prop-value ($k $v)) $v)
 
-
-(:kv-values (-> Expression Expression))
-(= 
-    (kv-values $expr)
-    (if (== $expr ()) ()
-            (let* (
-                (($k $v) (car-atom $expr))
-                ($tail (cdr-atom $expr))
-                ($tail-new (kv-values $tail))
-                )
-              (cons-atom $v $tail-new)
-            )
-    )
+(: props-values (-> Expression Expression))
+(= (props-values $expr)
+   (if (== $expr ()) ()
+       (let* (($head (car-atom $expr))
+              ($tail (cdr-atom $expr))
+              ($head-new (prop-value $head))
+              ($tail-new (props-values $tail))
+             )
+         (cons-atom $head-new $tail-new)
+       )
+   )
 )
+
+(= (df-values $id $expr) (let $vals (props-values $expr) (cons-atom $id $vals)))

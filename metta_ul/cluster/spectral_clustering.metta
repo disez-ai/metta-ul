@@ -67,6 +67,19 @@
     )
 )
 
+(: spectral-clustering.compute-affinity-matrix (-> (NPArray ($N $D)) Number (NPArray ($N $N))))
+(=
+    (spectral-clustering.compute-affinity-matrix $X $rbf-kernel-sigma)
+    (spectral-clustering.rbf-affinity-matrix
+        (spectral-clustering.square-distance-matrix
+            (spectral-clustering.square-norm $X)
+            $X
+        )
+        $rbf-kernel-sigma
+    )
+)
+
+; ================================================
 ; Python code: d = np.sum(W, axis=1)
 ; Compute the degree for each node by summing its affinities to all other nodes.
 (: spectral-clustering.degree (-> (NPArray ($N $N)) (NPArray ($N 1))))
@@ -84,7 +97,10 @@
         (np.div
             1.0
             (np.sqrt
-                $degree-W
+                (np.add
+                    $degree-W
+                    1e-10
+                )
             )
         )
     )
@@ -160,20 +176,23 @@
     (spectral-clustering.row-normalize $X)
     (np.div
         $X
-        (np.linalg.norm
-            $X
-            py.none
-            1
-            py.true
+        (np.add
+            (np.linalg.norm
+                $X
+                py.none
+                1
+                py.true
+            )
+            1e-10
         )
     )
 )
 
 ; Python code: kmeans(X=U_norm, k=k, max_iter=max_iter)
 ; Apply k-means to the normalized spectral embedding to partition data into k clusters.
-(: spectral-clustering.cluster (-> (NPArray ($N $D)) Number Number Number (NPArray ($K $D))))
+(: spectral-clustering.cluster (-> (NPArray ($N $D)) Number Number (NPArray ($K $D))))
 (=
-    (spectral-clustering.cluster $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter)
+    (spectral-clustering.cluster $X $num-clusters $max-kmeans-iter)
     (kmeans.fit
         $X
         $num-clusters
@@ -185,16 +204,10 @@
 ; Fit spectral clustering algorithm and return spectral embedding and cluster centroids.
 (: spectral-clustering.fit (-> (NPArray ($N $D)) Number Number Number ((NPArray ($N $C)) (NPArray ($K $C)))))
 (=
-    (spectral-clustering.fit $X $num-clusters $rbf-kernel-sigma $max-kmeans-iter)
+    (spectral-clustering.fit $X $num-clusters $affinity-param $max-kmeans-iter)
     (let
         $affinity-matrix
-        (spectral-clustering.rbf-affinity-matrix
-            (spectral-clustering.square-distance-matrix
-                (spectral-clustering.square-norm $X)
-                $X
-            )
-            $rbf-kernel-sigma
-        )
+        (spectral-clustering.compute-affinity-matrix $X $affinity-param)
         (let
             $embeddings
             (spectral-clustering.row-normalize
@@ -212,7 +225,7 @@
                     $num-clusters
                 )
             )
-            ($embeddings (spectral-clustering.cluster $embeddings $num-clusters $rbf-kernel-sigma $max-kmeans-iter))
+            ($embeddings (spectral-clustering.cluster $embeddings $num-clusters $max-kmeans-iter))
         )
     )
 )

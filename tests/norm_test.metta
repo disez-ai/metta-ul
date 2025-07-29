@@ -1,7 +1,7 @@
 ! (import! &self metta_ul)
-!(ul-from pandas import DataFrame)
-! (ul-import pandas as pd)
-! (ul-from sklearn.preprocessing import normalize)
+!(py-from! pandas import DataFrame)
+! (py-import! pandas as pd)
+! (py-from! sklearn.preprocessing import normalize)
 
 ! (bind! &df (pd.read_csv "tests/housing.csv" (usecols (py-list ("longitude" "latitude")))))
 
