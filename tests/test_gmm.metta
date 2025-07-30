@@ -1,3 +1,4 @@
+! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:gmm)
 
 (=

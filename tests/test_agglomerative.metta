@@ -1,3 +1,4 @@
+! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:agglomerative)
 
 (=
@@ -107,7 +108,7 @@
             Nil
             (np.array (distance-matrix1))
             "single"
-            ((np.vector 0 1) 2)
+            (UnionFind.Cons (np.vector 0 1) 2)
             0
         )
         (Heap.Node 0 (1.0 0 1) Nil Nil)
@@ -120,7 +121,7 @@
     (agglomerative.cluster.testTwoClusters)
     (assertEqual
         (agglomerative.cluster (np.array (X)) 2 "single")
-        ((np.vector 0 1) 2)
+        (UnionFind.Cons (np.vector 0 1) 2)
     )
 )
 (Test agglomerative.cluster.testTwoClusters)
@@ -129,7 +130,7 @@
     (agglomerative.cluster.testOneCluster)
     (assertEqual
         (agglomerative.cluster (np.array (X)) 1 "single")
-        ((np.vector 0 0) 1)
+        (UnionFind.Cons (np.vector 0 0) 1)
     )
 )
 (Test agglomerative.cluster.testOneCluster)
