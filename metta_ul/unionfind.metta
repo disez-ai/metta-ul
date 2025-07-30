@@ -3,6 +3,18 @@
 (: UnionFind Type)
 (: UnionFind.Cons (-> (NPArray ($n)) Number UnionFind))
 
+(: UnionFind.getParent (-> UnionFind (NPArray ($n))))
+(=
+    (UnionFind.getParent (UnionFind.Cons $parent $count))
+    $parent
+)
+
+(: UnionFind.getCount (-> UnionFind Number))
+(=
+    (UnionFind.getCount (UnionFind.Cons $parent $count))
+    $count
+)
+
 (: UnionFind.init (-> Number UnionFind))
 (=
     (UnionFind.init $n)
