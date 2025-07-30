@@ -18,7 +18,13 @@ class NumpyValue(MatchableObject):
         sh = self.content.shape
         bindings = {}
         if isinstance(other, GroundedAtom):
-            other = other.get_object()
+            # TODO: Currently (hyperon v0.2.6) we cannot know if GroundedAtom is wrapping
+            # a Python deserializable object or not without trying to unwrap it. This
+            # work around should be replaced with the appropriate logic when CGrounded is fixed. 
+            try:
+                other = other.get_object()
+            finally:
+                pass
         # Match by equality with another NumpyValue
         if isinstance(other, NumpyValue):
             return [{}] if other == self else []
