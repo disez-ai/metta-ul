@@ -1,8 +1,9 @@
+! (import! &self metta_ul)
 ! (import! &self metta_ul:unionfind)
 
 (=
     (UnionFind.init.test)
-    (let ($parent $count) (UnionFind.init 2)
+    (let (UnionFind.Cons $parent $count) (UnionFind.init 2)
         (assertEqual
             (
                 (np.assertAllClose $parent (np.arange 2))
@@ -17,7 +18,7 @@
 (=
     (UnionFind.find.test)
     (assertEqual
-        (UnionFind.find ((np.arange 2) 2) 0)
+        (UnionFind.find (UnionFind.Cons (np.arange 2) 2) 0)
         0
     )
 )
@@ -25,7 +26,7 @@
 
 (=
     (UnionFind.union.test)
-    (let ($parent $count) (UnionFind.union ((np.arange 2) 2) 0 1)
+    (let (UnionFind.Cons $parent $count) (UnionFind.union (UnionFind.Cons (np.arange 2) 2) 0 1)
         (assertEqual 
             (
                 (np.assertAllClose $parent (np.vector 1 1))
@@ -39,7 +40,7 @@
 
 (=
     (UnionFind.get.test)
-    (let $set (UnionFind.get ((np.vector 1 1) 1) 0)
+    (let $set (UnionFind.get (UnionFind.Cons (np.vector 1 1) 1) 0)
         (np.assertAllClose $set (np.arange 2))
     )
 )
