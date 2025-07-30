@@ -129,20 +129,20 @@
 
 (: agglomerative.recursion (-> UnionFind (NPArray ($n $n)) (Heap (Number Number Number)) String Number UnionFind))
 (=
-    (agglomerative.recursion ($parent $count) $distance-matrix $heap $linkage $k)
-    (if (> $count $k)
+    (agglomerative.recursion $uf $distance-matrix $heap $linkage $k)
+    (if (> (UnionFind.getCount $uf) $k)
         (let ($d $i $j) (Heap.peek $heap)
-            (if (UnionFind.areUnified ($parent $count) $i $j)
+            (if (UnionFind.areUnified $uf $i $j)
                 (agglomerative.recursion
-                    ($parent $count)
+                    $uf
                     $distance-matrix
                     (Heap.pop $heap)
                     $linkage
                     $k
                 )
-                (let $uf (UnionFind.union ($parent $count) $i $j)
+                (let $uf-unioned (UnionFind.union $uf $i $j)
                     (agglomerative.recursion
-                        $uf
+                        $uf-unioned
                         $distance-matrix
                         (agglomerative.heappush (Heap.pop $heap) $distance-matrix $linkage $uf (UnionFind.find $uf $i))
                         $linkage
@@ -151,7 +151,7 @@
                 )
             )
         )
-        ($parent $count)
+        $uf
     )
 )
 
