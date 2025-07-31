@@ -75,3 +75,18 @@
     (Heap.pop (Heap.Node $r $v $hl $hr))
     (Heap.merge $hl $hr)
 )
+
+(: Heap.filter (-> (Heap $a) (-> $a Bool) (Heap $a)))
+(=
+    (Heap.filter Nil $pred)
+    Nil
+)
+(=
+    (Heap.filter (Heap.Node $r $v $hl $hr) $pred)
+    (let $tail (Heap.filter (Heap.pop (Heap.Node $r $v $hl $hr)) $pred)
+        (if ($pred $v)
+            (Heap.push $tail $v)
+            $tail
+        )
+    )
+)

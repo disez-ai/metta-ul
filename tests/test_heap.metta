@@ -1,4 +1,5 @@
 ! (import! &self metta_ul:heap)
+! (import! &self metta_ul:functools)
 
 (=
     (Heap.lessOrEqual.testNumberLess)
@@ -195,3 +196,24 @@
     )
 )
 (Test Heap.pop.testTwo)
+
+(=
+    (Heap.filter.testNil)
+    (assertEqual
+        (Heap.filter Nil (Lambda ($v $s) (== $s B)))
+        Nil
+    )
+)
+(Test Heap.filter.testNil)
+
+(=
+    (Heap.filter.test)
+    (assertEqual
+        (Heap.filter 
+            (Heap.Node 1 (1 A) Nil (Heap.Node 0 (2 B) Nil Nil))
+            (Lambda ($v $s) (== $s B))
+        )
+        (Heap.Node 0 (2 B) Nil Nil)
+    )
+)
+(Test Heap.filter.test)
