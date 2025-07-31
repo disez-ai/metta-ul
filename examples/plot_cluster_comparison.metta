@@ -60,6 +60,7 @@
 (: cycle (-> Expression Number Expression))
 (= (cycle $d $s) (r-cycle $d () $s))
 
+(: count (-> Atom Number))
 (=
   (count (quote $atom))
   ((py-atom sum) (py-list (collapse (match &self $atom 1))))
