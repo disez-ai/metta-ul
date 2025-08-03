@@ -3,6 +3,14 @@
 ## Overview
 This module implements the Bisecting K-means clustering algorithm using iterative splitting of clusters. The algorithm starts with the entire dataset as a single cluster and recursively bisects the cluster with the maximum Sum of Squared Errors (SSE) using standard k-means (with k=2) until a desired number of clusters is reached. The resulting hierarchical clustering structure captures the splits performed during the process.
 
+## Type Definitions
+
+### Core Types
+- `Cluster`: A tuple `($indices $center $sse $hierarchy)` representing a single cluster
+- `(List Cluster)`: A typed list of clusters using `Cons` and `Nil` constructors
+- `(List (List Cluster))`: Represents the hierarchical clustering structure
+
+
 ## Function Definitions
 
 ### `bisecting-kmeans.compute-sse`
@@ -30,9 +38,11 @@ Computes the initial cluster for the dataset.
   - Type: `(NPArray ($N $D))`
 #### Returns:
 - A list containing the initial cluster.
-  - Type: `ClusterList`
+  - Type: `(List Cluster)
+`
 
-Where the `ClusterList` is a list of clusters, and each cluster is a tuple containing:
+Where the `(List Cluster)
+` is a list of clusters, and each cluster is a tuple containing:
 1. **Indices:** All data point indices in `$X`.
    - Type: `(NPArray ($N $D))`
 2. **Center:** The mean of the dataset.
@@ -40,7 +50,7 @@ Where the `ClusterList` is a list of clusters, and each cluster is a tuple conta
 3. **SSE:** The computed SSE for the cluster.
    - Type: `Number`
 4. **Hierarchy:** `pyNone` (as no hierarchy is present initially).
-   - Type: `Hierarchy`
+   - Type: `(List (List Cluster))`
 
 ---
 
@@ -92,7 +102,7 @@ Extracts the hierarchical structure information from a cluster tuple.
 
 #### Returns:
 - The hierarchy associated with the cluster.
-  - Type: `Hierarchy`
+  - Type: `(List (List Cluster))`
 ---
 
 ### `bisecting-kmeans.find-max-cluster`
@@ -100,7 +110,8 @@ Finds the cluster with the maximum SSE from a list of clusters.
 
 #### Parameters:
 - A list of clusters, where each cluster is a tuple `($indices $center $sse $hierarchy)`.
-  - Type: `ClusterList`
+  - Type: `(List Cluster)
+`
 
 #### Returns:
 - The cluster tuple with the highest SSE value.
@@ -125,7 +136,8 @@ Removes a target cluster from a list of clusters.
 
 #### Parameters:
 - `$clusters`: The list of current clusters.
-  - Type: `ClusterList`
+  - Type: `(List Cluster)
+`
 - `$target`: The cluster tuple to be removed.
   - Type: `Cluster`
 
@@ -147,7 +159,8 @@ Performs bisection on a given cluster using standard k-means with k=2.
 
 #### Returns:
 - A tuple containing two clusters obtained from splitting the input cluster. Each cluster is represented as `(indices, center, sse, hierarchy)`.
-  - Type: `ClusterList`
+  - Type: `(List Cluster)
+`
 ---
 
 ### `bisecting-kmeans.recursive-bisecting-kmeans`
@@ -157,17 +170,18 @@ Recursively applies bisecting k-means to further split clusters until the desire
 - `$X`: The dataset, represented as an array of data points.
   - Type: `(NPArray ($N $D))`
 - `$clusters`: The current list of clusters.
-  - Type: `ClusterList`
+  - Type: `(List Cluster)
+`
 - `$max-num-clusters`: The desired number of clusters.
   - Type: `Number`
 - `$max-iter`: The maximum iterations for each bisecting step.
   - Type: `Number`
 - `$hierarchy`: The current hierarchical clustering structure maintained as a MeTTa list.
-  - Type: `Hierarchy`
+  - Type: `(List (List Cluster))`
 
 #### Returns:
 - An updated hierarchical clustering structure as a MeTTa list describing the clustering process.
-  - Type: `Hierarchy`
+  - Type: `(List (List Cluster))`
 ---
 
 ### `bisecting-kmeans.fit`
@@ -193,7 +207,8 @@ Assigns a single data point to the closest cluster based on Euclidean distance.
 - `$point`: A single data point from the dataset.
   - Type: `(NPArray ($D))`
 - `$clusters`: A list of clusters.
-  - Type: `ClusterList`
+  - Type: `(List Cluster)
+`
 - `$best-cluster-idx`: The current best cluster index for the point (initial value provided).
   - Type: `Number`
 - `$best-distance`: The current best distance found (initially set to a high value, such as `pyINF`).
@@ -213,15 +228,16 @@ Assigns all data points in the dataset to their closest clusters.
 - `$X`: The dataset, represented as an array of data points.
   - Type: `(NPArray ($D))`
 - `$clusters`: The list of clusters.
-  - Type: `ClusterList`
+  - Type: `(List Cluster)
+`
 - `$point-idx`: The current index of the data point being processed.
   - Type: `Number`
 - `$labels`: A list of cluster labels corresponding to the assignment of each data point.
-  - Type: `LabelList`
+  - Type: `(NPArray ($N))`
 
 #### Returns:
 - A list of cluster labels indicating the assignment of each data point in `$X` to the nearest cluster.
-  - Type: `LabelList`
+  - Type: `(NPArray ($N))`
 ---
 
 ### `bisecting-kmeans.predict`
@@ -231,11 +247,11 @@ Predicts the cluster membership for each data point based on the final hierarchi
 - `$X`: The dataset, represented as an array of data points.
   - Type: `(NPArray ($N $D))`
 - `$hierarchy`: The hierarchical clustering structure generated by `bisecting-kmeans.fit`.
-  - Type: `Hierarchy`
+  - Type: `(List (List Cluster))`
 
 #### Returns:
 - A list of cluster labels indicating the assigned cluster for each data point in the dataset.
-  - Type: `LabelList`
+  - Type: `(NPArray ($N))`
 ---
 
 ## Usage
