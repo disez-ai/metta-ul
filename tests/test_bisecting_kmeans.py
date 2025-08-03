@@ -13,7 +13,7 @@ def extract_cluster_values(node):
     # If node is an ExpressionAtom, iterate its children.
     if isinstance(node, ExpressionAtom):
         for child in node.get_children():
-            # Skip tokens (like "::")
+            # Skip tokens (like "Cons", "Nil")
             if isinstance(child, SymbolAtom):
                 continue
             # If a child is an ExpressionAtom, recurse into it.
@@ -32,45 +32,37 @@ def extract_cluster_values(node):
     return values
 
 
-def metta_clusters_to_py_clusters(metta_clusters):
-    """
-    Recursively processes a cons-list structure in metta_clusters to produce
-    a list of python clusters. Each cluster is a list of python values.
 
-    Expected structure:
-      (::
-         (cluster_data)
-         ( (:: (cluster_data) ( ... )) )
-      )
-    with an empty ExpressionAtom (i.e. ()) indicating the end.
+def metta_lists_to_py_clusters(metta_lists):
+    """
+    Converts MeTTa Cons/Nil list structure to Python lists of clusters.
+    Expected structure: (Cons cluster_data (Cons cluster_data ... Nil))
     """
     clusters = []
 
-    def rec(cons_node):
-        # Stop if the node is not an ExpressionAtom or has no children.
-        if not isinstance(cons_node, ExpressionAtom) or not cons_node.get_children():
+    def extract_from_cons(node):
+        if not isinstance(node, ExpressionAtom) or not node.get_children():
             return
 
-        # Remove any SymbolAtom tokens (assumed to be the "::" markers).
-        children = [
-            child
-            for child in cons_node.get_children()
-            if not isinstance(child, SymbolAtom)
-        ]
-        if not children:
+        children = node.get_children()
+        if len(children) < 2:
             return
 
-        # The first child should be the cluster data.
-        cluster_data = children[0]
-        cluster_values = extract_cluster_values(cluster_data)
-        if cluster_values:
-            clusters.append(cluster_values)
+        # Check if this is a Cons node
+        if isinstance(children[0], SymbolAtom) and children[0].get_name() == "Cons":
+            if len(children) >= 3:
+                # First element is "Cons", second is data, third is tail
+                cluster_data = children[1]
+                cluster_values = extract_cluster_values(cluster_data)
+                if cluster_values:
+                    clusters.append(cluster_values)
 
-        # If there is a tail (second child), process it recursively.
-        if len(children) > 1:
-            rec(children[1])
+                # Process tail
+                tail = children[2]
+                if isinstance(tail, ExpressionAtom):
+                    extract_from_cons(tail)
 
-    rec(metta_clusters)
+    extract_from_cons(metta_lists)
     return clusters
 
 
@@ -282,7 +274,7 @@ def test_compute_initial_cluster(metta: MeTTa):
         ! (bisecting-kmeans.compute-initial-cluster (X1))    
         """
     )[0][0]
-    init_cluster = metta_clusters_to_py_clusters(result)
+    init_cluster = metta_lists_to_py_clusters(result)
     assert (
         len(init_cluster) == 1
     ), f"Expected 1 initial cluster, got {len(init_cluster)}"
@@ -315,12 +307,12 @@ def test_find_max_cluster(metta: MeTTa):
     )
     result: Atom = metta.run(
         """ 
-        (: clusters1 (-> ClusterList))       
+        (: clusters1 (-> (List Cluster)))       
         (=
             (clusters1)
-            (::
+            (Cons
                 (py.none py.none 10.0 py.none)
-                ()
+                Nil
             )
         )
         ! (bisecting-kmeans.find-max-cluster (clusters1))
@@ -340,16 +332,16 @@ def test_find_max_cluster(metta: MeTTa):
 
     result: Atom = metta.run(
         """        
-        (: clusters2 (-> ClusterList)) 
+        (: clusters2 (-> (List Cluster)))
         (=
             (clusters2)
-            (::
+            (Cons
                 (py.none py.none 10.0 py.none)
-                (::
+                (Cons
                     (py.none py.none 20.0 py.none)
-                    (::
+                    (Cons
                         (py.none py.none 5.0 py.none)
-                        ()
+                        Nil
                     )
                 )
             )
@@ -382,13 +374,13 @@ def test_remove_cluster(metta: MeTTa):
         """
         (=
             (clusters0)
-            (::
+            (Cons
                 ((np.array (0)) py.none 1.0 py.none)
-                (::
+                (Cons
                     ((np.array (1)) py.none 2.0 py.none)
-                    (::
+                    (Cons
                         ((np.array (2)) py.none 3.0 py.none)
-                        ()
+                        Nil
                     )
                 )
             )
@@ -397,7 +389,7 @@ def test_remove_cluster(metta: MeTTa):
         ! (bisecting-kmeans.remove-cluster (clusters0) ((np.array (1)) py.none 2.0 py.none))
         """
     )[0][0]
-    py_clusters = metta_clusters_to_py_clusters(result)
+    py_clusters = metta_lists_to_py_clusters(result)
     # Create dummy clusters as tuples.
     cl1 = [np.array([0]), None, 1.0, None]
     cl2 = [np.array([1]), None, 2.0, None]
@@ -409,13 +401,13 @@ def test_remove_cluster(metta: MeTTa):
         """
         (=
             (clusters1)
-            (::
+            (Cons
                 ((np.array (0)) py.none 1.0 py.none)
-                (::
+                (Cons
                     ((np.array (1)) py.none 2.0 py.none)
-                    (::
+                    (Cons
                         ((np.array (2)) py.none 3.0 py.none)
-                        ()
+                        Nil
                     )
                 )
             )
@@ -424,20 +416,20 @@ def test_remove_cluster(metta: MeTTa):
         ! (bisecting-kmeans.remove-cluster (clusters1) ((np.array (99)) py.none 2.0 py.none))
         """
     )[0][0]
-    py_clusters = metta_clusters_to_py_clusters(result)
+    py_clusters = metta_lists_to_py_clusters(result)
     assert py_clusters == clusters, "Removal of non-existent cluster altered the list."
     # Remove from empty list.
     result: Atom = metta.run(
         """
         (=
             (clusters2)
-            ()
+            Nil
         )
 
         ! (bisecting-kmeans.remove-cluster (clusters2) ((np.array (99)) py.none 2.0 py.none))
         """
     )[0][0]
-    py_clusters = metta_clusters_to_py_clusters(result)
+    py_clusters = metta_lists_to_py_clusters(result)
     assert py_clusters == [], "Expected empty list when removing from empty list."
 
 
@@ -455,24 +447,27 @@ def test_bisect_cluster(metta: MeTTa):
             (X)
             (np.array ((0.0 0.0) (0.0 1.0) (10.0 10.0) (10.0 11.0)))
         )
-        (: clusters (-> ClusterList))
+        (: clusters (-> (List Cluster)))
         (=
             (clusters)            
-            (::
+            (Cons
                 (
                     (np.array (0 1 2 3)) 
                     (np.array (5.0 5.5)) 
                     201.0 
                     py.none
                 )
-                ()
+                Nil
             )
         )
                         
         ! (bisecting-kmeans.bisect-cluster (X) (bisecting-kmeans.find-max-cluster (clusters)) 10)                
         """
     )[0][0]
-    cluster_0, cluster_1 = metta_clusters_to_py_clusters(result)
+    bisected_clusters = metta_lists_to_py_clusters(result)
+    assert len(bisected_clusters) == 2, f"Expected 2 clusters from bisection, got {len(bisected_clusters)}"
+
+    cluster_0, cluster_1 = bisected_clusters
 
     # Check that the union of indices of the children equals the parent's indices.
     union = np.sort(np.concatenate((cluster_0[0], cluster_1[0])))
@@ -517,20 +512,21 @@ def test_append_to_clusters(metta: MeTTa):
         
         (=
             (clusters0)
-            (::
+            (Cons
                 (cluster0)
-                (::
+                (Cons
                     (cluster1)
-                    ()
+                    Nil
                 )
             )
         )
         
         ;! (clusters)
-        ! (append (append (clusters0) (cluster2)) (cluster3))
+        ;! (List.concat (List.concat (clusters0) (Cons (cluster2) Nil)) (Cons (cluster3) Nil))   
+        ! (List.appendElement (List.appendElement (clusters0) (cluster2)) (cluster3))     
         """
     )[0][0]
-    cluster_0, cluster_1, cluster_2, cluster_3 = metta_clusters_to_py_clusters(result)
+    cluster_0, cluster_1, cluster_2, cluster_3 = metta_lists_to_py_clusters(result)
     extended_clusters = [cluster_0, cluster_1, cluster_2, cluster_3]
 
     dummy_cluster_0 = [np.array([0]), None, 10.0, None]
@@ -547,14 +543,14 @@ def test_append_to_clusters(metta: MeTTa):
         """        
         (=
             (clusters1)
-            ()
+            Nil
         )
 
         ;! (clusters)
-        ! (append (append (clusters1) (cluster0)) (cluster1))
+        ! (List.appendElement (List.appendElement (clusters1) (cluster0)) (cluster1))
         """
     )[0][0]
-    cluster_0, cluster_1 = metta_clusters_to_py_clusters(result)
+    cluster_0, cluster_1 = metta_lists_to_py_clusters(result)
     extended_clusters = [cluster_0, cluster_1]
     expected_empty = [dummy_cluster_0, dummy_cluster_1]
     assert (
@@ -563,10 +559,11 @@ def test_append_to_clusters(metta: MeTTa):
 
     result: Atom = metta.run(
         """                
-        ! (append (append (clusters0) ()) ())
+        ;! (List.appendElement (List.appendElement (clusters0) Nil) Nil)        
+        ! (List.appendElement (clusters0) Nil)               
         """
     )[0][0]
-    cluster_0, cluster_1 = metta_clusters_to_py_clusters(result)
+    cluster_0, cluster_1 = metta_lists_to_py_clusters(result)
 
     # Edge Case 2: Empty children tuple
     extended_clusters = [cluster_0, cluster_1]
@@ -578,10 +575,10 @@ def test_append_to_clusters(metta: MeTTa):
     # Edge Case 3: Both clusters and children are empty
     result: Atom = metta.run(
         """                
-        ! (append (append () ()) ())
+        ! (List.appendElement (List.appendElement Nil Nil) Nil)
         """
     )[0][0]
-    extended_clusters = metta_clusters_to_py_clusters(result)
+    extended_clusters = metta_lists_to_py_clusters(result)
 
     # extended_both_empty = extend_clusters([], ())
     assert extended_clusters == [], f"Expected empty list, got {extended_clusters}"
@@ -606,18 +603,18 @@ def test_append_to_hierarchy(metta: MeTTa):
                       
         (=
             (clusters0)
-            (::                
+            (Cons                
                 (cluster0)
-                ()                
+                Nil                
             )
         )
         
         (=
             (hierarchy0)
-            py.none
+            Nil
         )
         
-        ! (append (hierarchy0) (clusters0))
+        ! (List.appendElement (hierarchy0) (clusters0))
         """
     )[0][0]
     # hierarchy: List[List[Tuple[np.ndarray, np.ndarray, float, None]]]
@@ -645,46 +642,46 @@ def test_append_to_hierarchy(metta: MeTTa):
         )                
         (=
             (clusters0)
-            (::                
+            (Cons                
                 (cluster0)
-                ()                
+                Nil                
             )
         )
         (=
             (clusters1)
-            (::
+            (Cons
                 (cluster0)
-                (::
+                (Cons
                     (cluster1)
-                    ()
+                    Nil
                 )                                                
             )
         )
         (=
             (clusters2)
-            (::
+            (Cons
                 (cluster0)
-                (::
+                (Cons
                     (cluster1)
-                    (::
+                    (Cons
                         (cluster2)
-                        ()
+                        Nil
                     )
                 )                                                
             )
         )        
         (=
             (hierarchy1)
-            (::
+            (Cons
                 (clusters0)
-                (::
+                (Cons
                     (clusters1)
-                    ()
+                    Nil
                 )                
             )
         )
 
-        ! (append (hierarchy1) (clusters2))        
+        ! (List.appendElement (hierarchy1) (clusters2))        
         """
     )[0][0]
     hierarchy = parse_hierarchy(result)
@@ -715,16 +712,16 @@ def test_bisecting_kmeans(metta: MeTTa):
             (np.array ((0.0 0.0) (0.0 1.0) (1.0 0.0) (1.0 1.0) (5.0 5.0) (5.0 6.0)))            
         )
         
-        (: init-cluster (-> ClusterList))
+        (: init-cluster (-> (List Cluster)))
         (=
             (init-cluster)
             (bisecting-kmeans.compute-initial-cluster (X))            
         )
         
-        (: init-hierarchy (-> Hierarchy))
+        (: init-hierarchy (-> (List (List Cluster))))
         (=
             (init-hierarchy)
-            (append py.none (init-cluster))
+            (Cons (init-cluster) Nil)
         )
                 
         ! (bisecting-kmeans.recursive-bisecting-kmeans (X) (init-cluster) 1 10 (init-hierarchy))
@@ -738,7 +735,7 @@ def test_bisecting_kmeans(metta: MeTTa):
     # test for splitting into 3 clusters.
     result: Atom = metta.run(
         """            
-        ! (bisecting-kmeans.recursive-bisecting-kmeans (X) (init-cluster) 3 10 (init-hierarchy))        
+        ! (bisecting-kmeans.recursive-bisecting-kmeans (X) (init-cluster) 3 10 (init-hierarchy))                
         """
     )[0][0]
     hierarchy = parse_hierarchy(result)
@@ -789,21 +786,21 @@ def test_bisecting_kmeans_extract_centers(metta: MeTTa):
         (: cluster-list (-> ClusterList))
         (=
             (cluster-list)
-            (::
+            (Cons
                 (
                     (np.array (0 1 2))  ; indices
                     (np.array (1.0 1.0))  ; center
                     10.5  ; sse
                     py.none  ; hierarchy
                 )
-                (::
+                (Cons
                     (
                         (np.array (3 4))  ; indices
                         (np.array (2.0 2.0))  ; center
                         5.2  ; sse
                         py.none  ; hierarchy
                     )
-                    ()
+                    Nil
                 )
             )
         )
@@ -835,20 +832,18 @@ def test_bisecting_kmeans_concat_arrays(metta: MeTTa):
         !(import! &self metta_ul:cluster:bisecting_kmeans)
         """
     )
-
     # Test with multiple arrays
     result: Atom = metta.run(
-        """
-        (: arrays (-> (List (NPArray ($D)))))
+        """        
         (=
             (arrays)
-            (::
+            (Cons
                 (np.array (1.0 1.0))
-                (::
+                (Cons
                     (np.array (2.0 2.0))
-                    (::
+                    (Cons
                         (np.array (3.0 3.0))
-                        ()
+                        Nil
                     )
                 )
             )
@@ -870,9 +865,9 @@ def test_bisecting_kmeans_concat_arrays(metta: MeTTa):
         (: single-array (-> (List (NPArray ($D)))))
         (=
             (single-array)
-            (::
+            (Cons
                 (np.array (4.0 4.0))
-                ()
+                Nil
             )
         )
 
@@ -887,7 +882,7 @@ def test_bisecting_kmeans_concat_arrays(metta: MeTTa):
     ), f"Expected {expected_single}, got {single_result}"
 
     # Test with empty list
-    result: Atom = metta.run("! (bisecting-kmeans.concat-arrays ())")[0][0]
+    result: Atom = metta.run("! (bisecting-kmeans.concat-arrays Nil)")[0][0]
     empty_result = result.get_object().value
     assert len(empty_result) == 0, f"Expected empty array, got {empty_result}"
 
@@ -912,24 +907,24 @@ def test_bisecting_kmeans_assign(metta: MeTTa):
             ))
         )
 
-        (: clusters (-> ClusterList))
+        (: clusters (-> (List Cluster)))
         (=
             (clusters)
-            (::
+            (Cons
                 (
                     (np.array (0 1))  ; indices
                     (np.array (1.0 1.0))  ; center
                     10.5  ; sse
                     py.none  ; hierarchy
                 )
-                (::
+                (Cons
                     (
                         (np.array (2 3))  ; indices
                         (np.array (5.0 5.0))  ; center
                         5.2  ; sse
                         py.none  ; hierarchy
                     )
-                    ()
+                    Nil
                 )
             )
         )

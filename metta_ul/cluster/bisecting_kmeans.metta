@@ -1,5 +1,7 @@
 !(import! &self metta_ul)
 !(import! &self kmeans)
+!(import! &self metta_ul:linkedlist)
+
 
 ! (bind! bc-np (py-atom numpy))
 
@@ -11,84 +13,30 @@
         $index
     )
 )
-(=
-    (length ())
-    0
-)
-(=
-    (length (:: ($indices $center $sse $hierarchy) $xs))
-    (+ 1 (length $xs))
-)
 
+(: get-first (-> (List Cluster) Cluster))
 (=
-    (len ())
-    0
-)
-(=
-    (len (:: $x $xs))
-    (+ 1 (len $xs))
-)
-
-(: get-first (-> ClusterList Cluster))
-(=
-    (get-first (:: $x $y))
+    (get-first (Cons $x $y))
     $x
 )
 
-(: get-second (-> ClusterList Cluster))
+(: get-second (-> (List Cluster) Cluster))
 (=
-    (get-second (:: $x (:: $y ())))
+    (get-second (Cons $x (Cons $y Nil)))
     $y
 )
 
-(: append (-> ClusterList Cluster ClusterList))
-(: append (-> Hierarchy ClusterList Hierarchy))
-(: append (-> LabelList Number LabelList))
 (=
-    (append py.none $a)
-    (::
-        $a
-        ()
-    )
-)
-(=
-    (append () $a)
-    (::
-        $a
-        ()
-    )
-)
-(=
-    (append (:: $x $xs) $a)
-    (::
-        $x
-        (append $xs $a)
-    )
-)
-
-(=
-    (get-index () $idx)
-    py.none
-)
-
-(=
-    (get-index (:: $x $xs) $idx)
-    (if (== $idx 0)
-        $x
-        (get-index $xs (- $idx 1))
-    )
-)
-(=
-    (get-last ())
+    (get-last Nil)
     py.none
 )
 (=
-    (get-last (:: $x ()))
+    (get-last (Cons $x Nil))
     $x
 )
 (=
-    (get-last (:: $x (:: $y $ys)))
-    (get-last (:: $y $ys))
+    (get-last (Cons $x (Cons $y $ys)))
+    (get-last (Cons $y $ys))
 )
 
 ; =========================================
@@ -118,10 +66,10 @@
 ; indices = np.arange(n_samples)
 ; center = np.mean(data, axis=0)
 ; sse = compute_sse(data, indices, center)
-(: bisecting-kmeans.compute-initial-cluster (-> (NPArray ($N $D)) ClusterList))
+(: bisecting-kmeans.compute-initial-cluster (-> (NPArray ($N $D)) (List Cluster)))
 (=
     (bisecting-kmeans.compute-initial-cluster $X)
-    (::
+    (Cons
         (
             ; indices
             (np.arange
@@ -143,7 +91,7 @@
             ; hierarchy
             py.none
         )
-        ()
+        Nil
     )
 )
 
@@ -171,26 +119,27 @@
     $hierarchy
 )
 
-(: bisecting-kmeans.find-max-cluster (-> ClusterList Cluster))
+(: bisecting-kmeans.find-max-cluster (-> (List Cluster) Cluster))
 (=
-    (bisecting-kmeans.find-max-cluster (:: ($indices $center $sse $hierarchy) ()) )
+    (bisecting-kmeans.find-max-cluster (Cons ($indices $center $sse $hierarchy) Nil) )
     ($indices $center $sse $hierarchy)
 )
 (=
     (bisecting-kmeans.find-max-cluster
-        (:: ($indices1 $center1 $sse1 $hierarchy1)
-        (:: ($indices2 $center2 $sse2 $hierarchy2) $xs))
+        (Cons ($indices1 $center1 $sse1 $hierarchy1)
+        (Cons ($indices2 $center2 $sse2 $hierarchy2) $xs))
     )
     (if (>
         $sse1
         (bisecting-kmeans.get-cluster-sse
-            (bisecting-kmeans.find-max-cluster (:: ($indices2 $center2 $sse2 $hierarchy2) $xs))
+            (bisecting-kmeans.find-max-cluster (Cons ($indices2 $center2 $sse2 $hierarchy2) $xs))
         )
     )
          ($indices1 $center1 $sse1 $hierarchy1)
-         (bisecting-kmeans.find-max-cluster (:: ($indices2 $center2 $sse2 $hierarchy2) $xs))
+         (bisecting-kmeans.find-max-cluster (Cons ($indices2 $center2 $sse2 $hierarchy2) $xs))
     )
 )
+
 
 
 (: bisecting-kmeans.cluster-equal (-> Cluster Cluster Bool))
@@ -212,20 +161,20 @@
     )
 )
 
-(: bisecting-kmeans.remove-cluster (-> ClusterList Cluster ClusterList))
+(: bisecting-kmeans.remove-cluster (-> (List Cluster) Cluster (List Cluster)))
 (=
-    (bisecting-kmeans.remove-cluster () $target)
-    ()
+    (bisecting-kmeans.remove-cluster Nil $target)
+    Nil
 )
 (=
-    (bisecting-kmeans.remove-cluster (:: ($indices $center $sse $hierarchy) $xs) $target)
+    (bisecting-kmeans.remove-cluster (Cons ($indices $center $sse $hierarchy) $xs) $target)
     (if (bisecting-kmeans.cluster-equal ($indices $center $sse $hierarchy) $target)
         (bisecting-kmeans.remove-cluster $xs $target)
-        (:: ($indices $center $sse $hierarchy) (bisecting-kmeans.remove-cluster $xs $target))
+        (Cons ($indices $center $sse $hierarchy) (bisecting-kmeans.remove-cluster $xs $target))
     )
 )
 
-(: bisecting-kmeans.bisect-cluster (-> (NPArray ($N $D)) Cluster Number ClusterList))
+(: bisecting-kmeans.bisect-cluster (-> (NPArray ($N $D)) Cluster Number (List Cluster)))
 (=
     (bisecting-kmeans.bisect-cluster $X $max-cluster $max-iter)
     (let
@@ -234,7 +183,7 @@
         (kmeans.fit (np.take $X (bisecting-kmeans.get-cluster-indices $max-cluster) 0) 2)
 
         ; output tuple
-        (::
+        (Cons
             ; cluster 0
             (
                 (np.take
@@ -278,7 +227,7 @@
                 )
                 py.none
             )
-            (::
+            (Cons
                 ; cluster 1
                 (
                     (np.take
@@ -321,16 +270,16 @@
                     )
                     py.none
                 )
-                ()
+                Nil
             )
         )
     )
 )
 
-(: bisecting-kmeans.recursive-bisecting-kmeans (-> (NPArray ($N $D)) ClusterList Number Number Hierarchy Hierarchy))
+(: bisecting-kmeans.recursive-bisecting-kmeans (-> (NPArray ($N $D)) (List Cluster) Number Number (List (List Cluster)) (List (List Cluster))))
 (=
     (bisecting-kmeans.recursive-bisecting-kmeans $X $clusters $max-num-clusters $max-iter $hierarchy)
-    (if (>= (length $clusters) $max-num-clusters)
+    (if (>= (List.length $clusters) $max-num-clusters)
         $hierarchy
 
         (let
@@ -339,8 +288,8 @@
 
             (bisecting-kmeans.recursive-bisecting-kmeans
                 $X
-                (append
-                    (append
+                (List.appendElement
+                    (List.appendElement
                         (bisecting-kmeans.remove-cluster $clusters (bisecting-kmeans.find-max-cluster $clusters))
                         (get-first $bisect)
                     )
@@ -348,10 +297,10 @@
                 )
                 $max-num-clusters
                 $max-iter
-                (append
+                (List.appendElement
                     $hierarchy
-                    (append
-                        (append
+                    (List.appendElement
+                        (List.appendElement
                             (bisecting-kmeans.remove-cluster $clusters (bisecting-kmeans.find-max-cluster $clusters))
                             (get-first $bisect)
                         )
@@ -363,7 +312,7 @@
     )
 )
 
-(: bisecting-kmeans.fit (-> (NPArray ($N $D)) Number Number Hierarchy))
+(: bisecting-kmeans.fit (-> (NPArray ($N $D)) Number Number (List (List Cluster))))
 (=
     (bisecting-kmeans.fit $X $max-num-clusters $max-kmeans-iter)
     (let
@@ -375,30 +324,31 @@
             $init-cluster
             $max-num-clusters
             $max-kmeans-iter
-            (append py.none $init-cluster)
+            (List.appendElement Nil $init-cluster)
         )
     )
 )
 
 (=
-    (bisecting-kmeans.extract-centers ())
-    ()
+    (bisecting-kmeans.extract-centers Nil)
+    Nil
 )
 (=
-    (bisecting-kmeans.extract-centers (:: ($indices $center $sse $hierarchy) $rest))
-    (:: $center (bisecting-kmeans.extract-centers $rest))
+    (bisecting-kmeans.extract-centers (Cons ($indices $center $sse $hierarchy) $rest))
+    (Cons $center (bisecting-kmeans.extract-centers $rest))
 )
 
+(: bisecting-kmeans.concat-arrays (-> (List (NPArray ($D))) (NPArray ($N $D))))
 (=
-    (bisecting-kmeans.concat-arrays ())
+    (bisecting-kmeans.concat-arrays Nil)
     (np.array ())
 )
 (=
-    (bisecting-kmeans.concat-arrays (:: $first ()))
+    (bisecting-kmeans.concat-arrays (Cons $first Nil))
     (np.expand_dims $first 0)
 )
 (=
-    (bisecting-kmeans.concat-arrays (:: $first $rest))
+    (bisecting-kmeans.concat-arrays (Cons $first $rest))
     (np.append
         (np.expand_dims $first 0)
         (bisecting-kmeans.concat-arrays $rest)
@@ -420,7 +370,7 @@
 )
 
 
-(: bisecting-kmeans.predict (-> (NPArray ($N $D)) Hierarchy (NPArray ($N))))
+(: bisecting-kmeans.predict (-> (NPArray ($N $D)) (List (List Cluster)) (NPArray ($N))))
 (=
     (bisecting-kmeans.predict $X $hierarchy)
     (bisecting-kmeans.assign
