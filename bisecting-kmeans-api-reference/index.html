@@ -857,6 +857,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#type-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#function-definitions" class="md-nav__link">
     <span class="md-ellipsis">
       Function Definitions
@@ -1650,6 +1674,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#type-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#function-definitions" class="md-nav__link">
     <span class="md-ellipsis">
       Function Definitions
@@ -2196,6 +2244,13 @@
 <h1 id="metta_ulclusterbisecting-kmeans">metta_ul:cluster:bisecting-kmeans</h1>
 <h2 id="overview">Overview</h2>
 <p>This module implements the Bisecting K-means clustering algorithm using iterative splitting of clusters. The algorithm starts with the entire dataset as a single cluster and recursively bisects the cluster with the maximum Sum of Squared Errors (SSE) using standard k-means (with k=2) until a desired number of clusters is reached. The resulting hierarchical clustering structure captures the splits performed during the process.</p>
+<h2 id="type-definitions">Type Definitions</h2>
+<h3 id="core-types">Core Types</h3>
+<ul>
+<li><code>Cluster</code>: A tuple <code>($indices $center $sse $hierarchy)</code> representing a single cluster</li>
+<li><code>(List Cluster)</code>: A typed list of clusters using <code>Cons</code> and <code>Nil</code> constructors</li>
+<li><code>(List (List Cluster))</code>: Represents the hierarchical clustering structure</li>
+</ul>
 <h2 id="function-definitions">Function Definitions</h2>
 <h3 id="bisecting-kmeanscompute-sse"><code>bisecting-kmeans.compute-sse</code></h3>
 <p>Computes the Sum of Squared Errors (SSE) for a given cluster.</p>
@@ -2224,9 +2279,9 @@
 <h4 id="returns_1">Returns:</h4>
 <ul>
 <li>A list containing the initial cluster.</li>
-<li>Type: <code>ClusterList</code></li>
+<li>Type: <code>(List Cluster)</code></li>
 </ul>
-<p>Where the <code>ClusterList</code> is a list of clusters, and each cluster is a tuple containing:
+<p>Where the <code>(List Cluster)</code> is a list of clusters, and each cluster is a tuple containing:
 1. <strong>Indices:</strong> All data point indices in <code>$X</code>.
    - Type: <code>(NPArray ($N $D))</code>
 2. <strong>Center:</strong> The mean of the dataset.
@@ -2234,7 +2289,7 @@
 3. <strong>SSE:</strong> The computed SSE for the cluster.
    - Type: <code>Number</code>
 4. <strong>Hierarchy:</strong> <code>pyNone</code> (as no hierarchy is present initially).
-   - Type: <code>Hierarchy</code></p>
+   - Type: <code>(List (List Cluster))</code></p>
 <hr />
 <h3 id="bisecting-kmeansget-cluster-indices"><code>bisecting-kmeans.get-cluster-indices</code></h3>
 <p>Extracts the indices from a cluster tuple.</p>
@@ -2285,7 +2340,7 @@
 <h4 id="returns_5">Returns:</h4>
 <ul>
 <li>The hierarchy associated with the cluster.</li>
-<li>Type: <code>Hierarchy</code></li>
+<li>Type: <code>(List (List Cluster))</code></li>
 </ul>
 <hr />
 <h3 id="bisecting-kmeansfind-max-cluster"><code>bisecting-kmeans.find-max-cluster</code></h3>
@@ -2293,7 +2348,7 @@
 <h4 id="parameters_6">Parameters:</h4>
 <ul>
 <li>A list of clusters, where each cluster is a tuple <code>($indices $center $sse $hierarchy)</code>.</li>
-<li>Type: <code>ClusterList</code></li>
+<li>Type: <code>(List Cluster)</code></li>
 </ul>
 <h4 id="returns_6">Returns:</h4>
 <ul>
@@ -2319,7 +2374,7 @@
 <h4 id="parameters_8">Parameters:</h4>
 <ul>
 <li><code>$clusters</code>: The list of current clusters.</li>
-<li>Type: <code>ClusterList</code></li>
+<li>Type: <code>(List Cluster)</code></li>
 <li><code>$target</code>: The cluster tuple to be removed.</li>
 <li>Type: <code>Cluster</code></li>
 </ul>
@@ -2343,7 +2398,7 @@
 <h4 id="returns_9">Returns:</h4>
 <ul>
 <li>A tuple containing two clusters obtained from splitting the input cluster. Each cluster is represented as <code>(indices, center, sse, hierarchy)</code>.</li>
-<li>Type: <code>ClusterList</code></li>
+<li>Type: <code>(List Cluster)</code></li>
 </ul>
 <hr />
 <h3 id="bisecting-kmeansrecursive-bisecting-kmeans"><code>bisecting-kmeans.recursive-bisecting-kmeans</code></h3>
@@ -2353,18 +2408,18 @@
 <li><code>$X</code>: The dataset, represented as an array of data points.</li>
 <li>Type: <code>(NPArray ($N $D))</code></li>
 <li><code>$clusters</code>: The current list of clusters.</li>
-<li>Type: <code>ClusterList</code></li>
+<li>Type: <code>(List Cluster)</code></li>
 <li><code>$max-num-clusters</code>: The desired number of clusters.</li>
 <li>Type: <code>Number</code></li>
 <li><code>$max-iter</code>: The maximum iterations for each bisecting step.</li>
 <li>Type: <code>Number</code></li>
 <li><code>$hierarchy</code>: The current hierarchical clustering structure maintained as a MeTTa list.</li>
-<li>Type: <code>Hierarchy</code></li>
+<li>Type: <code>(List (List Cluster))</code></li>
 </ul>
 <h4 id="returns_10">Returns:</h4>
 <ul>
 <li>An updated hierarchical clustering structure as a MeTTa list describing the clustering process.</li>
-<li>Type: <code>Hierarchy</code></li>
+<li>Type: <code>(List (List Cluster))</code></li>
 </ul>
 <hr />
 <h3 id="bisecting-kmeansfit"><code>bisecting-kmeans.fit</code></h3>
@@ -2390,7 +2445,7 @@
 <li><code>$point</code>: A single data point from the dataset.</li>
 <li>Type: <code>(NPArray ($D))</code></li>
 <li><code>$clusters</code>: A list of clusters.</li>
-<li>Type: <code>ClusterList</code></li>
+<li>Type: <code>(List Cluster)</code></li>
 <li><code>$best-cluster-idx</code>: The current best cluster index for the point (initial value provided).</li>
 <li>Type: <code>Number</code></li>
 <li><code>$best-distance</code>: The current best distance found (initially set to a high value, such as <code>pyINF</code>).</li>
@@ -2411,16 +2466,16 @@
 <li><code>$X</code>: The dataset, represented as an array of data points.</li>
 <li>Type: <code>(NPArray ($D))</code></li>
 <li><code>$clusters</code>: The list of clusters.</li>
-<li>Type: <code>ClusterList</code></li>
+<li>Type: <code>(List Cluster)</code></li>
 <li><code>$point-idx</code>: The current index of the data point being processed.</li>
 <li>Type: <code>Number</code></li>
 <li><code>$labels</code>: A list of cluster labels corresponding to the assignment of each data point.</li>
-<li>Type: <code>LabelList</code></li>
+<li>Type: <code>(NPArray ($N))</code></li>
 </ul>
 <h4 id="returns_13">Returns:</h4>
 <ul>
 <li>A list of cluster labels indicating the assignment of each data point in <code>$X</code> to the nearest cluster.</li>
-<li>Type: <code>LabelList</code></li>
+<li>Type: <code>(NPArray ($N))</code></li>
 </ul>
 <hr />
 <h3 id="bisecting-kmeanspredict"><code>bisecting-kmeans.predict</code></h3>
@@ -2430,12 +2485,12 @@
 <li><code>$X</code>: The dataset, represented as an array of data points.</li>
 <li>Type: <code>(NPArray ($N $D))</code></li>
 <li><code>$hierarchy</code>: The hierarchical clustering structure generated by <code>bisecting-kmeans.fit</code>.</li>
-<li>Type: <code>Hierarchy</code></li>
+<li>Type: <code>(List (List Cluster))</code></li>
 </ul>
 <h4 id="returns_14">Returns:</h4>
 <ul>
 <li>A list of cluster labels indicating the assigned cluster for each data point in the dataset.</li>
-<li>Type: <code>LabelList</code></li>
+<li>Type: <code>(NPArray ($N))</code></li>
 </ul>
 <hr />
 <h2 id="usage">Usage</h2>
