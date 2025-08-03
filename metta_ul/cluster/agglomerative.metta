@@ -1,19 +1,6 @@
-!(import! &self metta_ul)
-!(import! &self metta_ul:linkedlist)
-
-(: PyList Type)
-(: py-list (-> Expression PyList))
-
-(: agglomerative.init-clusters (-> Number (List PyList)))
-(=
-    (agglomerative.init-clusters $n)
-    (let $n-1 (- $n 1)
-        (if (> $n 0)
-            (Cons (py-list ($n-1)) (agglomerative.init-clusters $n-1))
-            Nil
-        )
-    )
-)
+! (import! &self metta_ul)
+! (import! &self metta_ul:unionfind)
+! (import! &self metta_ul:heap)
 
 (: agglomerative.distance-matrix (-> (NPArray ($n $d)) (NPArray ($n $n))))
 (=
@@ -28,7 +15,7 @@
     )
 )
 
-(: agglomerative.linkage-distance (-> (NPArray ($n $n)) PyList PyList String Number))
+(: agglomerative.linkage-distance (-> (NPArray ($n $n)) (NPArray ($a)) (NPArray ($b)) String Number))
 (=
     (agglomerative.linkage-distance $distance-matrix $cluster1 $cluster2 $linkage)
     (let $distances ((py-dot $distance-matrix __getitem__) (np.ix_ $cluster1 $cluster2))
@@ -42,122 +29,154 @@
     )
 )
 
-(: agglomerative.closest-clusters (-> (List PyList) (NPArray ($n $n)) String Number (PyList PyList) (PyList PyList)))
-(= (agglomerative.closest-clusters Nil $distance-matrix $linkage $min-distance $closest-pair) $closest-pair)
-(= 
-    (agglomerative.closest-clusters (Cons $c $cs) $distance-matrix $linkage $min-distance $closest-pair)
-    (agglomerative.closest-clusters (Cons $c $cs) $cs $distance-matrix $linkage $min-distance $closest-pair)
-)
-(: agglomerative.closest-clusters (-> (List PyList) (List PyList) (NPArray ($n $n)) String Number (PyList PyList) (PyList PyList)))
+(: agglomerative.heapify (-> (NPArray ($a $a)) (Heap (Number Number Number))))
+(: agglomerative.heapify (-> (NPArray ($a $a)) (NPArray ($a)) Number (Heap (Number Number Number)) (Heap (Number Number Number))))
 (=
-    (agglomerative.closest-clusters $clusters1 $clusters2 $distance-matrix $linkage $min-distance $closest-pair)
-    (case ($clusters1 $clusters2)
-        (
-            ((Nil Nil) $closest-pair)
-
-            (
-                ((Cons $c1 $cs1) Nil)
-                (agglomerative.closest-clusters $cs1 $distance-matrix $linkage $min-distance $closest-pair)
+    (agglomerative.heapify $distance-matrix)
+    (let $n (np.shape $distance-matrix 0)
+        (agglomerative.heapify $distance-matrix (np.argmin (np.add $distance-matrix (np.mul (np.max $distance-matrix) (np.eye (np.shape $distance-matrix 0)))) 0) (- $n 1) Nil)
+    )
+)
+(=
+    (agglomerative.heapify $distance-matrix $nn $i $heap)
+    (let $j (np.item $nn $i)
+        (if (== $i 0)
+            (Heap.push 
+                $heap 
+                (
+                    (np.item $distance-matrix (py-tuple ($i $j)))
+                    $i
+                    $j
+                )
             )
+            (agglomerative.heapify 
+                $distance-matrix
+                $nn
+                (- $i 1)
+                (Heap.push 
+                    $heap 
+                    (
+                        (np.item $distance-matrix (py-tuple ($i $j)))
+                        $i
+                        $j
+                    )
+                )
+            )
+        )
+    )
+)
 
-            (
-                ((Cons $c1 $cs1) (Cons $c2 $cs2))
-                (let 
-                    $distance 
-                    (agglomerative.linkage-distance
+(: agglomerative.heappush (-> (Heap (Number Number Number)) (NPArray ($a $a)) String UnionFind Number (Heap (Number Number Number))))
+(: agglomerative.heappush (-> (Heap (Number Number Number)) (NPArray ($a $a)) String UnionFind Number (NPArray ($k)) Number (Heap (Number Number Number))))
+(=
+    (agglomerative.heappush $heap $distance-matrix $linkage $uf $new-root)
+    (let* (
+        ($roots (UnionFind.roots $uf))
+        ($k (np.shape $roots 0))
+    )
+        (agglomerative.heappush
+            $heap
+            $distance-matrix 
+            $linkage
+            $uf 
+            $new-root
+            $roots
+            (- $k 1)
+        )
+    )
+)
+(=
+    (agglomerative.heappush $heap $distance-matrix $linkage $uf $new-root $roots $k)
+    (let $root (np.item $roots $k)
+        (if (== $new-root $root)
+            (agglomerative.heappush
+                $heap
+                $distance-matrix
+                $linkage
+                $uf 
+                $new-root
+                $roots
+                (- $k 1)
+            )
+            (agglomerative.heappush
+                (Heap.push
+                    $heap
+                    (
+                        (agglomerative.linkage-distance
+                            $distance-matrix
+                            (UnionFind.get $uf $new-root)
+                            (UnionFind.get $uf $root)
+                            $linkage
+                        )
+                        $new-root
+                        $root
+                    )
+                )
+                $distance-matrix 
+                $linkage
+                $uf 
+                $new-root
+                $roots
+                (- $k 1)
+            )
+        )
+    )
+)
+(=
+    (agglomerative.heappush $heap $distance-matrix $linkage $uf $new-root $roots -1)
+    $heap
+)
+
+(: agglomerative.recursion (-> UnionFind (NPArray ($n $n)) (Heap (Number Number Number)) String Number UnionFind))
+(=
+    (agglomerative.recursion $uf $distance-matrix $heap $linkage $k)
+    (if (> (UnionFind.getCount $uf) $k)
+        (let ($d $i $j) (Heap.peek $heap)
+            (if (UnionFind.areUnified $uf $i $j)
+                (agglomerative.recursion
+                    $uf
+                    $distance-matrix
+                    (Heap.pop $heap)
+                    $linkage
+                    $k
+                )
+                (let $uf-unioned (UnionFind.union $uf $i $j)
+                    (agglomerative.recursion
+                        $uf-unioned
                         $distance-matrix
-                        $c1
-                        $c2
+                        (agglomerative.heappush (Heap.pop $heap) $distance-matrix $linkage $uf (UnionFind.find $uf $i))
                         $linkage
-                    )
-                    (if (> $min-distance $distance)
-                        (agglomerative.closest-clusters
-                            $clusters1
-                            $cs2
-                            $distance-matrix
-                            $linkage
-                            $distance
-                            ($c1 $c2)
-                        )
-                        (agglomerative.closest-clusters
-                            $clusters1
-                            $cs2
-                            $distance-matrix
-                            $linkage
-                            $min-distance
-                            $closest-pair
-                        )
+                        $k
                     )
                 )
             )
         )
+        $uf
     )
 )
 
-(: agglomerative.merge-clusters (-> (List PyList) (NPArray ($n $n)) String (List PyList)))
+(: agglomerative.cluster (-> (NPArray ($n $d)) Number String UnionFind))
 (=
-    (agglomerative.merge-clusters $clusters $distance-matrix $linkage)
-    (let 
-        ($c1 $c2)
-        (agglomerative.closest-clusters
-            $clusters
-            $distance-matrix
-            $linkage
-            py.pinf
-            ()
-        )
-        (List.append
-            ((py-dot $c1 __add__) $c2)
-            (List.remove
-                (List.fromExpression ($c1 $c2))
-                $clusters
-            )
-        )
-    )
-)
-
-(: agglomerative.recursion (-> Number String (List PyList) (NPArray ($n $n)) Number (List PyList)))
-(=
-    (agglomerative.recursion $k $linkage $clusters $distance-matrix $length)
-    (if (== $k $length)
-        $clusters
+    (agglomerative.cluster $X $k $linkage)
+    (let $distance-matrix (agglomerative.distance-matrix $X)
         (agglomerative.recursion
-            $k
-            $linkage
-            (agglomerative.merge-clusters $clusters $distance-matrix $linkage)
+            (UnionFind.init (np.shape $X 0))
             $distance-matrix
-            (- $length 1)
-        )
-    )
-)
-
-(: agglomerative (-> (NPArray ($n $d)) Number String (List PyList)))
-(=
-    (agglomerative $X $k $linkage)
-    (let $n (np.shape $X 0)
-        (agglomerative.recursion
-            $k
+            (agglomerative.heapify $distance-matrix)
             $linkage
-            (agglomerative.init-clusters $n)
-            (agglomerative.distance-matrix $X)
-            $n
+            $k
         )
     )
 )
 
-
-(: agglomerative.assign (-> (List PyList) (NPArray ($n)) Number (NPArray ($n))))
+(: agglomerative.assign (-> UnionFind (NPArray ($n)) (NPArray ($k)) Number (NPArray ($n))))
 (=
-    (agglomerative.assign $clusters $assignment $index)
-    (case $clusters
-        (
-            (Nil $assignment)
-            ((Cons $c $cs)
-                (let $_ (np.put $assignment $c $index)
-                    (agglomerative.assign $cs $assignment (+ 1 $index))
-                )
-            )
+    (agglomerative.assign $uf $assignment $roots $index)
+    (if (>= $index 0)
+        (let $_ (np.put $assignment (UnionFind.get $uf (np.item $roots $index)) $index)
+            (agglomerative.assign $uf $assignment $roots (- $index 1))
         )
+        $assignment
     )
 )
 
@@ -165,9 +184,12 @@
 (: agglomerative.fit-predict (-> (NPArray ($n $d)) Number String (NPArray ($n))))
 (=
     (agglomerative.fit-predict $X $k $linkage)
-    (agglomerative.assign
-        (agglomerative $X $k $linkage)
-        (np.ones (np.shape $X 0))
-        0
+    (let $uf (agglomerative.cluster $X $k $linkage)
+        (agglomerative.assign
+            $uf
+            (np.ones (np.shape $X 0))
+            (UnionFind.roots $uf)
+            (- $k 1)
+        )
     )
 )

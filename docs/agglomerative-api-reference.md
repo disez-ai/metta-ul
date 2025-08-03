@@ -1,155 +1,284 @@
-# metta_ul:cluster:agglomerative
+# `metta_ul:cluster:agglomerative`
 
 ## Overview
-This module implements agglomerative clustering using hierarchical merging. The algorithm starts with each data point as its own cluster and iteratively merges the closest clusters based on a chosen linkage criterion.
+
+This module implements agglomerative clustering using a priority heap and a union-find structure to efficiently merge clusters until a desired number of clusters remain. It supports multiple linkage strategies: `"single"`, `"complete"`, and `"average"`.
 
 ## Function Definitions
 
-### `agglomerative.init-clusters`
-Initializes clusters where each data point starts as its own cluster.
-
-#### Parameters:
-- `$n`: The number of data points (clusters initially).
-    - Type: `Number`
-
-#### Returns:
-- A list where each data point is its own cluster.
-    - Type: `(List PyList)`
-
 ### `agglomerative.distance-matrix`
+
 Computes the pairwise Euclidean distance matrix for the dataset.
 
 #### Parameters:
-- `$X`: The dataset, represented as an array of data points.
-    - Type: `(NPArray ($n $d))`
+
+* `$X`: Input dataset as a 2D NumPy array.
+
+  * Type: `(NPArray ($n $d))`
 
 #### Returns:
-- A square matrix where the entry at (i, j) represents the Euclidean distance between points i and j.
-    - Type: `(NPArray ($n $n))`
+
+* Pairwise distance matrix between points in `$X`.
+
+  * Type: `(NPArray ($n $n))`
+
+---
 
 ### `agglomerative.linkage-distance`
-Computes the distance between two clusters based on the specified linkage criterion.
+
+Calculates the distance between two clusters based on a specified linkage method.
 
 #### Parameters:
-- `$distance-matrix`: The precomputed distance matrix.
-    - Type: `(NPArray ($n $n))`
-- `$cluster1`: The first cluster.
-    - Type: `PyList`
-- `$cluster2`: The second cluster.
-    - Type: `PyList`
-- `$linkage`: The linkage method to use (`"single"`, `"complete"`, or `"average"`).
-    - Type: `String`
+
+* `$distance-matrix`: Precomputed pairwise distance matrix.
+
+  * Type: `(NPArray ($n $n))`
+* `$cluster1`: Indices of the first cluster.
+
+  * Type: `(NPArray ($a))`
+* `$cluster2`: Indices of the second cluster.
+
+  * Type: `(NPArray ($b))`
+* `$linkage`: Linkage method (`"single"`, `"complete"`, or `"average"`).
+
+  * Type: `String`
 
 #### Returns:
-- The computed distance between the two clusters.
-    - Type: `Number`
 
-### `agglomerative.closest-clusters`
-Finds the two clusters that are closest based on the specified linkage criterion.
+* Scalar distance between the two clusters.
+
+  * Type: `Number`
+
+---
+
+### `agglomerative.heapify`
+
+Initializes a heap with the smallest pairwise distances between data points.
+
+#### Overload 1:
 
 #### Parameters:
-- `$clusters`: The list of current clusters.
-    - Type: `(List PyList)`
-- `$distance-matrix`: The precomputed distance matrix.
-    - Type: `(NPArray ($n $n))`
-- `$linkage`: The linkage method to use.
-    - Type: `String`
-- `$min-distance`: The current minimum distance found.
-    - Type: `Number`
-- `$closest-pair`: The closest pair of clusters found so far.
-    - Type: `(PyList PyList)`
+
+* `$distance-matrix`: Pairwise distance matrix.
+
+  * Type: `(NPArray ($a $a))`
 
 #### Returns:
-- A tuple containing the closest pair of clusters.
 
-### `agglomerative.merge-clusters`
-Merges the two clusters that are closest based on the specified linkage criterion.
+* Initialized heap of distances.
+
+  * Type: `(Heap (Number Number Number))`
+
+#### Overload 2 (internal recursion):
 
 #### Parameters:
-- `$clusters`: The list of current clusters.
-    - Type: `(List PyList)`
-- `$distance-matrix`: The precomputed distance matrix.
-    - Type: `(NPArray ($n $n))`
-- `$linkage`: The linkage method to use.
-    - Type: `String`
+
+* `$distance-matrix`: Pairwise distance matrix.
+
+  * Type: `(NPArray ($a $a))`
+* `$nn`: Array of closest neighbor indices.
+
+  * Type: `(NPArray ($a))`
+* `$i`: Index for recursion.
+
+  * Type: `Number`
+* `$heap`: Current heap.
+
+  * Type: `(Heap (Number Number Number))`
 
 #### Returns:
-- The updated clusters.
-    - Type: `(List PyList)`
+
+* Updated heap.
+
+  * Type: `(Heap (Number Number Number))`
+
+---
+
+### `agglomerative.heappush`
+
+Pushes new distance entries into the heap involving a newly formed cluster.
+
+#### Overload 1:
+
+#### Parameters:
+
+* `$heap`: Current heap.
+
+  * Type: `(Heap (Number Number Number))`
+* `$distance-matrix`: Pairwise distance matrix.
+
+  * Type: `(NPArray ($a $a))`
+* `$linkage`: Linkage method.
+
+  * Type: `String`
+* `$uf`: UnionFind data structure.
+
+  * Type: `UnionFind`
+* `$new-root`: Root of the newly created cluster.
+
+  * Type: `Number`
+
+#### Returns:
+
+* Updated heap.
+
+  * Type: `(Heap (Number Number Number))`
+
+#### Overload 2 (internal recursion):
+
+#### Parameters:
+
+* `$heap`: Current heap.
+
+  * Type: `(Heap (Number Number Number))`
+* `$distance-matrix`: Pairwise distance matrix.
+
+  * Type: `(NPArray ($a $a))`
+* `$linkage`: Linkage method.
+
+  * Type: `String`
+* `$uf`: UnionFind structure.
+
+  * Type: `UnionFind`
+* `$new-root`: Root of new cluster.
+
+  * Type: `Number`
+* `$roots`: All current roots.
+
+  * Type: `(NPArray ($k))`
+* `$k`: Index for recursion.
+
+  * Type: `Number`
+
+#### Returns:
+
+* Updated heap.
+
+  * Type: `(Heap (Number Number Number))`
+
+---
 
 ### `agglomerative.recursion`
-The basic recursion step of the algorithm.
+
+Recursively merges clusters until only `$k` clusters remain.
 
 #### Parameters:
-- `$linkage`: The linkage method to use (`"single"`, `"complete"`, or `"average"`).
-    - Type: `String`
-- `$clusters`: The list of current clusters.
-    - Type: `(List PyList)`
-- `$distance-matrix`: The precomputed distance matrix.
-    - Type: `(NPArray ($n $n))`
-- `$length`: The count of clusters in `$clusters`.
-    - Type: `Number`
+
+* `($parent $count)`: UnionFind structure holding cluster merges and count of current clusters.
+
+  * Type: `UnionFind`
+* `$distance-matrix`: Pairwise distance matrix.
+
+  * Type: `(NPArray ($n $n))`
+* `$heap`: Min-heap of cluster distances.
+
+  * Type: `(Heap (Number Number Number))`
+* `$linkage`: Linkage strategy to use.
+
+  * Type: `String`
+* `$k`: Desired number of clusters.
+
+  * Type: `Number`
 
 #### Returns:
-- A clusters as a MeTTa list.
-    - Type: `(List PyList)`
 
-### `agglomerative`
-Performs agglomerative clustering on a dataset.
+* Updated UnionFind structure with merged clusters.
+
+  * Type: `UnionFind`
+
+---
+
+### `agglomerative.cluster`
+
+Performs the full agglomerative clustering procedure using a priority heap and union-find.
 
 #### Parameters:
-- `$X`: The dataset, represented as an array of data points.
-    - Type: `(NPArray ($n $d))`
-- `$linkage`: The linkage method to use (`"single"`, `"complete"`, or `"average"`).
-    - Type: `String`
+
+* `$X`: Input data points.
+
+  * Type: `(NPArray ($n $d))`
+* `$k`: Number of clusters to return.
+
+  * Type: `Number`
+* `$linkage`: Linkage method to use.
+
+  * Type: `String`
 
 #### Returns:
-- Clusters as a MeTTa list of Python lists of numbers which represent a row in `$X`.
-    - Type: `(List PyList)`
+
+* Final UnionFind structure after merging.
+
+  * Type: `UnionFind`
+
+---
 
 ### `agglomerative.assign`
-Transform a MeTTa list of clusters into a Numpy array of assignments.
+
+Assigns cluster indices to data points based on the final UnionFind structure.
 
 #### Parameters:
-- `$clusters`: The list of clusters.
-    - Type: `(List PyList)`
-- `$assignment`: The current assignment.
-    - Type: `(NPArray ($n))`
-- `$index`: The index of the cluster in `$clusters`.
-    - Type: `Number`
+
+* `$uf`: Final UnionFind structure.
+
+  * Type: `UnionFind`
+* `$assignment`: Array for storing assignment results.
+
+  * Type: `(NPArray ($n))`
+* `$roots`: List of cluster roots.
+
+  * Type: `(NPArray ($k))`
+* `$index`: Current index of the root being assigned.
+
+  * Type: `Number`
 
 #### Returns:
-- Assignments as a numpy array.
-    - Type: `(NPArray ($n))`
+
+* Final cluster assignment array.
+
+  * Type: `(NPArray ($n))`
+
+---
 
 ### `agglomerative.fit-predict`
-Clusters a numpy array of samples.
-(: agglomerative.fit-predict (-> (NPArray ($n $d)) Number String (NPArray ($n))))
-(=
-    (agglomerative.fit-predict $X $k $linkage)
+
+Clusters a dataset and returns an array of cluster assignments.
 
 #### Parameters:
-- `$X`: The list of clusters.
-    - Type: `(NPArray ($n $d))`
-- `$k`: The number of clusters.
-    - Type: `Number`
-- `$linkage`: The linkage method to use (`"single"`, `"complete"`, or `"average"`).
-    - Type: `String`
+
+* `$X`: Dataset of shape `(n, d)`.
+
+  * Type: `(NPArray ($n $d))`
+* `$k`: Number of clusters to form.
+
+  * Type: `Number`
+* `$linkage`: Linkage method (`"single"`, `"complete"`, `"average"`).
+
+  * Type: `String`
 
 #### Returns:
-- Assignments as a numpy array.
-    - Type: `(NPArray ($n))`
+
+* Cluster assignment for each point.
+
+  * Type: `(NPArray ($n))`
+
+---
 
 ## Usage
-To cluster a dataset `S` of type `(NPArray ($n $d))` with `"average"` linking:
+
+To cluster dataset `S` into 4 clusters using `"average"` linkage:
+
 ```metta
 (=
     (assignments)
-    (agglomerative.fit-predict (S) "average")
+    (agglomerative.fit-predict S 4 "average")
 )
 ```
 
-## Notes
-- The distance metric used is the Euclidean norm.
-- The algorithm supports different linkage strategies to control the merging behavior.
+---
 
+## Notes
+
+* This implementation is optimized using a heap for fast retrieval of the smallest cluster distances and a union-find structure to avoid merging already connected clusters.
+* All distance computations are based on the Euclidean norm.
+* The use of `np.ix_` allows efficient distance slicing between cluster indices.
+* The recursive definitions are tail-optimized for stackless processing.

@@ -1,3 +1,4 @@
+! (import! &self metta_ul)
 ! (import! &self metta_ul:cluster:agglomerative)
 
 (=
@@ -12,12 +13,12 @@
 
 (=
     (cluster1)
-    (py-list (0))
+    (np.vector 0)
 )
 
 (=
     (cluster2)
-    (py-list (1))
+    (np.vector 1)
 )
 
 (=
@@ -88,68 +89,51 @@
     )
 )
 (Test agglomerative.linkage-distance.testAverage)
-    
-;; Test agglomerative.closest-clusters
+
+;; Test agglomerative.heapify
 (=
-    (agglomerative.closest-clusters.test)
+    (agglomerative.heapify.test)
     (assertEqual
-        (agglomerative.closest-clusters (clusters1) (np.array (distance-matrix2)) "single" py.pinf ())
-        ((cluster1) (cluster2))
+        (agglomerative.heapify (np.array (distance-matrix2)))
+        (Heap.Node 1 (1.0 0 1) (Heap.Node 1 (1.0 1 0) Nil (Heap.Node 0 (2.0 2 0) Nil Nil)) Nil)
     )
 )
-(Test agglomerative.closest-clusters.test)
+(Test agglomerative.heapify.test)
 
-
-
-;; Test agglomerative.merge-clusters
+;; Test agglomerative.heappush
 (=
-    (agglomerative.merge-clusters.test)
+    (agglomerative.heappush.test)
     (assertEqual
-        (agglomerative.merge-clusters (clusters1) (np.array (distance-matrix2)) "single")
-        (clusters2)
+        (agglomerative.heappush
+            Nil
+            (np.array (distance-matrix1))
+            "single"
+            (UnionFind.Cons (np.vector 0 1) 2)
+            0
+        )
+        (Heap.Node 0 (1.0 0 1) Nil Nil)
     )
 )
-(Test agglomerative.merge-clusters.test)
+(Test agglomerative.heappush.test)
 
-;; Test agglomerative.init-clusters
+;; Test agglomerative.cluster
 (=
-    (agglomerative.init-clusters.test)
+    (agglomerative.cluster.testTwoClusters)
     (assertEqual
-        (agglomerative.init-clusters 2)
-        (List.fromExpression ((cluster2) (cluster1)))
+        (agglomerative.cluster (np.array (X)) 2 "single")
+        (UnionFind.Cons (np.vector 0 1) 2)
     )
 )
-(Test agglomerative.init-clusters.test)
-
-
-;; Test agglomerative.recursion
-(=
-    (agglomerative.recursion.testNoRecursion)
-    (assertEqual
-        (agglomerative.recursion 1 "single" (flat-clusters) (np.array (distance-matrix2)) 1)
-        (flat-clusters)
-    )
-)
-(Test agglomerative.recursion.testNoRecursion)
+(Test agglomerative.cluster.testTwoClusters)
 
 (=
-    (agglomerative.recursion.testOneRecursion)
+    (agglomerative.cluster.testOneCluster)
     (assertEqual
-        (agglomerative.recursion 1 "single" (clusters2) (np.array (distance-matrix2)) 2)
-        (List.fromExpression ((py-list (2 0 1))))
+        (agglomerative.cluster (np.array (X)) 1 "single")
+        (UnionFind.Cons (np.vector 0 0) 1)
     )
 )
-(Test agglomerative.recursion.testOneRecursion)
-
-;; Test agglomerative
-(=
-    (agglomerative.test)
-    (assertEqual
-        (agglomerative (np.array (X)) 1 "single")
-        (List.fromExpression ((py-list (1 0))))
-    )
-)
-(Test agglomerative.test)
+(Test agglomerative.cluster.testOneCluster)
 
 ;; Test agglomerative.fit-predict
 (=

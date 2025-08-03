@@ -13,53 +13,33 @@ This project is packaged as a Python module and includes a Dockerized environmen
 
 ## Authors
 
-- **Ramin Barati** - <rekino@gmail.com>
+- **Ramin Barati** - <me@rbarati.com>
 - **Amirhossein Nourani Zadeh** - <amirhossein.nouranizadeh@gmail.com>
 - **Farhoud** - <farhoud.m7@gmail.com>
 
 ## Requirements
 
 - Python 3.7 or later
-- Docker
-- `hyperon` >= 0.2.2
-- `scikit-learn`
+- `hyperon`
+- `numpy`
+- `pandas`
 
 ## Installation
 
 ### Using pip
 
 ```sh
-pip install -e .
-```
-
-### Using Docker
-
-Build and run the containerized environment:
-
-```sh
-docker build . -t metta_ul
+pip install metta-ul
 ```
 
 ## Running Tests
-
-### Running tests inside Docker
-
-You can run tests using the provided `Makefile`. This will:
-
-1. Build the Docker image
-2. Run tests inside a container
-3. Clean up the container after the test run
-
-To execute:
-
+First, install PyTest:
 ```sh
-make test
+pip install pytest
 ```
-
-Alternatively, if you want to run pytest directly inside Docker:
-
+Then, run the tests using:
 ```sh
-docker run -it --rm --mount type=bind,src=$(pwd),dst=/app --name metta_ul_run metta_ul pytest -s
+pytest .
 ```
 
 ## Contributing

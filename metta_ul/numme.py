@@ -18,7 +18,13 @@ class NumpyValue(MatchableObject):
         sh = self.content.shape
         bindings = {}
         if isinstance(other, GroundedAtom):
-            other = other.get_object()
+            # TODO: Currently (hyperon v0.2.6) we cannot know if GroundedAtom is wrapping
+            # a Python deserializable object or not without trying to unwrap it. This
+            # work around should be replaced with the appropriate logic when CGrounded is fixed. 
+            try:
+                other = other.get_object()
+            finally:
+                pass
         # Match by equality with another NumpyValue
         if isinstance(other, NumpyValue):
             return [{}] if other == self else []
@@ -268,6 +274,8 @@ def numme_atoms():
     pyTrue = ValueAtom(True)
     pyPINF = ValueAtom(float("inf"))
     nmTrue = G(PatternOperation("np.True_", wrapnpop(np.True_), unwrap=False))
+    nmItem = G(PatternOperation("np.item", wrapnpop(lambda arr, idx: arr.item(idx)), unwrap=False))
+    nmNonzero = G(PatternOperation("np.nonzero", wrapnpop(np.nonzero), unwrap=False))
 
     atomPi = ValueAtom(np.pi)
 
@@ -329,6 +337,8 @@ def numme_atoms():
         "np.True_": nmTrue,
         "py.assertIsNone": nmAssertIsNone,
         "np.sort": nmSort,
+        "np.item": nmItem,
+        "np.nonzero": nmNonzero,
         "np.reshape": nmReshape,
         "np.zeros": nmZeros,
         "np.isin": nmIsin,

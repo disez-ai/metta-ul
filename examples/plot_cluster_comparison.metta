@@ -60,15 +60,11 @@
 (: cycle (-> Expression Number Expression))
 (= (cycle $d $s) (r-cycle $d () $s))
 
-(= (count $x) (let* (
-      ($count (new-state 0))
-      ($_ 
-          (collapse (match &self $x 
-              (change-state! $count (+ (get-state $count) 1))))
-      )
-    )
-    (get-state $count)
-))
+(: count (-> Atom Number))
+(=
+  (count (quote $atom))
+  ((py-atom sum) (py-list (collapse (match &self $atom 1))))
+)
 
 !(bind! &colors ("#377eb8" "#ff7f00" "#4daf4a" "#f781bf" "#a65628" "#984ea3" "#999999" "#e41a1c" "#dede00"))
 (= (make-color $labels) 
@@ -181,16 +177,8 @@
 ; )
 
 
-!(bind! &tdc (count (ToyData $s $y)))
-!(bind! &agn (let* (
-      ($count (new-state 0))
-      ($_ 
-          (collapse (match &self (= (fit-predict $a $b) $y) 
-              (change-state! $count (+ (get-state $count) 1))))
-      )
-    )
-    (get-state $count)
-))
+!(bind! &tdc (count (quote (ToyData $s $y))))
+!(bind! &agn (count (quote (= (fit-predict $a $b) $y))))
 
 (= (plot-it $data $labels $algn $plt-idx) (
   let* (

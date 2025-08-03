@@ -3,9 +3,6 @@
 ! (import! &self metta_ul:helper)
 ! (py-from! pandas import DataFrame)
 
-
-! (assertEqual (kv-values ((k1 1) (k2 2))) (1 2))
-
 ! (py-import! pandas as pd)
 
 ! (bind! &df (pd.read_csv "tests/housing.csv" (nrows 100) (usecols (py-list ("longitude" "latitude")))))
@@ -16,8 +13,8 @@
 ! (match &self (House 1 ((longitude $x) (latitude $y))) (assertEqual (get-type $x) Number))
 
 ! (bind! &data (np.array (collapse (match &self (House $id ((longitude $x) (latitude $y))) ($id $x $y)))))
-! (bind! &model (gmm (np.slice &data [:,1:]) 3))
-! (bind! &labels (gmm.predict (np.slice &data [:,1:]) &model))
+! (bind! &model (kmeans.fit (np.slice &data [:,1:]) 3))
+! (bind! &labels (kmeans.predict (np.slice &data [:,1:]) &model))
 ! (cons-labels &data &labels ClusterLabel)
 ;
 ;

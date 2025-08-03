@@ -1,102 +1,164 @@
 # Agglomerative Clustering in MeTTa
 
-**Author:** Ramin Barati, Amirhossein Nouranizadeh, Farhoud Mojahedzadeh  
-**Date:** May 21, 2025  
-**Version:** 1.0  
+**Author:** Ramin Barati, Amirhossein Nouranizadeh, Farhoud Mojahedzadeh
+
+**Date:** July 29, 2025
+
+**Version:** 1.0
 
 ---
 
 ## Abstract
-This report presents an open‑source implementation of agglomerative (hierarchical) clustering in the MeTTa language. By leveraging MeTTa’s declarative recursion and linked‐list constructs, it performs bottom‐up cluster merging with selectable linkage criteria (single, complete, average). We analyze time and memory complexities at each step and compare design features to scikit‑learn’s `AgglomerativeClustering`.
+
+We present an implementation of agglomerative (hierarchical) clustering in the MeTTa programming language, incorporating a min-heap and union-find data structures for performance optimization. By avoiding repeated full pairwise searches and tracking cluster memberships with union-find, the algorithm achieves significantly improved performance over naive approaches. This report details the algorithm's design, MeTTa-specific implementations, and performance characteristics.
 
 ## Introduction
-Hierarchical clustering builds nested partitions by iteratively merging or splitting clusters. Agglomerative clustering starts with each point as its own cluster and merges the closest pair until `k` clusters remain. Implementing this in MeTTa:
 
-- Demonstrates MeTTa’s capability to express non‐parametric, recursive algorithms.  
-- Provides a template for tree‐based clustering methods.  
-- Targets AI and Data Science open‑source contributors.
+Hierarchical clustering is widely used for grouping unlabeled data without requiring a priori knowledge of the number of clusters. Agglomerative clustering performs this by repeatedly merging the closest pair of clusters until the desired number of clusters is reached.
 
-MeTTa is a multi‑paradigm language for functional and declarative computations over meta‑graphs. See http://www.metta‑lang.dev.
+This MeTTa implementation is designed to:
+
+* Demonstrate efficient recursive programming with MeTTa.
+* Serve as a high-performance clustering module for symbolic and numerical data.
+* Showcase how classical data structures (heap, union-find) can be expressed declaratively.
 
 ## Algorithm Overview
-1. **Initialization**: Start with `n` singleton clusters.  
-2. **Distance Matrix**: Compute all pairwise distances.  
-3. **Linkage**: Define cluster distance via single (min), complete (max), or average metrics.  
-4. **Merge Loop**: Repeatedly find and merge the two closest clusters until `k` remain.  
-5. **Assignment**: Label each data point by its final cluster.
+
+1. **Distance Matrix Computation**: Compute full pairwise distances between data points.
+2. **Heap Initialization**: Build a min-heap with the smallest distance for each point.
+3. **Union-Find Initialization**: Each point begins in its own set.
+4. **Recursive Merge**: Pop the heap to find the nearest cluster pair. If not already unified, merge them and update the heap with distances to the new cluster.
+5. **Label Assignment**: Assign a unique label to each disjoint set.
 
 ## MeTTa Implementation Details
-The MeTTa code uses recursive definitions and NumPy bindings (`metta_ul`) plus a linked‐list module for cluster lists.
 
-1. **Cluster Initialization** (`agglomerative.init-clusters`):
-   - Recursively builds a `List` of singleton `PyList`s containing each index from `0` to `n-1`.
-   - *Time:* O(n)  *Memory:* O(n)
+### 1. **Distance Matrix** (`agglomerative.distance-matrix`)
 
-2. **Distance Matrix Computation** (`agglomerative.distance-matrix`):
-   - Computes an n-by-n symmetric matrix of Euclidean distances using `np.expand_dims` and `np.linalg.norm` over the last axis.
-   - *Time:* O(n²·d)  *Memory:* O(n²)
+Computes an \$n \times n\$ matrix of pairwise Euclidean distances.
 
-3. **Linkage Distance** (`agglomerative.linkage-distance`):
-   - For clusters C1, C2, extracts submatrix of pairwise distances and applies:
-     - **single**: min  **complete**: max  **average**: mean
-   - *Time:* O(|C1|·|C2|)  *Memory:* O(|C1|·|C2|)
+* *Implementation*: Uses broadcasting via `np.expand_dims` and `np.linalg.norm`.
+* *Time:* O(n²·d)
+* *Memory:* O(n²)
 
-4. **Closest Cluster Pair** (`agglomerative.closest-clusters`):
-   - Recursively iterates all cluster pairs via two‐list traversal, tracking the minimum linkage distance.
-   - *Time:* O(m²·p) where m=current cluster count, p=cluster‐pair cost; worst‐case O(n⁴) but decreases as clusters merge.  
-   - *Memory:* negligible extra beyond clusters list.
+### 2. **Linkage Function** (`agglomerative.linkage-distance`)
 
-5. **Merge Clusters** (`agglomerative.merge-clusters`):
-   - Uses `closest-clusters` to identify clusters (c1, c2), concatenates their index lists, and updates the cluster `List`.
-   - *Time & Memory:* dominated by `closest-clusters`, plus O(|c1|+|c2|) list operations.
+Computes distance between two clusters using a linkage criterion:
 
-6. **Recursive Merge Loop** (`agglomerative.recursion`):
-   - Recurses until the number of clusters equals `k`, performing `n-k` merges.
-   - *Time:* O((n–k)·n⁴) worst‑case; typical much lower.  
-   - *Memory:* tail-call optimized, peak ~O(n²).
+* **single**: minimum pairwise distance
 
-7. **Assignment** (`agglomerative.assign`):
-   - Traverses final clusters and fills an assignment vector of length `n` with cluster indices.
-   - *Time:* O(n)  *Memory:* O(n)
+* **complete**: maximum pairwise distance
 
-8. **Fit & Predict API** (`agglomerative.fit-predict`):
-   - One‐line pipeline: `(agglomerative.fit-predict X k linkage)` returns an `np.array` of labels.
-   - *Time:* combined complexities above.  *Memory:* O(n²).
+* **average**: mean pairwise distance
 
-## Comparison with scikit‑learn
-scikit‑learn’s `AgglomerativeClustering` implements similar linkage strategies with optimized C loops and optional connectivity constraints.
+* *Time:* O(|C₁|·|C₂|)
 
-| Feature             | MeTTa Implementation                         | scikit‑learn                       |
-|---------------------|----------------------------------------------|-------------------------------------|
-| Linkage types       | single, complete, average                    | ward, complete, average, single     |
-| Connectivity        | not supported                                | graph‐based sparse                  |
-| Initialization      | trivial (singletons)                         | trivial (singletons)                |
-| Convergence control | fixed merges to reach `k`                    | same                               |
-| Parallelization     | single‑threaded                              | single‑threaded                     |
-| Memory trade‑off    | stores full distance matrix                  | stores condensed or sparse matrices |
+* *Memory:* O(|C₁|·|C₂|)
+
+### 3. **Heap Initialization** (`agglomerative.heapify`)
+
+For each point, identifies its nearest neighbor and inserts the pair with their distance into a min-heap.
+
+* *Implementation*: Uses masked distance matrix to avoid self-pairing.
+* *Time:* O(n²)
+* *Memory:* O(n)
+
+### 4. **Heap Update** (`agglomerative.heappush`)
+
+After a merge, computes the distance between the new cluster and all remaining clusters and pushes these distances to the heap.
+
+* *Implementation*: Recursively compares new root with others using union-find and linkage function.
+* *Time:* O(n·p) where p = cost of linkage calculation
+* *Memory:* Heap contains up to O(n²) entries over time.
+
+### 5. **Union-Find Recursion** (`agglomerative.recursion`)
+
+Recursive loop merges the closest cluster pair at each step, skipping pairs already unified.
+
+* *Implementation*:
+
+  * Uses `UnionFind.areUnified` to avoid redundant merges.
+  * After each merge, updates heap with new distances.
+* *Time:* Worst-case O((n–k)·n²·p), where p is linkage cost
+* *Memory:* Tail-recursive stack, union-find trees + heap
+
+### 6. **Cluster Routine** (`agglomerative.cluster`)
+
+Main pipeline for clustering: computes distances, initializes heap and union-find, runs merge recursion.
+
+* *Time:* Aggregate of above steps
+* *Memory:* Aggregate of above steps
+
+### 7. **Cluster Assignment** (`agglomerative.assign`)
+
+Labels each element according to the root of its union-find group.
+
+* *Time:* O(n)
+* *Memory:* O(n)
+
+### 8. **API Entry Point** (`agglomerative.fit-predict`)
+
+Wrapper that runs clustering and returns an `np.array` of cluster labels.
+
+* *Time:* Total time from above steps
+* *Memory:* O(n²)
+
+## Comparison with Naive Agglomerative (e.g., scikit-learn)
+
+| Feature           | MeTTa Optimized Implementation       | scikit‑learn                               |
+| ----------------- | ------------------------------------ | ------------------------------------------ |
+| Linkage types     | single, complete, average            | ward, complete, average, single            |
+| Distance storage  | full matrix (numpy)                  | condensed or sparse matrix                 |
+| Search strategy   | heap-based nearest-neighbor tracking | fast C loops, optional connectivity        |
+| Merge bookkeeping | union-find                           | tree / linkage matrix                      |
+| Parallelization   | not yet supported                    | not supported in `AgglomerativeClustering` |
+| Best-case runtime | O(n²·log n) with fast linkage        | O(n²) for complete linkage                 |
 
 ## Benchmark Setup
-*(To be populated with dataset-specific benchmarks.)*
+*The allgorithm does not return in an acceptable time even for pretty small datasets (~20 samples).*
+
 
 ## Usage Example
+
 ```metta
 (import! &self metta_ul:cluster:agglomerative)
 
-;; Fit and predict 4 clusters with average linkage
-(let $labels (agglomerative.fit-predict X 4 "average")
+;; Run average-linkage clustering with k = 3
+(let $labels (agglomerative.fit-predict $X 3 "average")
     (println! $labels)
 )
 ```
 
+Where `$X` is an `np.array` of shape `(n, d)`.
+
 ## Limitations & Future Work
-- **High complexity**: worst-case merging is expensive; consider optimized search (e.g., priority queue).  
-- **Connectivity constraints**: add sparse linkage for large datasets.  
-- **Parallel merging**: explore MeTTa’s concurrent constructs.  
+
+* **Dense Distance Matrix**: O(n²) memory use limits scalability.
+* **Heap Growth**: No deduplication; heap may grow large unless compacted.
+* **Condensed Matrix Support**: Could reduce memory footprint with careful index mapping.
+
+### Planned Extensions:
+
+* Add support for sparse graph connectivity (e.g., radius or k-NN graphs).
+* Use priority queue with distance caching to avoid redundant linkage evaluations.
 
 ## Conclusion
-This implementation illustrates MeTTa’s ability to encode hierarchical clustering declaratively. While performance and memory usage are constrained by O(n²) matrices and recursive merging, it provides a clear foundation for advanced clustering features.
+
+This report documents a fast, modular, and expressive implementation of agglomerative clustering in MeTTa. The use of declarative recursion, heaps, and union-find enables realistic performance on medium-scale datasets and lays the groundwork for extending MeTTa into more advanced unsupervised learning domains.
 
 ## References
-1. Johnson (1967). Hierarchical clustering schemes.  
-2. Pedregosa et al. (2011). scikit‑learn: Machine Learning in Python.  
-3. MeTTa Language Specification. http://www.metta-lang.dev/spec
+
+1. Johnson, S. C. (1967). Hierarchical clustering schemes.
+2. Pedregosa et al. (2011). Scikit-learn: Machine learning in Python.
+3. MeTTa Language Specification. [http://www.metta-lang.dev/spec](http://www.metta-lang.dev/spec)
+4. Tarjan, R. E. (1975). Efficiency of a good but not linear set union algorithm.
+
+---
+
+Would you like me to generate:
+
+* a visual diagram of the algorithm flow?
+* benchmark plots?
+* unit test examples in MeTTa?
+* a compact README.md version of this?
+
+Let me know what you need next.

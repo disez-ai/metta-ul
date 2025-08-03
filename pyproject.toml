@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "metta-ul"
-version = "0.1.0"
+version = "1.0.0"
 authors = [
     { name = "Ramin Barati", email = "rekino@gmail.com" },
     { name = "Amirhossein Nouranizadeh", email = "amirhossein.nouranizadeh@gmail.com" },
@@ -16,9 +16,8 @@ readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "hyperon",
-    "scikit-learn",
     "pandas",
-    "seaborn",
+    "numpy"
 ]
 
 [project.optional-dependencies]
