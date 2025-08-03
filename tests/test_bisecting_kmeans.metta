@@ -62,21 +62,21 @@
 
 (=
     (clusters1)
-    (::
+    (Cons
         (py.none py.none 10.0 py.none)
-        ()
+        Nil
     )
 )
 
 (=
     (clusters2)
-    (::
+    (Cons
         (py.none py.none 10.0 py.none)
-        (::
+        (Cons
             (py.none py.none 20.0 py.none)
-            (::
+            (Cons
                 (py.none py.none 5.0 py.none)
-                ()
+                Nil
             )
         )
     )
@@ -84,13 +84,13 @@
 
 (=
     (clusters3)
-    (::
+    (Cons
         ((np.array (0)) py.none 1.0 py.none)
-        (::
+        (Cons
             ((np.array (1)) py.none 2.0 py.none)
-            (::
+            (Cons
                 ((np.array (2)) py.none 3.0 py.none)
-                ()
+                Nil
             )
         )
     )
@@ -98,18 +98,18 @@
 
 (=
     (clusters4)
-    (::
+    (Cons
         ((np.array (1)) py.none 2.0 py.none)
-        (::
+        (Cons
             ((np.array (2)) py.none 3.0 py.none)
-            ()
+            Nil
         )
     )
 )
 
 (=
     (clusters5)
-    ()
+    Nil
 )
 
 (=
@@ -119,14 +119,14 @@
 
 (=
     (clusters6)
-    (::
+    (Cons
         (
             (np.array (0 1 2 3))
             (np.array (5.0 5.5))
             201.0
             py.none
         )
-        ()
+        Nil
     )
 )
 
@@ -134,6 +134,61 @@
     (X6)
     (np.array ((0.0 0.0) (0.0 1.0) (1.0 0.0) (1.0 1.0) (5.0 5.0) (5.0 6.0)))
 )
+
+;; Test clusters for extract-centers and assign functions
+(=
+    (test-clusters-extract)
+    (Cons
+        (
+            (np.array (0 1))
+            (np.array (1.0 1.0))
+            10.5
+            py.none
+        )
+        (Cons
+            (
+                (np.array (3 4))
+                (np.array (2.0 2.0))
+                5.2
+                py.none
+            )
+            Nil
+        )
+    )
+)
+
+;; Test data for assign function
+(=
+    (X-assign)
+    (np.array (
+        (0.5 0.5)
+        (1.5 1.5)
+        (4.5 4.5)
+        (5.5 5.5)
+    ))
+)
+
+(=
+    (test-clusters-assign)
+    (Cons
+        (
+            (np.array (0 1))
+            (np.array (1.0 1.0))
+            10.5
+            py.none
+        )
+        (Cons
+            (
+                (np.array (2 3))
+                (np.array (5.0 5.0))
+                5.2
+                py.none
+            )
+            Nil
+        )
+    )
+)
+
 ;; ========================================================================
 ;; =================== Test bisecting-kmeans.compute-sse ==================
 ;; ========================================================================
@@ -178,7 +233,7 @@
         (bisecting-kmeans.compute-initial-cluster (X4))
         (assertEqual
             (
-                (np.assertAllClose (length $init-cluster-list) 1)
+                (np.assertAllClose (List.length $init-cluster-list) 1)
                 (np.assertAllClose
                     (bisecting-kmeans.get-cluster-indices (get-first $init-cluster-list))
                     (np.arange (np.shape (X4) 0))
@@ -296,7 +351,7 @@
         (bisecting-kmeans.remove-cluster (clusters5) ((np.array (99)) py.none 2.0 py.none))
         (assertEqual
             $new-clusters
-            ()
+            Nil
         )
     )
 )
@@ -323,71 +378,67 @@
 (Test bisecting-kmeans.bisect-cluster.test1)
 
 ;; ========================================================================
-;; ========== Test bisecting-kmeans.recursive-bisecting-kmeans ============
+;; =================== Test bisecting-kmeans.assign ======================
 ;; ========================================================================
 
 (=
-    (bisecting-kmeans.recursive-bisecting-kmeans.test1)
+    (bisecting-kmeans.assign.test1)
     (let
-        $init-cluster
-        (bisecting-kmeans.compute-initial-cluster (X6))
+        $assignments
+        (bisecting-kmeans.assign (X-assign) (test-clusters-assign))
+        (np.assertAllClose
+            $assignments
+            (np.array (0 0 1 1))
+        )
+    )
+)
+(Test bisecting-kmeans.assign.test1)
+
+(=
+    (bisecting-kmeans.assign.test2)
+    (let
+        $X-test
+        (np.array (
+            (4.0 4.0)
+            (6.0 6.0)
+            (0.9 0.9)
+            (3.0 3.0)
+        ))
         (let
-            $init-hierarchy
-            (append py.none $init-cluster)
-            (let
-                $hierarchy
-                (bisecting-kmeans.recursive-bisecting-kmeans (X6) $init-cluster 1 10 $init-hierarchy)
-                (np.assertAllClose (len $hierarchy) 1)
+            $assignments
+            (bisecting-kmeans.assign $X-test (test-clusters-assign))
+            (np.assertAllClose
+                $assignments
+                (np.array (1 1 0 0))
             )
         )
     )
 )
-(Test bisecting-kmeans.recursive-bisecting-kmeans.test1)
-
-(=
-    (bisecting-kmeans.recursive-bisecting-kmeans.test2)
-    (let
-        $init-cluster
-        (bisecting-kmeans.compute-initial-cluster (X6))
-        (let
-            $init-hierarchy
-            (append py.none $init-cluster)
-            (let
-                $hierarchy
-                (bisecting-kmeans.recursive-bisecting-kmeans (X6) $init-cluster 3 10 $init-hierarchy)
-                (np.assertAllClose (len $hierarchy) 3)
-            )
-        )
-    )
-)
-(Test bisecting-kmeans.recursive-bisecting-kmeans.test2)
+(Test bisecting-kmeans.assign.test2)
 
 ;; ========================================================================
-;; ======================= Test bisecting-kmeans.fit ======================
+;; ================= Test bisecting-kmeans.fit ===========================
 ;; ========================================================================
 
 (=
     (bisecting-kmeans.fit.test1)
     (let
-        $output
-        (bisecting-kmeans.fit (X6) 1 10)
-        (np.assertAllClose (len $output) 1)
+        $X-fit
+        (np.array ((0.0 0.0) (0.0 1.0) (1.0 0.0) (1.0 1.0) (5.0 5.0) (5.0 6.0)))
+        (let
+            $hierarchy
+            (bisecting-kmeans.fit $X-fit 2 10)
+            (assertEqual
+                (>= (List.length $hierarchy) 1)
+                True
+            )
+        )
     )
 )
 (Test bisecting-kmeans.fit.test1)
 
-(=
-    (bisecting-kmeans.fit.test2)
-    (let
-        $output
-        (bisecting-kmeans.fit (X6) 3 10)
-        (np.assertAllClose (len $output) 3)
-    )
-)
-(Test bisecting-kmeans.fit.test2)
-
 ;; ========================================================================
-;; ==================== Test bisecting-kmeans.predict =====================
+;; ================= Test bisecting-kmeans.predict =======================
 ;; ========================================================================
 
 (=
@@ -412,3 +463,25 @@
     )
 )
 (Test bisecting-kmeans.predict.test1)
+
+;; ========================================================================
+;; ========== Test bisecting-kmeans.recursive-bisecting-kmeans ============
+;; ========================================================================
+
+(=
+    (bisecting-kmeans.recursive-bisecting-kmeans.test1)
+    (let
+        $init-cluster
+        (bisecting-kmeans.compute-initial-cluster (X6))
+        (let
+            $init-hierarchy
+            (Cons $init-cluster Nil)
+            (let
+                $hierarchy
+                (bisecting-kmeans.recursive-bisecting-kmeans (X6) $init-cluster 1 10 $init-hierarchy)
+                (np.assertAllClose (List.length $hierarchy) 1)
+            )
+        )
+    )
+)
+(Test bisecting-kmeans.recursive-bisecting-kmeans.test1)

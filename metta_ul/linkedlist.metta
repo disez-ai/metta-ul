@@ -61,6 +61,15 @@
     (Cons $x (List.append $y $xs))
 )
 
+(: List.appendElement (-> (List $a) $a (List $a)))
+(= (List.appendElement Nil $a)
+   (if (== $a Nil) Nil (Cons $a Nil)))
+(= (List.appendElement (Cons $x $xs) $a)
+   (if (== $a Nil)
+       (Cons $x $xs)
+       (Cons $x (List.appendElement $xs $a))))
+
+
 (: List.length (-> (List $a) Number))
 (= (List.length Nil) 0)
 (= (List.length (Cons $x $xs)) (+ 1 (List.length $xs)))
