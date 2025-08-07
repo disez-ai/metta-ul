@@ -23,8 +23,8 @@ class NumpyValue(MatchableObject):
             # work around should be replaced with the appropriate logic when CGrounded is fixed. 
             try:
                 other = other.get_object()
-            finally:
-                pass
+            except:
+                print(f'NumpyValue.match_: {other} is not python serializable')
         # Match by equality with another NumpyValue
         if isinstance(other, NumpyValue):
             return [{}] if other == self else []
