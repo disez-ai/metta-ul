@@ -651,7 +651,7 @@
         (spectral-clustering.fit (X-Fit) 2)
         (let
             $pred
-            (spectral-clustering.predict $fit-outputs 2)
+            (spectral-clustering.predict $fit-outputs)
             (assertEqual
                 (
                     (np.assertAllClose (np.slice $pred [0]) (np.slice $pred [1]))
@@ -690,7 +690,7 @@
         (spectral-clustering.fit (X-Fit) 2 1 100)
         (let
             $pred
-            (spectral-clustering.predict $fit-outputs 2)
+            (spectral-clustering.predict $fit-outputs)
             (assertEqual
                 (
                     (np.assertAllClose (np.slice $pred [0]) (np.slice $pred [1]))

@@ -247,8 +247,6 @@ Predicts the cluster assignment for each data point in the dataset using the spe
   1. `$embeddings`: The spectral embedding matrix.
   2. `$centroids`: The centroids obtained from the clustering step.
   - Type: `((NPArray ($N $C)) (NPArray ($K $C)))`
-- `$num-clusters`: The number of clusters.
-  - Type: `Number`
 
 #### Returns:
 - A vector of cluster labels, one for each data point, determined by assigning each point to the nearest centroid.
@@ -278,8 +276,7 @@ To predict the cluster labels for the dataset `S`:
 (=
     (cluster-labels)
     (spectral-clustering.predict
-        (embeddings-and-centroids)        
-        3
+        (embeddings-and-centroids)
     )    
 )
 ```
