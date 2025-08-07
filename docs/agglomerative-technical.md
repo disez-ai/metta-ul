@@ -97,7 +97,7 @@ Labels each element according to the root of its union-find group.
 
 ### 8. **API Entry Point** (`agglomerative.fit-predict`)
 
-Wrapper that runs clustering and returns an `np.array` of cluster labels.
+Wrapper that runs clustering and returns an `NPArray` of cluster labels.
 
 * *Time:* Total time from above steps
 * *Memory:* O(n²)
@@ -128,7 +128,7 @@ Wrapper that runs clustering and returns an `np.array` of cluster labels.
 )
 ```
 
-Where `$X` is an `np.array` of shape `(n, d)`.
+Where `$X` is of type `(NPArray ($n $d))`.
 
 ## Limitations & Future Work
 
@@ -143,22 +143,11 @@ Where `$X` is an `np.array` of shape `(n, d)`.
 
 ## Conclusion
 
-This report documents a fast, modular, and expressive implementation of agglomerative clustering in MeTTa. The use of declarative recursion, heaps, and union-find enables realistic performance on medium-scale datasets and lays the groundwork for extending MeTTa into more advanced unsupervised learning domains.
+This report documents a fast (in theory), modular, and expressive implementation of agglomerative clustering in MeTTa. The use of declarative recursion, heaps, and union-find enables realistic performance on medium-scale datasets and lays the groundwork for extending MeTTa into more advanced unsupervised learning domains. However, in practice, the allgorithm is extremely slow to execute even for pretty small datasets. This might be caused by the mentioned issue of heap growth. We might be able to alleviate this by replacing the leftist heap with an indexed heap, but that requires some implementation of a collection that has O(1) complexity in accessing the elements, otherwise no performance gain could be observed over this lazy strategy that we have implemented here.
 
 ## References
 
 1. Johnson, S. C. (1967). Hierarchical clustering schemes.
 2. Pedregosa et al. (2011). Scikit-learn: Machine learning in Python.
-3. MeTTa Language Specification. [http://www.metta-lang.dev/spec](http://www.metta-lang.dev/spec)
+3. MeTTa Language Specification. [http://www.metta-lang.dev](http://www.metta-lang.dev)
 4. Tarjan, R. E. (1975). Efficiency of a good but not linear set union algorithm.
-
----
-
-Would you like me to generate:
-
-* a visual diagram of the algorithm flow?
-* benchmark plots?
-* unit test examples in MeTTa?
-* a compact README.md version of this?
-
-Let me know what you need next.
