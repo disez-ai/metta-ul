@@ -238,16 +238,8 @@
 )
 
 ; Predict the cluster assignments of data given spectral embeddings, centroids and number of clusters.
-(: spectral-clustering.predict (-> ((NPArray ($N $C)) (NPArray ($K $C))) Number ((NPArray ($N)))))
+(: spectral-clustering.predict (-> ((NPArray ($N $C)) (NPArray ($K $C))) ((NPArray ($N)))))
 (=
-    (spectral-clustering.predict ($embeddings $centroids) $num-clusters)
-    (np.argmax
-        (np.transpose
-            (kmeans.assign
-                $embeddings
-                $centroids
-            )
-        )
-        1
-    )
+    (spectral-clustering.predict ($embeddings $centroids))
+    (kmeans.predict $embeddings $centroids)
 )
