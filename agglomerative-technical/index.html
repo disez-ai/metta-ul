@@ -1575,7 +1575,7 @@
 <li><em>Memory:</em> O(n)</li>
 </ul>
 <h3 id="8-api-entry-point-agglomerativefit-predict">8. <strong>API Entry Point</strong> (<code>agglomerative.fit-predict</code>)</h3>
-<p>Wrapper that runs clustering and returns an <code>np.array</code> of cluster labels.</p>
+<p>Wrapper that runs clustering and returns an <code>NPArray</code> of cluster labels.</p>
 <ul>
 <li><em>Time:</em> Total time from above steps</li>
 <li><em>Memory:</em> O(n²)</li>
@@ -1632,7 +1632,7 @@
     (println! $labels)
 )
 </code></pre></div>
-<p>Where <code>$X</code> is an <code>np.array</code> of shape <code>(n, d)</code>.</p>
+<p>Where <code>$X</code> is of type <code>(NPArray ($n $d))</code>.</p>
 <h2 id="limitations-future-work">Limitations &amp; Future Work</h2>
 <ul>
 <li><strong>Dense Distance Matrix</strong>: O(n²) memory use limits scalability.</li>
@@ -1645,23 +1645,14 @@
 <li>Use priority queue with distance caching to avoid redundant linkage evaluations.</li>
 </ul>
 <h2 id="conclusion">Conclusion</h2>
-<p>This report documents a fast, modular, and expressive implementation of agglomerative clustering in MeTTa. The use of declarative recursion, heaps, and union-find enables realistic performance on medium-scale datasets and lays the groundwork for extending MeTTa into more advanced unsupervised learning domains.</p>
+<p>This report documents a fast (in theory), modular, and expressive implementation of agglomerative clustering in MeTTa. The use of declarative recursion, heaps, and union-find enables realistic performance on medium-scale datasets and lays the groundwork for extending MeTTa into more advanced unsupervised learning domains. However, in practice, the allgorithm is extremely slow to execute even for pretty small datasets. This might be caused by the mentioned issue of heap growth. We might be able to alleviate this by replacing the leftist heap with an indexed heap, but that requires some implementation of a collection that has O(1) complexity in accessing the elements, otherwise no performance gain could be observed over this lazy strategy that we have implemented here.</p>
 <h2 id="references">References</h2>
 <ol>
 <li>Johnson, S. C. (1967). Hierarchical clustering schemes.</li>
 <li>Pedregosa et al. (2011). Scikit-learn: Machine learning in Python.</li>
-<li>MeTTa Language Specification. <a href="http://www.metta-lang.dev/spec">http://www.metta-lang.dev/spec</a></li>
+<li>MeTTa Language Specification. <a href="http://www.metta-lang.dev">http://www.metta-lang.dev</a></li>
 <li>Tarjan, R. E. (1975). Efficiency of a good but not linear set union algorithm.</li>
 </ol>
-<hr />
-<p>Would you like me to generate:</p>
-<ul>
-<li>a visual diagram of the algorithm flow?</li>
-<li>benchmark plots?</li>
-<li>unit test examples in MeTTa?</li>
-<li>a compact README.md version of this?</li>
-</ul>
-<p>Let me know what you need next.</p>
 
 
 

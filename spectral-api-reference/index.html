@@ -2704,8 +2704,6 @@
 <li><code>$embeddings</code>: The spectral embedding matrix.</li>
 <li><code>$centroids</code>: The centroids obtained from the clustering step.</li>
 <li>Type: <code>((NPArray ($N $C)) (NPArray ($K $C)))</code></li>
-<li><code>$num-clusters</code>: The number of clusters.</li>
-<li>Type: <code>Number</code></li>
 </ul>
 <h4 id="returns_17">Returns:</h4>
 <ul>
@@ -2732,8 +2730,7 @@
 <div class="highlight"><pre><span></span><code>(=
     (cluster-labels)
     (spectral-clustering.predict
-        (embeddings-and-centroids)        
-        3
+        (embeddings-and-centroids)
     )    
 )
 </code></pre></div></p>
