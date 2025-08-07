@@ -3,7 +3,6 @@
 ! (import! &self metta_ul:helper)
 
 ! (py-import! pandas as pd)
-! (py-import! numpy as unp)
 ! (py-from! sklearn.preprocessing import StandardScaler)
 ! (py-from! sklearn.preprocessing import OneHotEncoder)
 ! (py-from! sklearn.impute import SimpleImputer)
@@ -28,7 +27,7 @@
         ($imputed-numerical-numpy (SimpleImputer.fit_transform $imputer $numerical-numpy))
         ($one-encoder (OneHotEncoder (handle_unknown "ignore") (sparse_output (py-atom False))))
         ($encoded-numpy (OneHotEncoder.fit_transform $one-encoder $categorical-numpy))
-        ($X (unp.concatenate (py-tuple ($imputed-numerical-numpy $encoded-numpy)) (axis 1)))
+        ($X (np.concat (py-tuple ($imputed-numerical-numpy $encoded-numpy)) 1))
         ($scaler (StandardScaler))
         ($X-scaled (StandardScaler.fit_transform $scaler $X))
     ) $X-scaled)
@@ -40,7 +39,7 @@
 (= (fit-predict $ds)  
   (let* (
     ($model (spectral-clustering.fit $ds 3))
-    ($labels (spectral-clustering.predict $model 3))
+    ($labels (spectral-clustering.predict $model))
   ) $labels )
 )
 
