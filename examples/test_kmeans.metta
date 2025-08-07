@@ -2,12 +2,12 @@
 ! (import! &self metta_ul:cluster:kmeans)
 
 ! (py-import! pandas as pd)
-! (py-import! numpy as unp)
 ! (py-from! sklearn.preprocessing import StandardScaler)
 ! (py-from! sklearn.preprocessing import OneHotEncoder)
 ! (py-from! sklearn.impute import SimpleImputer)
 ! (py-from! sklearn.manifold import TSNE)
 ! (py-import! seaborn as usns)
+! (py-import! matplotlib.pyplot as plt)
 
 ! (bind! &df (pd.DataFrame.values (pd.read_csv "tests/housing.csv")))
 
@@ -19,7 +19,7 @@
         ($imputed-numerical-numpy (SimpleImputer.fit_transform $imputer $numerical-numpy))
         ($one-encoder (OneHotEncoder (handle_unknown "ignore") (sparse_output (py-atom False))))
         ($encoded-numpy (OneHotEncoder.fit_transform $one-encoder $categorical-numpy))
-        ($X (unp.concatenate (py-tuple ($imputed-numerical-numpy $encoded-numpy)) (axis 1)))
+        ($X (np.concat (py-tuple ($imputed-numerical-numpy $encoded-numpy)) 1))
         ($scaler (StandardScaler))
         ($X-scaled (StandardScaler.fit_transform $scaler $X))
     ) $X-scaled)
@@ -48,3 +48,5 @@
 ! (bind! &plot (usns.scatterplot (x (ul-slice &X-reduced [:,0])) (y (ul-slice &X-reduced [:,1])) (hue &labels)))
 
 ! (println! ("data" (get-type &plot)))
+
+! (plt.show)
