@@ -163,7 +163,7 @@
     (() (println! ("start spectral-clustering on " $dn "data type" (get-type $ds))))
     (($model $t1) (timeit (quote (spectral-clustering.fit $ds (get-param $dn n_clusters)))))
     (() (println! ("fitted" $dn)))
-    (($labels $t2) (timeit (quote (spectral-clustering.predict $model (get-param $dn n_clusters)))))
+    (($labels $t2) (timeit (quote (spectral-clustering.predict $model))))
     (() (println! ("spectral-clustering done on " $dn take (+ $t1 $t2))))
   ) ($labels "SpectralClustering" (+ $t1 $t2)))
 )

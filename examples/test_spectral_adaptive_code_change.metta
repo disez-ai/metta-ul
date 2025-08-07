@@ -59,7 +59,7 @@
 (= (fit-predict $ds)
   (let* (
     ($model (spectral-clustering.fit $ds 3 5 100))
-    ($labels (spectral-clustering.predict $model 3))
+    ($labels (spectral-clustering.predict $model))
   ) $labels )
 )
 
